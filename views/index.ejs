@@ -3,21 +3,15 @@
 <html>
 <head>
 	<title>Node Authentication</title>
-	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css"> <!-- load bootstrap css -->
-	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css"> <!-- load fontawesome -->
-	<style>
-		body 		{ padding-top:80px; }
-	</style>
+	<link rel="stylesheet" type="text/css" href="style/bootstrap.css">
+	<link rel="stylesheet" type="text/css" href="style/index.css">
+	<link rel="stylesheet" type="text/css" href="style/font-awesome-4.7.0/css/font-awesome.css">
 </head>
 <body>
     <div class="container">
-        <div class="jumbotron text-center">
-            <h1><span class="fa fa-lock"></span> Node Authentication</h1>
-
-            <p>Login or Register with:</p>
-
-            <a href="/login" class="btn btn-default"><span class="fa fa-user"></span> Local Login</a>
-            <a href="/signup" class="btn btn-default"><span class="fa fa-user"></span> Local Signup</a>
+        <div class="jumbotron text-center login-alert">
+            <h1><span class="fa fa-lock"></span> Please login first</h1>
+						<a href="/login" class="btn btn-default"><span class="fa fa-user"></span>Login</a>
         </div>
     </div>
 </body>

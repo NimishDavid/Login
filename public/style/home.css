@@ -1,0 +1,13 @@
+/*.header img, .header button {
+  display: inline-block;
+  font-size: default;
+}
+
+.header img {
+  height: 50px;
+}
+
+.header {
+  padding: 20px;
+  border-bottom: 1px solid lightgray;
+}*/
