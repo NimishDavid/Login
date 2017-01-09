@@ -5,6 +5,5 @@ module.exports = {
         'user': 'root',
         'password': 'ndm0150040'
     },
-	'database': 'college',
-    'users_table': 'users'
+	'database': 'bug_tracker'
 };
