@@ -1,7 +1,3 @@
-// server.js
-
-// set up ======================================================================
-// get all the tools we need
 var express  = require('express');
 var session  = require('express-session');
 var cookieParser = require('cookie-parser');
@@ -13,38 +9,35 @@ var port     = process.env.PORT || 8000;
 var passport = require('passport');
 var flash    = require('connect-flash');
 
-// configuration ===============================================================
-// connect to our database
+// Configuration connect to database
 
-require('./config/passport')(passport); // pass passport for configuration
+require('./config/passport')(passport); // Pass passport for configuration
 
-
-
-// set up our express application
-app.use(morgan('dev')); // log every request to the console
-app.use(cookieParser()); // read cookies (needed for auth)
+// Set up our express application
+app.use(morgan('dev')); // Log every request to the console
+app.use(cookieParser()); // Read cookies (needed for auth)
 app.use(bodyParser.urlencoded({
 	extended: true
 }));
 app.use(bodyParser.json());
 
-app.set('view engine', 'ejs'); // set up ejs for templating
+app.set('view engine', 'ejs'); // Set up ejs for templating
 
-// required for passport
+// Required for passport
 app.use(session({
-	secret: 'vidyapathaisalwaysrunning',
+	secret: 'nimishdm',
 	resave: true,
 	saveUninitialized: true
- } )); // session secret
+} )); // Session secret
 app.use(passport.initialize());
-app.use(passport.session()); // persistent login sessions
-app.use(flash()); // use connect-flash for flash messages stored in session
+app.use(passport.session()); // Persistent login sessions
+app.use(flash()); // Use connect-flash for flash messages stored in session
 
 app.use(express.static(__dirname + '/public'));
 
-// routes ======================================================================
-require('./app/routes.js')(app, passport); // load our routes and pass in our app and fully configured passport
+// Load routes passing app and passport
+require('./app/routes.js')(app, passport);
 
-// launch ======================================================================
+// Start Server
 app.listen(port);
-console.log('The magic happens on port ' + port);
+console.log('Server listening at port ' + port);
