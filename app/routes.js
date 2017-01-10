@@ -45,11 +45,8 @@ module.exports = function(app, passport) {
 		if(req.user.priority == 1) {
 			var projects;
 			connection.query("SELECT * FROM projects", function(err, rows){
-                if (err)
-                    return (err);
-                if (!rows.length) {
-                    return ("No data"); // req.flash is the way to set flashdata using connect-flash
-                }
+				if(err)
+					throw(err);
 				res.render('reportBug.ejs', {
 					user : req.user,
 					proj : rows,

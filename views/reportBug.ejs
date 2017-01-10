@@ -28,15 +28,23 @@
 								<label>Bug Type :</label>
                                 <select class="form-control" name="bug_type" required>
                                  <option value="">Select Bug type</option>
+                                 <option value="Type A">Type A</option>
+                                 <option value="Type B">Type B</option>
+                                 <option value="Type C">Type C</option>
                                 </select>
                                 <div class="help-block with-errors"></div>
 							</div>
                             <div class="col-sm-4 form-group">
 								<label>Project</label>
                                 <select class="form-control" name="project" required>
-                                    <% for(i=0;i<len;i++) {%>
-                                    <option value = <%= proj[i].name %>><%= proj[i].name %></option>
-                                    <% } %>
+                                        <% if(len==0) { %>
+                                            <option value = "">Database Empty</option>
+                                        <% } else { %>
+                                            <option value = "">Select Project</option>
+                                            <% for(i=0;i<len;i++) {%>
+                                            <option value = <%= proj[i].name %> > <%= proj[i].name %> </option>
+                                            <% } %>
+                                        <% } %>
                                 </select>
                                 <div class="help-block with-errors"></div>
 							</div>
@@ -50,14 +58,20 @@
 							<div class="col-sm-3 form-group">
 								<label>Severity</label>
                                 <select class="form-control" name="severity" required>
-                                 <option value="volvo">Volvo</option>
+                                 <option value="">Select severity</option>
+                                 <option value="Minor">Minor</option>
+                                 <option value="Major">Major</option>
+                                 <option value="Critical">Critical</option>
                                 </select>
                                 <div class="help-block with-errors"></div>
 							</div>
                             <div class="col-sm-3 form-group">
 								<label>Priority</label>
                                 <select class="form-control" name="priority" required>
-                                 <option value="volvo">Volvo</option>
+                                    <option value="">Select priority</option>
+                                    <option value="Low">Low</option>
+                                    <option value="Moderate">Moderate</option>
+                                    <option value="High">High</option>
                                 </select>
                                 <div class="help-block with-errors"></div>
 							</div>
@@ -81,7 +95,12 @@
                             <div class="col-sm-3 form-group">
 								<label>Status</label>
                                 <select class="form-control" name="status" required>
-                                 <option value="volvo">Volvo</option>
+                                 <option value="">Select status</option>
+                                 <option value="Open">Open</option>
+                                 <option value="Resolving">Resolving</option>
+                                 <option value="Review">Review</option>
+                                 <option value="Approval">Approval</option>
+                                 <option value="Closed">Closed</option>
                                 </select>
                                 <div class="help-block with-errors"></div>
 							</div>
