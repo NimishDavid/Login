@@ -1,5 +1,10 @@
 module.exports = function(app, passport) {
 
+	var dbconfig = require('../config/database');
+	var mysql = require('mysql');
+	var connection = mysql.createConnection(dbconfig.connection);
+	connection.query('USE ' + dbconfig.database);
+
 	// Index page
 	app.get('/', function(req, res) {
 		res.render('index.ejs'); // load the index.ejs file
@@ -34,6 +39,27 @@ module.exports = function(app, passport) {
 		res.render('home.ejs', {
 			user : req.user // Get the user out of session and pass to template.
 		});
+	});
+
+	app.get('/home/reportBug', isLoggedIn, function(req, res) {
+		if(req.user.priority == 1) {
+			var projects;
+			connection.query("SELECT * FROM projects", function(err, rows){
+                if (err)
+                    return (err);
+                if (!rows.length) {
+                    return ("No data"); // req.flash is the way to set flashdata using connect-flash
+                }
+				res.render('reportBug.ejs', {
+					user : req.user,
+					proj : rows,
+					len : rows.length
+				});
+			});
+		}
+		else {
+			res.end("Forbidden access");
+		}
 	});
 
 	// Logout
