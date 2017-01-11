@@ -1,4 +1,4 @@
-module.exports = function(app, passport) {
+module.exports = function(app, passport, expressValidator) {
 
 	var dbconfig = require('../config/database');
 	var mysql = require('mysql');
@@ -57,6 +57,117 @@ module.exports = function(app, passport) {
 		else {
 			res.end("Forbidden access");
 		}
+	});
+
+	app.post('/home/reportBug', isLoggedIn, function(req, res) {
+
+		if(req.user.priority == 1) {
+			var message;
+
+			req.assert('bug_name', 'Bug name is required').notEmpty();
+		    req.assert('bug_type', 'Bug type is required').notEmpty();
+			req.assert('project', 'Project ID is required').notEmpty().isNumeric();
+			req.assert('bug_description', 'Bug Description is required').notEmpty().isLength(50,200);
+			req.assert('severity', 'Severity is required').notEmpty();
+			req.assert('priority', 'Priority is required').notEmpty();
+			req.assert('file', 'File is required').notEmpty();
+			req.assert('method', 'Method is required').notEmpty();
+			req.assert('line', 'Line number is required').notEmpty().isNumeric();
+
+		    var errors = req.validationErrors();
+		    if( !errors){   //No errors were found.  Passed Validation!
+
+				var dbQuery = "INSERT INTO `bug_tracker`.`bugs` (`id`, `name`, `bug_type`, `description`, `project_id`, `file`, `method`, `line`, `priority`, `severity`, `status`, `developer_id`) VALUES (NULL, \""+req.body.bug_name+"\", \""+req.body.bug_type+"\", \""+req.body.bug_description+"\", \""+req.body.project+"\", \""+req.body.file+"\", \""+req.body.method+"\", \""+req.body.line+"\", \""+req.body.priority+"\", \""+req.body.severity+"\", \"Open\", NULL)";
+
+				connection.query(dbQuery, function(err, rows){
+					if(err)
+						throw(err);
+					else {
+						console.log("Bug report successful");
+						message = "success";
+						res.render('reportBug.ejs', {
+							user : req.user,
+							msg : message
+						});
+					}
+				});
+		    }
+		    else {   //Display errors to user
+				console.log("Bug report failed");
+				message = "error";
+				res.render('reportBug.ejs', {
+					user : req.user,
+					msg : message
+				});
+		    }
+		}
+		else {
+			res.end("Forbidden access");
+		}
+
+	});
+
+	app.get('/home/unassignedBugs', isLoggedIn, function(req, res) {
+
+		if(req.user.priority == 0) {
+			function getProjects() {
+
+				return new Promise(function(resolve, reject) {
+
+					connection.query("SELECT id FROM projects WHERE manager_id = "+req.user.id, function(err, projectsRes){
+						if(err)
+							reject(err);
+						else {
+							resolve(projectsRes);
+						}
+					});
+
+				});
+
+			}
+
+			getProjects()
+			.then(function(projectsRes) {
+				return new Promise(function(resolve, reject) {
+						connection.query("SELECT * FROM bugs WHERE project_id = "+projectsRes.id, function(err, bugsRes){
+							if(err)
+								reject(err);
+							else {
+								resolve(bugsRes);
+							}
+						});
+				});
+			})
+			// .then(function(bugsRes) {
+			// 	return new Promise(function(resolve, reject) {
+			// 		connection.query("SELECT * FROM project_team WHERE project_id = "+projectsRes.id, function(err, devRes){
+			// 			console.log(devRes);
+			// 			if(err)
+			// 				reject(err);
+			// 			else {
+			// 				var devs = [];
+			// 				devRes.foreach(function(dev) {
+			//
+			// 				});
+			// 			}
+			// 		});
+			// 	});
+			// })
+			.then(function(bugsRes,devRes) {
+				res.render('bugReports.ejs', {
+					user : req.user,
+					state: "unassigned",
+					resultAdmin: bugsRes
+				});
+			}).catch(function(err) {
+				console.log(err);
+			});
+
+		}
+		else {
+			res.end("Forbidden access");
+		}
+
 	});
 
 	// Logout

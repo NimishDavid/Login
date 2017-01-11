@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Bug Reports</title>
+        <link rel="stylesheet" type="text/css" href="/style/bugReports.css">
+    </head>
+    <body>
+    <% include navbar %>
+    <div class="container">
+    	<div class="row">
+			<div class="col-md-12">
+                    <% if(typeof(resultAdmin) != 'undefined') { %>
+                        <% if(state == 'unassigned') { %>
+                            <div class="panel panel-default">
+            					<div class="panel-heading">
+            						<h3 class="panel-title">Unassigned Bugs</h3>
+            						<div class="pull-right">
+            							<span class="clickable filter" data-toggle="tooltip" title="Toggle table filter" data-container="body">
+                                            <i class="fa fa-filter" aria-hidden="true"></i>
+            							</span>
+            						</div>
+            					</div>
+            					<div class="panel-body">
+            						<input type="text" class="form-control" id="dev-table-filter" data-action="filter" data-filters="#dev-table" placeholder="Filter Developers" />
+            					</div>
+        					<table class="table table-hover" id="dev-table">
+        						<thead>
+        							<tr>
+        								<th>#</th>
+        								<th>Name</th>
+        								<th>Type</th>
+        								<th>Description</th>
+                                        <th>Severity</th>
+                                        <th>Priority</th>
+                                        <th>Assign to</th>
+        							</tr>
+        						</thead>
+                            <% for(i=0; i<resultAdmin.length; i++) {%>
+                                <% if(resultAdmin[i].status == 'Open') {%>
+
+                                <% } %>
+                            <% } %>
+
+        						<tbody>
+        							<tr>
+        								<td>1</td>
+        								<td>Kilgore</td>
+        								<td>Trout</td>
+        								<td>kilgore</td>
+        							</tr>
+        							<tr>
+        								<td>2</td>
+        								<td>Bob</td>
+        								<td>Loblaw</td>
+        								<td>boblahblah</td>
+        							</tr>
+        							<tr>
+        								<td>3</td>
+        								<td>Holden</td>
+        								<td>Caulfield</td>
+        								<td>penceyreject</td>
+        							</tr>
+        						</tbody>
+        					</table>
+                        <% } %> // If state is unassigned
+                    <% } %> // If admin
+				</div>
+			</div>
+		</div>
+	</div>
+
+    <script src="/table.js" charset="utf-8"></script>
+
+    </body>
+</html>

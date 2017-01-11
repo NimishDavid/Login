@@ -1,18 +1,17 @@
+
+body {
+  background: url(/secure.jpg) no-repeat center center fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
+.panel-default {
+opacity: 0.9;
+margin-top:30px;
+}
+.form-group.last { margin-bottom:0px; }
 .login_panel {
-  width: 40%;
-  margin: 50px auto;
-  text-align: center;
-  padding: 20px;
+    margin-top: 150px;
 }
-
-.login_panel h1 {
-  padding-bottom: 20px;
-}
-.header {
-  background-color: #0269c2;
-  text-align: center;
-}
-
-.header   h1 {
-    color: white;
-  }

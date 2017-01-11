@@ -3,6 +3,7 @@ var session  = require('express-session');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var morgan = require('morgan');
+var expressValidator = require('express-validator');
 var app      = express();
 var port     = process.env.PORT || 8000;
 
@@ -20,6 +21,7 @@ app.use(bodyParser.urlencoded({
 	extended: true
 }));
 app.use(bodyParser.json());
+app.use(expressValidator());
 
 app.set('view engine', 'ejs'); // Set up ejs for templating
 
@@ -34,9 +36,10 @@ app.use(passport.session()); // Persistent login sessions
 app.use(flash()); // Use connect-flash for flash messages stored in session
 
 app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + '/scripts'));
 
 // Load routes passing app and passport
-require('./app/routes.js')(app, passport);
+require('./app/routes.js')(app, passport,expressValidator);
 
 // Start Server
 app.listen(port);

@@ -10,13 +10,27 @@
     </head>
     <body>
 
-        <% include navbar %>
+    <% include navbar %>
+
 
     <div class="container">
+    <% if(typeof(msg) != 'undefined') { %>
+        <%if(msg == 'success') {%>
+            <div class="alert alert-success alert-dismissable fade in">
+                <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                <strong>Success!</strong>&nbspBug reported successfully.
+            </div>
+        <% } else {%>
+            <div class="alert alert-danger alert-dismissable fade in">
+                <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                <strong>Error!</strong>&nbspBug report failed.
+            </div>
+        <% } %>
+    <% } %>
     <h1 class="well">Report a bug</h1>
 	<div class="col-lg-12 well">
 	<div class="row">
-				<form name="reportBugForm" id="reportBugForm" data-toggle="validator" method="post" action="#">
+				<form name="reportBugForm" id="reportBugForm" data-toggle="validator" method="post" action="">
 					<div class="col-sm-12">
 						<div class="row">
 							<div class="col-sm-5 form-group">
@@ -37,21 +51,23 @@
                             <div class="col-sm-4 form-group">
 								<label>Project</label>
                                 <select class="form-control" name="project" required>
+                                    <% if(typeof(len) != 'undefined') { %>
                                         <% if(len==0) { %>
                                             <option value = "">Database Empty</option>
                                         <% } else { %>
                                             <option value = "">Select Project</option>
                                             <% for(i=0;i<len;i++) {%>
-                                            <option value = <%= proj[i].name %> > <%= proj[i].name %> </option>
+                                            <option value = <%= proj[i].id %> > <%= proj[i].name %> </option>
                                             <% } %>
                                         <% } %>
+                                    <% } %>
                                 </select>
                                 <div class="help-block with-errors"></div>
 							</div>
 						</div>
 						<div class="form-group">
 							<label>Bug Description</label>
-							<textarea name="bug_description" placeholder="Bug description" rows="3" class="form-control" required></textarea>
+							<textarea name="bug_description" placeholder="Bug description" rows="3" class="form-control" data-minlength = "50" required></textarea>
                             <div class="help-block with-errors"></div>
 						</div>
 						<div class="row">
@@ -89,28 +105,22 @@
 							</div>
 							<div class="col-sm-3 form-group">
 								<label>Line</label>
-								<input type="text" name="line" placeholder="Line" class="form-control" required>
+								<input type="number" name="line" placeholder="Line" class="form-control" required>
                                 <div class="help-block with-errors"></div>
 							</div>
-                            <div class="col-sm-3 form-group">
+                            <!-- <div class="col-sm-4 form-group">
 								<label>Status</label>
                                 <select class="form-control" name="status" required>
                                  <option value="">Select status</option>
                                  <option value="Open">Open</option>
+                                 <option value="Assigned">Assigned</option>
                                  <option value="Resolving">Resolving</option>
                                  <option value="Review">Review</option>
                                  <option value="Approval">Approval</option>
                                  <option value="Closed">Closed</option>
                                 </select>
                                 <div class="help-block with-errors"></div>
-							</div>
-                            <div class="col-sm-3 form-group">
-								<label>Assign to</label>
-                                <select class="form-control" name="manager" required>
-                                 <option value="volvo">Volvo</option>
-                                </select>
-                                <div class="help-block with-errors"></div>
-							</div>
+							</div> -->
 						</div>
 					<input type="submit" class="btn btn-primary" value="Submit">
 					</div>
