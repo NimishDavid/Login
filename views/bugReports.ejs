@@ -69,6 +69,55 @@
         						</tbody>
         					</table>
                         <% } %> <!--If state is unassigned -->
+
+                        <% if(state == 'assigned') { %>
+
+                            <div class="panel panel-default">
+            					<div class="panel-heading">
+            						<h3 class="panel-title">Assigned Bugs</h3>
+            						<div class="pull-right">
+            							<span class="clickable filter" data-toggle="tooltip" title="Toggle table filter" data-container="body">
+                                            <i class="fa fa-filter" aria-hidden="true"></i>
+            							</span>
+            						</div>
+            					</div>
+            					<div class="panel-body">
+            						<input type="text" class="form-control" id="dev-table-filter" data-action="filter" data-filters="#dev-table" placeholder="Filter Bugs" />
+            					</div>
+        					<table class="table table-hover" id="dev-table">
+        						<thead>
+        							<tr>
+        								<th>#</th>
+        								<th>Name</th>
+        								<th>Type</th>
+        								<th>Description</th>
+                                        <th>Severity</th>
+                                        <th>Priority</th>
+                                        <th>Assigned to</th>
+        							</tr>
+        						</thead>
+                                <tbody>
+                                <% for(i=0; i<resultAdmin.length; i++) {%>
+                                    <% if(resultAdmin[i].status == 'Assigned') {%>
+
+                                        <tr>
+            								<td class="bug_id"><%= resultAdmin[i].id %></td>
+            								<td><%= resultAdmin[i].name %></td>
+            								<td><%= resultAdmin[i].bug_type %></td>
+            								<td><%= resultAdmin[i].description %></td>
+                                            <td><%= resultAdmin[i].severity %></td>
+                                            <td><%= resultAdmin[i].priority %></td>
+                                            <td><%= resultAdmin[i].developer_id %></td>
+
+            							</tr>
+
+                                    <% } %>
+                                <% } %>
+        						</tbody>
+        					</table>
+
+                        <% } %> <!-- If state is assigned -->
+
                     <% } %> <!--If admin -->
 				</div>
 			</div>

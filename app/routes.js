@@ -194,7 +194,61 @@ module.exports = function(app, passport, expressValidator) {
 
 	app.get('/home/assignedBugs', isLoggedIn, function(req, res) {
 		if(req.user.priority == 0) {
+			function getProjects() {
 
+				return new Promise(function(resolve, reject) {
+
+					connection.query("SELECT id FROM projects WHERE manager_id = "+req.user.id, function(err, projectsRes){
+						if(err)
+							reject(err);
+						else {
+							resolve(projectsRes);
+						}
+					});
+
+				});
+
+			}
+
+			getProjects()
+			.then(function(projectsRes) {
+				return new Promise(function(resolve, reject) {
+						connection.query("SELECT * FROM bugs WHERE project_id = "+projectsRes[0].id, function(err, bugsRes){
+							if(err)
+								reject(err);
+							else {
+								resolve([projectsRes, bugsRes]);
+							}
+						});
+				});
+			}).then(function(params) {
+				return new Promise(function(resolve, reject) {
+					var projectsRes = params[0];
+					var bugsRes = params[1];
+					var dbQuery =    "SELECT * FROM project_team JOIN users ON users.id = project_team.user_id WHERE priority = 2 AND project_id = "+projectsRes[0].id;
+					connection.query(dbQuery, function(err, devRes){
+						if(err)
+							reject(err);
+						else {
+							resolve([projectsRes, bugsRes, devRes]);
+						}
+					});
+				});
+			}).then(function(params) {
+				var projectsRes = params[0];
+				var bugsRes = params[1];
+				var devRes = params[2];
+				console.log(devRes);
+
+				res.render('bugReports.ejs', {
+					user : req.user,
+					state: "assigned",
+					resultAdmin: bugsRes,
+					devs : devRes
+				});
+			}).catch(function(err) {
+				console.log(err);
+			});
 		}
 		else {
 			res.end("Forbidden access");
