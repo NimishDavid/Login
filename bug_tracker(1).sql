@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Jan 12, 2017 at 10:32 AM
+-- Generation Time: Jan 12, 2017 at 05:07 PM
 -- Server version: 5.5.53-0ubuntu0.14.04.1
 -- PHP Version: 5.5.9-1ubuntu4.20
 
@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS `bugs` (
   PRIMARY KEY (`id`),
   KEY `project_id` (`project_id`),
   KEY `developer_id` (`developer_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=12 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=19 ;
 
 --
 -- Dumping data for table `bugs`
@@ -52,7 +52,14 @@ INSERT INTO `bugs` (`id`, `name`, `bug_type`, `description`, `project_id`, `file
 (8, 'Fatal Bug', 'Type B', 'Bug bug bug bug bug bug bug bug bug bug bug bug bug', 1, 'server.html', 'callmethod()', 82, 'Moderate', 'Minor', 'Open', NULL),
 (9, 'Fatal Bug', 'Type B', 'Bug bug bug bug bug bug bug bug bug bug bug bug bug', 1, 'server.html', 'callmethod()', 82, 'Moderate', 'Minor', 'Open', NULL),
 (10, 'Fatal Bug', 'Type B', 'Bug bug bug bug bug bug bug bug bug bug bug bug bug', 1, 'server.html', 'callmethod()', 82, 'Moderate', 'Minor', 'Open', NULL),
-(11, 'Fatal Bug', 'Type B', 'Bug bug bug bug bug bug bug bug bug bug bug bug bug', 1, 'server.html', 'callmethod()', 82, 'Moderate', 'Minor', 'Open', NULL);
+(11, 'Fatal Bug', 'Type B', 'Bug bug bug bug bug bug bug bug bug bug bug bug bug', 1, 'server.html', 'callmethod()', 82, 'Moderate', 'Minor', 'Open', NULL),
+(12, 'Fatal Bug', 'Type B', 'Bug bug bug bug bug bug bug bug bug bug bug bug bug', 2, 'server.html', 'callmethod()', 82, 'Moderate', 'Minor', 'Assigned', 11),
+(13, 'Fatal Bug', 'Type B', 'Bug bug bug bug bug bug bug bug bug bug bug bug bug', 2, 'server.html', 'callmethod()', 82, 'Moderate', 'Minor', 'Assigned', 9),
+(14, 'Fatal Bug', 'Type B', 'Bug bug bug bug bug bug bug bug bug bug bug bug bug', 2, 'server.html', 'callmethod()', 82, 'Moderate', 'Minor', 'Assigned', 11),
+(15, 'Fatal Bug', 'Type B', 'Bug bug bug bug bug bug bug bug bug bug bug bug bug', 2, 'server.html', 'callmethod()', 82, 'Moderate', 'Minor', 'Assigned', 9),
+(16, 'Fatal Bug', 'Type B', 'Bug bug bug bug bug bug bug bug bug bug bug bug bug', 2, 'server.html', 'callmethod()', 82, 'Moderate', 'Minor', 'Open', NULL),
+(17, 'Fatal Bug', 'Type B', 'Bug bug bug bug bug bug bug bug bug bug bug bug bug', 2, 'server.html', 'callmethod()', 82, 'Moderate', 'Minor', 'Open', NULL),
+(18, 'Fatal Bug', 'Type B', 'Bug bug bug bug bug bug bug bug bug bug bug bug bug', 2, 'server.html', 'callmethod()', 82, 'Moderate', 'Minor', 'Open', NULL);
 
 -- --------------------------------------------------------
 

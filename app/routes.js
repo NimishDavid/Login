@@ -154,7 +154,6 @@ module.exports = function(app, passport, expressValidator) {
 				var projectsRes = params[0];
 				var bugsRes = params[1];
 				var devRes = params[2];
-				console.log(devRes);
 
 				res.render('bugReports.ejs', {
 					user : req.user,
@@ -171,6 +170,35 @@ module.exports = function(app, passport, expressValidator) {
 			res.end("Forbidden access");
 		}
 
+	});
+
+	app.post('/home/unassignedBugs', isLoggedIn, function(req, res) {
+		if(req.user.priority == 0) {
+			console.log("Unassigned post entered");
+			console.log(req.body.dev);
+			console.log(req.body.bug);
+			var dbQuery = "UPDATE bugs SET developer_id = "+req.body.dev+", status = 'Assigned' WHERE id = "+req.body.bug;
+			connection.query(dbQuery, function(err, devRes){
+				if(err)
+					console.log(err);
+				else {
+					// console.log("Database update successful");
+					res.send("Bug assigned to developer");
+				}
+			});
+		}
+		else {
+			res.end("Forbidden access");
+		}
+	});
+
+	app.get('/home/assignedBugs', isLoggedIn, function(req, res) {
+		if(req.user.priority == 0) {
+
+		}
+		else {
+			res.end("Forbidden access");
+		}
 	});
 
 	// Logout

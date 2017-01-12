@@ -22,7 +22,7 @@
             						</div>
             					</div>
             					<div class="panel-body">
-            						<input type="text" class="form-control" id="dev-table-filter" data-action="filter" data-filters="#dev-table" placeholder="Filter Developers" />
+            						<input type="text" class="form-control" id="dev-table-filter" data-action="filter" data-filters="#dev-table" placeholder="Filter Bugs" />
             					</div>
         					<table class="table table-hover" id="dev-table">
         						<thead>
@@ -34,43 +34,50 @@
                                         <th>Severity</th>
                                         <th>Priority</th>
                                         <th>Assign to</th>
+                                        <th>Save</th>
         							</tr>
         						</thead>
-                            <% for(i=0; i<resultAdmin.length; i++) {%>
-                                <% if(resultAdmin[i].status == 'Open') {%>
+                                <tbody>
+                                <% for(i=0; i<resultAdmin.length; i++) {%>
+                                    <% if(resultAdmin[i].status == 'Open') {%>
 
+                                        <tr>
+            								<td class="bug_id"><%= resultAdmin[i].id %></td>
+            								<td><%= resultAdmin[i].name %></td>
+            								<td><%= resultAdmin[i].bug_type %></td>
+            								<td><%= resultAdmin[i].description %></td>
+                                            <td><%= resultAdmin[i].severity %></td>
+                                            <td><%= resultAdmin[i].priority %></td>
+                                            <td class="dev_id">
+
+                                                    <select class="form-control" name="developer"  required>
+                                                     <option value="">Select Developer</option>
+                                                         <% for(j=0;j<devs.length;j++) {%>
+                                                             <option value= <%= devs[j].id %> > <%= devs[j].name %>  </option>
+                                                        <% } %>
+                                                    </select>
+                                                    <div class="help-block with-errors"></div>
+
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-sm btn-primary update">Save</button>
+                                            </td>
+            							</tr>
+
+                                    <% } %>
                                 <% } %>
-                            <% } %>
-
-        						<tbody>
-        							<tr>
-        								<td>1</td>
-        								<td>Kilgore</td>
-        								<td>Trout</td>
-        								<td>kilgore</td>
-        							</tr>
-        							<tr>
-        								<td>2</td>
-        								<td>Bob</td>
-        								<td>Loblaw</td>
-        								<td>boblahblah</td>
-        							</tr>
-        							<tr>
-        								<td>3</td>
-        								<td>Holden</td>
-        								<td>Caulfield</td>
-        								<td>penceyreject</td>
-        							</tr>
         						</tbody>
         					</table>
-                        <% } %> // If state is unassigned
-                    <% } %> // If admin
+                        <% } %> <!--If state is unassigned -->
+                    <% } %> <!--If admin -->
 				</div>
 			</div>
 		</div>
 	</div>
 
     <script src="/table.js" charset="utf-8"></script>
+    <script src="/assignDeveloper.js" charset="utf-8"></script>
+    <script src="/axios.min.js" charset="utf-8"></script>
 
     </body>
 </html>
