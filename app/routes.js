@@ -1,5 +1,5 @@
 module.exports = function(app, passport, expressValidator) {
-
+	var async = require('async');
 	var dbconfig = require('../config/database');
 	var mysql = require('mysql');
 	var connection = mysql.createConnection(dbconfig.connection);
@@ -129,31 +129,41 @@ module.exports = function(app, passport, expressValidator) {
 			getProjects()
 			.then(function(projectsRes) {
 				return new Promise(function(resolve, reject) {
-						connection.query("SELECT * FROM bugs WHERE project_id = "+projectsRes.id, function(err, bugsRes){
+						connection.query("SELECT * FROM bugs WHERE project_id = "+projectsRes[0].id, function(err, bugsRes){
 							if(err)
 								reject(err);
 							else {
-								resolve(bugsRes);
+								resolve(projectsRes, bugsRes);
 							}
 						});
 				});
-			})
-			// .then(function(bugsRes) {
-			// 	return new Promise(function(resolve, reject) {
-			// 		connection.query("SELECT * FROM project_team WHERE project_id = "+projectsRes.id, function(err, devRes){
-			// 			console.log(devRes);
-			// 			if(err)
-			// 				reject(err);
-			// 			else {
-			// 				var devs = [];
-			// 				devRes.foreach(function(dev) {
-			//
-			// 				});
-			// 			}
-			// 		});
-			// 	});
-			// })
-			.then(function(bugsRes,devRes) {
+			}).then(function(projectsRes, bugsRes) {
+				return new Promise(function(resolve, reject) {
+					console.log(bugsRes);
+					connection.query("SELECT * FROM project_team WHERE project_id = "+projectsRes[0].id, function(err, teamRes){
+						if(err)
+							reject(err);
+						else {
+							console.log(teamRes);
+							resolve(projectsRes, bugsRes, teamRes);
+						}
+					});
+				});
+			}).then(function(projectsRes, bugsRes, teamRes) {
+				return new Promise(function(resolve, reject) {
+					async.forEachOf(teamRes, function(elem,key){
+						console.log("eachof entered");
+						console.log(elem);
+					}
+					, function(err) {
+						if(err)
+							reject(error);
+						else {
+							resolve(projectsRes, bugsRes, teamRes);
+						}
+					});
+				});
+			}).then(function(projectsRes, bugsRes, teamRes) {
 				res.render('bugReports.ejs', {
 					user : req.user,
 					state: "unassigned",

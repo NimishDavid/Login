@@ -5,6 +5,7 @@
     "start": "node ./server"
   },
   "dependencies": {
+    "async": "^2.1.4",
     "bcrypt-nodejs": "0.0.3",
     "body-parser": "^1.13.1",
     "bootstrap-validator": "^0.11.9",
