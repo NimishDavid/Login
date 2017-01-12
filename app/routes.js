@@ -323,6 +323,20 @@ module.exports = function(app, passport, expressValidator) {
 		}
 	});
 
+	app.get('/home/devBugReport', isLoggedIn, function(req, res) {
+		connection.query("SELECT * FROM bugs WHERE developer_id = "+req.user.id+"AND status = 'Assigned'", function(err, bugsRes){
+			if(err)
+				console.log(err);
+			else {
+				res.render('devBugReports.ejs', {
+					user : req.user,
+					type : "open",
+					resultDev: bugsRes
+				});
+			}
+		});
+	});
+
 	// Logout
 	app.get('/logout', function(req, res) {
 		req.logout();
