@@ -175,7 +175,7 @@ module.exports = function(app, passport, expressValidator) {
 	app.post('/home/unassignedBugs', isLoggedIn, function(req, res) {
 		if(req.user.priority == 0) {
 			req.assert('dev').notEmpty().isInt();
-			req.assert('bug').notEmpty();
+			req.assert('bug').notEmpty().isInt();
 			var errors = req.validationErrors();
 		    if( !errors){
 				var dbQuery = "UPDATE bugs SET developer_id = "+req.body.dev+", status = 'Assigned' WHERE id = "+req.body.bug;
@@ -183,13 +183,14 @@ module.exports = function(app, passport, expressValidator) {
 					if(err)
 						console.log(err);
 					else {
-						// console.log("Database update successful");
+						console.log("Bug assigned to developer");
 						res.send("Bug assigned to developer");
 					}
 				});
 			}
 			else {
 				console.log("Invalid input");
+				res.end("Invalid input");
 			}
 		}
 		else {
@@ -324,17 +325,67 @@ module.exports = function(app, passport, expressValidator) {
 	});
 
 	app.get('/home/devBugReport', isLoggedIn, function(req, res) {
-		connection.query("SELECT * FROM bugs WHERE developer_id = "+req.user.id+"AND status = 'Assigned'", function(err, bugsRes){
-			if(err)
-				console.log(err);
-			else {
-				res.render('devBugReports.ejs', {
-					user : req.user,
-					type : "open",
-					resultDev: bugsRes
+		if(req.user.priority == 2) {
+			connection.query("SELECT * FROM bugs WHERE developer_id = "+req.user.id+" AND (status = 'Assigned' OR status = 'Resolving')", function(err, bugsRes){
+				if(err)
+					console.log(err);
+				else {
+					res.render('devBugReports.ejs', {
+						user : req.user,
+						type : "open",
+						resultDev: bugsRes
+					});
+				}
+			});
+		}
+		else {
+			res.end("Forbidden access");
+		}
+	});
+
+	app.post('/home/devBugReport', isLoggedIn, function(req, res) {
+		if(req.user.priority == 2) {
+			req.assert('status').notEmpty();
+			req.assert('bug').notEmpty().isInt();
+			var errors = req.validationErrors();
+		    if( !errors){
+				var dbQuery = "UPDATE bugs SET status = '"+ req.body.status +"' WHERE id = "+req.body.bug;
+				connection.query(dbQuery, function(err, devRes){
+					if(err)
+						console.log(err);
+					else {
+						// console.log("Database update successful");
+						res.send("Bug status changed successfully");
+					}
 				});
 			}
-		});
+			else {
+				console.log("Invalid input");
+				res.end("Invalid input");
+			}
+		}
+		else {
+			res.end("Forbidden access");
+		}
+	});
+
+	app.get('/home/devBugHistory', isLoggedIn, function(req, res) {
+		if(req.user.priority == 2) {
+			connection.query("SELECT * FROM bugs WHERE developer_id = "+req.user.id+" AND status NOT IN ('Assigned', 'Resolving')", function(err, bugsRes){
+				if(err)
+					console.log(err);
+				else {
+					res.render('devBugReports.ejs', {
+						user : req.user,
+						type : "history",
+						resultDev: bugsRes
+					});
+				}
+			});
+		}
+		else {
+			res.end("Forbidden access");
+		}
 	});
 
 	// Logout

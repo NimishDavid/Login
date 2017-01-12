@@ -1,13 +1,13 @@
 $(".update").click(function() {
-    var $dev = $(this).closest("tr").find(".dev_id")     // Gets a descendent with class="dev_id"
+    var $stat = $(this).closest("tr").find(".stat")     // Gets a descendent with class="stat"
     .find(":selected").val();
-    if(!$dev) {
-        alert("Please select a developer");
+    if(!$stat) {
+        alert("Please select status");
     }
     else {
         var $bug = $(this).closest("tr").find(".bug_id").text();         // Retrieves the text within <td>
-        axios.post('/home/unassignedBugs', {
-            dev : $dev,
+        axios.post('/home/devBugReport', {
+            status : $stat,
             bug : $bug
           })
           .then(function (response) {
