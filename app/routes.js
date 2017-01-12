@@ -174,18 +174,23 @@ module.exports = function(app, passport, expressValidator) {
 
 	app.post('/home/unassignedBugs', isLoggedIn, function(req, res) {
 		if(req.user.priority == 0) {
-			console.log("Unassigned post entered");
-			console.log(req.body.dev);
-			console.log(req.body.bug);
-			var dbQuery = "UPDATE bugs SET developer_id = "+req.body.dev+", status = 'Assigned' WHERE id = "+req.body.bug;
-			connection.query(dbQuery, function(err, devRes){
-				if(err)
-					console.log(err);
-				else {
-					// console.log("Database update successful");
-					res.send("Bug assigned to developer");
-				}
-			});
+			req.assert('dev').notEmpty().isInt();
+			req.assert('bug').notEmpty();
+			var errors = req.validationErrors();
+		    if( !errors){
+				var dbQuery = "UPDATE bugs SET developer_id = "+req.body.dev+", status = 'Assigned' WHERE id = "+req.body.bug;
+				connection.query(dbQuery, function(err, devRes){
+					if(err)
+						console.log(err);
+					else {
+						// console.log("Database update successful");
+						res.send("Bug assigned to developer");
+					}
+				});
+			}
+			else {
+				console.log("Invalid input");
+			}
 		}
 		else {
 			res.end("Forbidden access");
