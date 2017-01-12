@@ -133,41 +133,34 @@ module.exports = function(app, passport, expressValidator) {
 							if(err)
 								reject(err);
 							else {
-								resolve(projectsRes, bugsRes);
+								resolve([projectsRes, bugsRes]);
 							}
 						});
 				});
-			}).then(function(projectsRes, bugsRes) {
+			}).then(function(params) {
 				return new Promise(function(resolve, reject) {
-					console.log(bugsRes);
-					connection.query("SELECT * FROM project_team WHERE project_id = "+projectsRes[0].id, function(err, teamRes){
+					var projectsRes = params[0];
+					var bugsRes = params[1];
+					var dbQuery =    "SELECT * FROM project_team JOIN users ON users.id = project_team.user_id WHERE priority = 2 AND project_id = "+projectsRes[0].id;
+					connection.query(dbQuery, function(err, devRes){
 						if(err)
 							reject(err);
 						else {
-							console.log(teamRes);
-							resolve(projectsRes, bugsRes, teamRes);
+							resolve([projectsRes, bugsRes, devRes]);
 						}
 					});
 				});
-			}).then(function(projectsRes, bugsRes, teamRes) {
-				return new Promise(function(resolve, reject) {
-					async.forEachOf(teamRes, function(elem,key){
-						console.log("eachof entered");
-						console.log(elem);
-					}
-					, function(err) {
-						if(err)
-							reject(error);
-						else {
-							resolve(projectsRes, bugsRes, teamRes);
-						}
-					});
-				});
-			}).then(function(projectsRes, bugsRes, teamRes) {
+			}).then(function(params) {
+				var projectsRes = params[0];
+				var bugsRes = params[1];
+				var devRes = params[2];
+				console.log(devRes);
+
 				res.render('bugReports.ejs', {
 					user : req.user,
 					state: "unassigned",
-					resultAdmin: bugsRes
+					resultAdmin: bugsRes,
+					devs : devRes
 				});
 			}).catch(function(err) {
 				console.log(err);
