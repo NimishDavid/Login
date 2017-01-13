@@ -503,6 +503,17 @@ module.exports = function(app, passport, expressValidator) {
 		}
 	});
 
+	app.get('/home/manageProjects', isLoggedIn, function(req, res) {
+		if(req.user.class == 0) {
+			res.render('manageProjects.ejs', {
+				user : req.user
+			});
+		}
+		else {
+			res.end("Forbidden access");
+		}
+	});
+
 	// Logout
 	app.get('/logout', function(req, res) {
 		req.logout();
