@@ -42,7 +42,7 @@ module.exports = function(app, passport, expressValidator) {
 	});
 
 	app.get('/home/reportBug', isLoggedIn, function(req, res) {
-		if(req.user.priority == 1) {
+		if(req.user.class == 1) {
 			var projects;
 			connection.query("SELECT * FROM project_team JOIN users JOIN projects ON users.id = project_team.user_id AND project_team.project_id = projects.id WHERE users.id = ?",[req.user.id], function(err, rows){
 				if(err)
@@ -64,7 +64,7 @@ module.exports = function(app, passport, expressValidator) {
 
 	app.post('/home/reportBug', isLoggedIn, function(req, res) {
 
-		if(req.user.priority == 1) {
+		if(req.user.class == 1) {
 			var message;
 
 			req.assert('bug_name', 'Bug name is required').notEmpty();
@@ -72,7 +72,7 @@ module.exports = function(app, passport, expressValidator) {
 			req.assert('project', 'Project ID is required').notEmpty().isNumeric();
 			req.assert('bug_description', 'Bug Description is required').notEmpty().isLength(50,200);
 			req.assert('severity', 'Severity is required').notEmpty();
-			req.assert('priority', 'Priority is required').notEmpty();
+			req.assert('class', 'Class is required').notEmpty();
 			req.assert('file', 'File is required').notEmpty();
 			req.assert('method', 'Method is required').notEmpty();
 			req.assert('line', 'Line number is required').notEmpty().isNumeric();
@@ -82,7 +82,7 @@ module.exports = function(app, passport, expressValidator) {
 		    var errors = req.validationErrors();
 		    if( !errors){   //No errors were found.  Passed Validation!
 
-				var dbQuery = "INSERT INTO `bug_tracker`.`bugs` (`id`, `name`, `bug_type`, `description`, `project_id`, `file`, `method`, `line`, `priority`, `severity`, `status`, `tester_id`, `developer_id`) VALUES (NULL, \""+req.body.bug_name+"\", \""+req.body.bug_type+"\", \""+req.body.bug_description+"\", \""+req.body.project+"\", \""+req.body.file+"\", \""+req.body.method+"\", \""+req.body.line+"\", \""+req.body.priority+"\", \""+req.body.severity+"\", \"Open\", \""+ req.user.id +"\" , NULL)";
+				var dbQuery = "INSERT INTO `bug_tracker`.`bugs` (`id`, `name`, `bug_type`, `description`, `project_id`, `file`, `method`, `line`, `class`, `severity`, `status`, `tester_id`, `developer_id`) VALUES (NULL, \""+req.body.bug_name+"\", \""+req.body.bug_type+"\", \""+req.body.bug_description+"\", \""+req.body.project+"\", \""+req.body.file+"\", \""+req.body.method+"\", \""+req.body.line+"\", \""+req.body.class+"\", \""+req.body.severity+"\", \"Open\", \""+ req.user.id +"\" , NULL)";
 
 				connection.query(dbQuery, function(err, rows){
 					if(err)
@@ -114,7 +114,7 @@ module.exports = function(app, passport, expressValidator) {
 
 	app.get('/home/unassignedBugs', isLoggedIn, function(req, res) {
 
-		if(req.user.priority == 0) {
+		if(req.user.class == 0) {
 			function getProjects() {
 
 				return new Promise(function(resolve, reject) {
@@ -146,7 +146,7 @@ module.exports = function(app, passport, expressValidator) {
 				return new Promise(function(resolve, reject) {
 					var projectsRes = params[0];
 					var bugsRes = params[1];
-					var dbQuery =    "SELECT * FROM project_team JOIN users ON users.id = project_team.user_id WHERE priority = 2 AND project_id = "+projectsRes[0].id;
+					var dbQuery =    "SELECT * FROM project_team JOIN users ON users.id = project_team.user_id WHERE class = 2 AND project_id = "+projectsRes[0].id;
 					connection.query(dbQuery, function(err, devRes){
 						if(err)
 							reject(err);
@@ -178,7 +178,7 @@ module.exports = function(app, passport, expressValidator) {
 	});
 
 	app.post('/home/unassignedBugs', isLoggedIn, function(req, res) {
-		if(req.user.priority == 0) {
+		if(req.user.class == 0) {
 			req.assert('dev').notEmpty().isInt();
 			req.assert('bug').notEmpty().isInt();
 			var errors = req.validationErrors();
@@ -204,7 +204,7 @@ module.exports = function(app, passport, expressValidator) {
 	});
 
 	app.get('/home/assignedBugs', isLoggedIn, function(req, res) {
-		if(req.user.priority == 0) {
+		if(req.user.class == 0) {
 			function getProjects() {
 
 				return new Promise(function(resolve, reject) {
@@ -236,7 +236,7 @@ module.exports = function(app, passport, expressValidator) {
 				return new Promise(function(resolve, reject) {
 					var projectsRes = params[0];
 					var bugsRes = params[1];
-					var dbQuery =    "SELECT * FROM project_team JOIN users ON users.id = project_team.user_id WHERE priority = 2 AND project_id = "+projectsRes[0].id;
+					var dbQuery =    "SELECT * FROM project_team JOIN users ON users.id = project_team.user_id WHERE class = 2 AND project_id = "+projectsRes[0].id;
 					connection.query(dbQuery, function(err, devRes){
 						if(err)
 							reject(err);
@@ -267,7 +267,7 @@ module.exports = function(app, passport, expressValidator) {
 	});
 
 	app.get('/home/closedBugs', isLoggedIn, function(req, res) {
-		if(req.user.priority == 0) {
+		if(req.user.class == 0) {
 			function getProjects() {
 
 				return new Promise(function(resolve, reject) {
@@ -299,7 +299,7 @@ module.exports = function(app, passport, expressValidator) {
 				return new Promise(function(resolve, reject) {
 					var projectsRes = params[0];
 					var bugsRes = params[1];
-					var dbQuery =    "SELECT * FROM project_team JOIN users ON users.id = project_team.user_id WHERE priority = 2 AND project_id = "+projectsRes[0].id;
+					var dbQuery =    "SELECT * FROM project_team JOIN users ON users.id = project_team.user_id WHERE class = 2 AND project_id = "+projectsRes[0].id;
 					connection.query(dbQuery, function(err, devRes){
 						if(err)
 							reject(err);
@@ -330,7 +330,7 @@ module.exports = function(app, passport, expressValidator) {
 	});
 
 	app.get('/home/devBugReport', isLoggedIn, function(req, res) {
-		if(req.user.priority == 2) {
+		if(req.user.class == 2) {
 			connection.query("SELECT * FROM bugs WHERE developer_id = "+req.user.id+" AND (status = 'Assigned' OR status = 'Resolving')", function(err, bugsRes){
 				if(err)
 					console.log(err);
@@ -349,7 +349,7 @@ module.exports = function(app, passport, expressValidator) {
 	});
 
 	app.post('/home/devBugReport', isLoggedIn, function(req, res) {
-		if(req.user.priority == 2) {
+		if(req.user.class == 2) {
 			req.assert('status').notEmpty();
 			req.assert('bug').notEmpty().isInt();
 			var errors = req.validationErrors();
@@ -375,7 +375,7 @@ module.exports = function(app, passport, expressValidator) {
 	});
 
 	app.get('/home/devBugHistory', isLoggedIn, function(req, res) {
-		if(req.user.priority == 2) {
+		if(req.user.class == 2) {
 			connection.query("SELECT * FROM bugs WHERE developer_id = "+req.user.id+" AND status NOT IN ('Assigned', 'Resolving')", function(err, bugsRes){
 				if(err)
 					console.log(err);
@@ -394,7 +394,7 @@ module.exports = function(app, passport, expressValidator) {
 	});
 
 	app.get('/home/reviewBugs', isLoggedIn, function(req, res) {
-		if(req.user.priority == 1) {
+		if(req.user.class == 1) {
 			connection.query("SELECT * FROM bugs WHERE tester_id = "+req.user.id+" AND status = 'Review'", function(err, bugsRes){
 				if(err)
 					console.log(err);
@@ -413,7 +413,7 @@ module.exports = function(app, passport, expressValidator) {
 	});
 
 	app.post('/home/reviewBugs', isLoggedIn, function(req, res) {
-		if(req.user.priority == 1) {
+		if(req.user.class == 1) {
 			req.assert('status').notEmpty();
 			req.assert('bug').notEmpty().isInt();
 			var errors = req.validationErrors();
@@ -439,7 +439,7 @@ module.exports = function(app, passport, expressValidator) {
 	});
 
 	app.get('/home/trackBugs', isLoggedIn, function(req, res) {
-		if(req.user.priority == 1) {
+		if(req.user.class == 1) {
 			connection.query("SELECT * FROM bugs WHERE tester_id = "+req.user.id+" AND status NOT IN ('Review')", function(err, bugsRes){
 				if(err)
 					console.log(err);
@@ -458,8 +458,8 @@ module.exports = function(app, passport, expressValidator) {
 	});
 
 	app.get('/home/approveBugs', isLoggedIn, function(req, res) {
-		if(req.user.priority == 0) {
-			connection.query("SELECT * FROM projects JOIN bugs JOIN users ON bugs.project_id = projects.id AND projects.manager_id = ? AND bugs.developer_id = users.id AND bugs.status = 'Approval'", [req.user.id], function(err, bugsRes){
+		if(req.user.class == 0) {
+			connection.query("SELECT bugs.id AS bugid, bugs.name AS bugname, bugs.bug_type AS bugtype, bugs.description AS description, bugs.priority AS priority, bugs.severity as severity, users.name AS assignedto, bugs.status AS status FROM projects JOIN bugs JOIN users ON bugs.project_id = projects.id AND projects.manager_id = ? AND bugs.developer_id = users.id AND bugs.status = 'Approval'", [req.user.id], function(err, bugsRes){
 				if(err)
 					console.log(err);
 				else {
@@ -471,6 +471,32 @@ module.exports = function(app, passport, expressValidator) {
 					});
 				}
 			});
+		}
+		else {
+			res.end("Forbidden access");
+		}
+	});
+
+	app.post('/home/approveBugs', isLoggedIn, function(req, res) {
+		if(req.user.class == 0) {
+			req.assert('status').notEmpty();
+			req.assert('bug').notEmpty().isInt();
+			var errors = req.validationErrors();
+		    if( !errors){
+				var dbQuery = "UPDATE bugs SET status = '"+ req.body.status +"' WHERE id = "+req.body.bug;
+				connection.query(dbQuery, function(err, devRes){
+					if(err)
+						console.log(err);
+					else {
+						// console.log("Database update successful");
+						res.send("Bug status changed successfully");
+					}
+				});
+			}
+			else {
+				console.log("Invalid input");
+				res.end("Invalid input");
+			}
 		}
 		else {
 			res.end("Forbidden access");

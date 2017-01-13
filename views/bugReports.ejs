@@ -200,17 +200,17 @@
                                     <% if(resultAdmin[i].status == 'Approval') {%>
 
                                         <tr>
-            								<td class="bug_id"><%= resultAdmin[i].id %></td>
-            								<td><%= resultAdmin[i].name %></td>
-            								<td><%= resultAdmin[i].bug_type %></td>
+            								<td class="bug_id"><%= resultAdmin[i].bugid %></td>
+            								<td><%= resultAdmin[i].bugname %></td>
+            								<td><%= resultAdmin[i].bugtype %></td>
             								<td><%= resultAdmin[i].description %></td>
                                             <td><%= resultAdmin[i].severity %></td>
                                             <td><%= resultAdmin[i].priority %></td>
-                                            <td><%= resultAdmin[i].name %></td>
+                                            <td><%= resultAdmin[i].assignedto %></td>
                                             <td class="stat">
                                                 <select class="form-control" name="status" required>
                                                  <option value="">Select status</option>
-                                                 <option value="Rejected">Rejected</option>
+                                                 <option value="Rejected">Reject</option>
                                                  <option value="Closed">Closed</option>
                                                 </select>
                                             </td>
@@ -232,7 +232,14 @@
 	</div>
 
     <script src="/table.js" charset="utf-8"></script>
-    <script src="/assignDeveloper.js" charset="utf-8"></script>
+    <% if(typeof(resultAdmin) != 'undefined') { %>
+        <% if(state == 'unassigned') { %>
+            <script src="/assignDeveloper.js" charset="utf-8"></script>
+        <% } %>
+        <% if(state == 'approve') { %>
+            <script src="/adminStatusUpdate.js" charset="utf-8"></script>
+        <% } %>
+    <% } %>
     <script src="/axios.min.js" charset="utf-8"></script>
 
     </body>
