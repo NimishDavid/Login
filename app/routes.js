@@ -44,14 +44,17 @@ module.exports = function(app, passport, expressValidator) {
 	app.get('/home/reportBug', isLoggedIn, function(req, res) {
 		if(req.user.priority == 1) {
 			var projects;
-			connection.query("SELECT * FROM projects", function(err, rows){
+			connection.query("SELECT * FROM project_team JOIN users JOIN projects ON users.id = project_team.user_id AND project_team.project_id = projects.id WHERE users.id = ?",[req.user.id], function(err, rows){
 				if(err)
 					throw(err);
-				res.render('reportBug.ejs', {
-					user : req.user,
-					proj : rows,
-					len : rows.length
-				});
+					else {
+						console.log(rows);
+						res.render('reportBug.ejs', {
+							user : req.user,
+							proj : rows,
+							len : rows.length
+						});
+					}
 			});
 		}
 		else {
@@ -73,11 +76,13 @@ module.exports = function(app, passport, expressValidator) {
 			req.assert('file', 'File is required').notEmpty();
 			req.assert('method', 'Method is required').notEmpty();
 			req.assert('line', 'Line number is required').notEmpty().isNumeric();
+			// req.assert('tester_id', 'Tester ID is required').notEmpty().isNumeric();
+			// req.assert('status', 'Status is required').notEmpty();
 
 		    var errors = req.validationErrors();
 		    if( !errors){   //No errors were found.  Passed Validation!
 
-				var dbQuery = "INSERT INTO `bug_tracker`.`bugs` (`id`, `name`, `bug_type`, `description`, `project_id`, `file`, `method`, `line`, `priority`, `severity`, `status`, `developer_id`) VALUES (NULL, \""+req.body.bug_name+"\", \""+req.body.bug_type+"\", \""+req.body.bug_description+"\", \""+req.body.project+"\", \""+req.body.file+"\", \""+req.body.method+"\", \""+req.body.line+"\", \""+req.body.priority+"\", \""+req.body.severity+"\", \"Open\", NULL)";
+				var dbQuery = "INSERT INTO `bug_tracker`.`bugs` (`id`, `name`, `bug_type`, `description`, `project_id`, `file`, `method`, `line`, `priority`, `severity`, `status`, `tester_id`, `developer_id`) VALUES (NULL, \""+req.body.bug_name+"\", \""+req.body.bug_type+"\", \""+req.body.bug_description+"\", \""+req.body.project+"\", \""+req.body.file+"\", \""+req.body.method+"\", \""+req.body.line+"\", \""+req.body.priority+"\", \""+req.body.severity+"\", \"Open\", \""+ req.user.id +"\" , NULL)";
 
 				connection.query(dbQuery, function(err, rows){
 					if(err)
@@ -388,12 +393,97 @@ module.exports = function(app, passport, expressValidator) {
 		}
 	});
 
+	app.get('/home/reviewBugs', isLoggedIn, function(req, res) {
+		if(req.user.priority == 1) {
+			connection.query("SELECT * FROM bugs WHERE tester_id = "+req.user.id+" AND status = 'Review'", function(err, bugsRes){
+				if(err)
+					console.log(err);
+				else {
+					res.render('testerBugReports.ejs', {
+						user : req.user,
+						type : "review",
+						resultTes: bugsRes
+					});
+				}
+			});
+		}
+		else {
+			res.end("Forbidden access");
+		}
+	});
+
+	app.post('/home/reviewBugs', isLoggedIn, function(req, res) {
+		if(req.user.priority == 1) {
+			req.assert('status').notEmpty();
+			req.assert('bug').notEmpty().isInt();
+			var errors = req.validationErrors();
+		    if( !errors){
+				var dbQuery = "UPDATE bugs SET status = '"+ req.body.status +"' WHERE id = "+req.body.bug;
+				connection.query(dbQuery, function(err, devRes){
+					if(err)
+						console.log(err);
+					else {
+						// console.log("Database update successful");
+						res.send("Bug status changed successfully");
+					}
+				});
+			}
+			else {
+				console.log("Invalid input");
+				res.end("Invalid input");
+			}
+		}
+		else {
+			res.end("Forbidden access");
+		}
+	});
+
+	app.get('/home/trackBugs', isLoggedIn, function(req, res) {
+		if(req.user.priority == 1) {
+			connection.query("SELECT * FROM bugs WHERE tester_id = "+req.user.id+" AND status NOT IN ('Review')", function(err, bugsRes){
+				if(err)
+					console.log(err);
+				else {
+					res.render('testerBugReports.ejs', {
+						user : req.user,
+						type : "track",
+						resultTes: bugsRes
+					});
+				}
+			});
+		}
+		else {
+			res.end("Forbidden access");
+		}
+	});
+
+	app.get('/home/approveBugs', isLoggedIn, function(req, res) {
+		if(req.user.priority == 0) {
+			connection.query("SELECT * FROM projects JOIN bugs JOIN users ON bugs.project_id = projects.id AND projects.manager_id = ? AND bugs.developer_id = users.id AND bugs.status = 'Approval'", [req.user.id], function(err, bugsRes){
+				if(err)
+					console.log(err);
+				else {
+					console.log(bugsRes);
+					res.render('bugReports.ejs', {
+						user : req.user,
+						state : "approve",
+						resultAdmin: bugsRes
+					});
+				}
+			});
+		}
+		else {
+			res.end("Forbidden access");
+		}
+	});
+
 	// Logout
 	app.get('/logout', function(req, res) {
 		req.logout();
 		res.redirect('/');
 	});
 };
+
 
 // Route middleware to verify login.
 function isLoggedIn(req, res, next) {

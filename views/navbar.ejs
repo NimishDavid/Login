@@ -34,14 +34,15 @@
                           <li><a href="/home/closedBugs">Closed</a></li>
                         </ul>
                       </li>
-                    <li><a href="#">Review Bugs<span class="sr-only">(current)</span></a></li>
+                    <li><a href="/home/approveBugs">Approve Resolved Bugs<span class="sr-only">(current)</span></a></li>
                     <li><a href="#">Manage Projects</a></li>
                   </ul>
               <% } else if(user.priority == 1) {%>
                   <ul class="nav navbar-nav">
                     <li><a href="#">Tasks</a></li>
                     <li><a href="/home/reportBug">Report Bugs<span class="sr-only">(current)</span></a></li>
-                    <li><a href="#">Track Bugs</a></li>
+                    <li><a href="/home/reviewBugs">Review Bugs</a></li>
+                    <li><a href="/home/trackBugs">Track Bugs</a></li>
                   </ul>
               <% } else if(user.priority == 2) {%>
                   <ul class="nav navbar-nav">
