@@ -503,11 +503,48 @@ module.exports = function(app, passport, expressValidator) {
 		}
 	});
 
-	app.get('/home/manageProjects', isLoggedIn, function(req, res) {
+	app.get('/home/manageTesters', isLoggedIn, function(req, res) {
 		if(req.user.class == 0) {
-			res.render('manageProjects.ejs', {
-				user : req.user
-			});
+			function getTesters() {
+				return new Promise (function(resolve, reject) {
+					var dbQuery = "SELECT users.id AS testerId, users.name AS testerName, projects.id AS projectId FROM projects JOIN project_team JOIN users ON project_team.user_id = users.id AND projects.id = project_team.project_id AND users.class = 1 AND projects.manager_id = ?";
+					connection.query(dbQuery,[req.user.id], function(err, testRes) {
+						if(err) {
+							console.log(err);
+						}
+						else {
+							resolve(testRes);
+						}
+					});
+				});
+			}
+			getTesters().then(function(testRes) {
+				console.log(testRes);
+				res.render('manageTesters.ejs', {
+					user : req.user,
+					testers : testRes
+				});
+			}).catch(function(err) {
+				console.log(err);
+			})
+		}
+		else {
+			res.end("Forbidden access");
+		}
+	});
+
+	app.post('/home/manageTesters/addTesters', isLoggedIn, function(req, res) {
+		if(req.user.class == 0) {
+			console.log(req.body);
+		}
+		else {
+			res.end("Forbidden access");
+		}
+	});
+
+	app.post('/home/manageTesters/removeTesters', isLoggedIn, function(req, res) {
+		if(req.user.class == 0) {
+			console.log(req.body);
 		}
 		else {
 			res.end("Forbidden access");

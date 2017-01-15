@@ -4,6 +4,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var morgan = require('morgan');
 var expressValidator = require('express-validator');
+var forEach = require('async-foreach').forEach;
 var app      = express();
 var port     = process.env.PORT || 8000;
 
