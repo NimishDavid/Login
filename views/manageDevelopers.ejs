@@ -38,28 +38,28 @@
                     <% } %>
                     <div class="panel panel-default">
                 		<div class="panel-heading">
-                			<h3 class="panel-title">Add Testers</h3>
+                			<h3 class="panel-title">Add Developers</h3>
                 		</div>
                 		<div class="panel-body fixed-panel">
                             <div class="col-md-12">
-                              <div class="col-md-1"><input type="checkbox" name="testers" value= "" disabled></div>
+                              <div class="col-md-1"><input type="checkbox" name="developers" value= "" disabled></div>
                               <div class="col-md-6"><strong><p>Tester Name</p></strong></div>
                               <div class="col-md-5"><strong><p>User ID</p></strong></div>
                             </div>
-                            <form class="" action="/home/manageTesters/addTesters" method="post">
-                                <% if(typeof(testersAdd) != 'undefined') { %>
-                                  <% testersAdd.forEach(function(item, index) {%>
+                            <form class="" action="/home/manageDevelopers/addDevelopers" method="post">
+                                <% if(typeof(developersAdd) != 'undefined') { %>
+                                  <% developersAdd.forEach(function(item, index) {%>
                                     <div class="col-md-12">
                                       <div class="col-md-1">
                                           <label>
-                                              <input type="checkbox" name="testers[]" value= <%= item.testerId %> >
+                                              <input type="checkbox" name="developers[]" value= <%= item.developerId %> >
                                           </label>
                                       </div>
                                       <div class="col-md-6">
-                                          <p> <%= item.testerName %> </p>
+                                          <p> <%= item.developerName %> </p>
                                       </div>
                                       <div class="col-md-5">
-                                          <p> <%= item.testerId %> </p>
+                                          <p> <%= item.developerId %> </p>
                                       </div>
                                     </div>
                                   <% }); %>
@@ -75,28 +75,28 @@
         			<div class="col-md-12">
                     <div class="panel panel-default">
                     		<div class="panel-heading">
-                    			<h3 class="panel-title">Remove Testers</h3>
+                    			<h3 class="panel-title">Remove Developers</h3>
                     		</div>
                     		<div class="panel-body fixed-panel">
                           <div class="col-md-12">
-                            <div class="col-md-1"><input type="checkbox" name="testers" value= "" disabled></div>
+                            <div class="col-md-1"><input type="checkbox" name="developers" value= "" disabled></div>
                             <div class="col-md-6"><strong><p>Tester Name</p></strong></div>
                             <div class="col-md-5"><strong><p>User ID</p></strong></div>
                           </div>
-                          <form class="" action="/home/manageTesters/removeTesters" method="post">
-                              <% if(typeof(testersRem) != 'undefined') { %>
-                                <% testersRem.forEach(function(item, index) {%>
+                          <form class="" action="/home/manageDevelopers/removeDevelopers" method="post">
+                              <% if(typeof(developersRem) != 'undefined') { %>
+                                <% developersRem.forEach(function(item, index) {%>
                                   <div class="col-md-12">
                                     <div class="col-md-1">
                                         <label>
-                                            <input type="checkbox" name="testers[]" value= <%= item.testerId %> >
+                                            <input type="checkbox" name="developers[]" value= <%= item.developerId %> >
                                         </label>
                                     </div>
                                     <div class="col-md-6">
-                                        <p> <%= item.testerName %> </p>
+                                        <p> <%= item.developerName %> </p>
                                     </div>
                                     <div class="col-md-5">
-                                        <p> <%= item.testerId %> </p>
+                                        <p> <%= item.developerId %> </p>
                                     </div>
                                   </div>
                                 <% }); %>

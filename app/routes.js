@@ -41,6 +41,27 @@ module.exports = function(app, passport, expressValidator) {
 		});
 	});
 
+	app.get('/home/testerTasks', isLoggedIn, function(req, res) {
+		if(req.user.class == 1) {
+			var projects;
+			connection.query("SELECT DISTINCT(projects.id) AS projectId, projects.name AS projectName, projects.manager_id AS managerId, users.name AS managerName  FROM project_team JOIN projects JOIN users ON project_team.project_id = projects.id AND projects.manager_id = users.id WHERE project_team.user_id = ?",[req.user.id], function(err, tasksRes){
+				if(err)
+					throw(err);
+					else {
+						console.log(tasksRes);
+						res.render('testerBugReports.ejs', {
+							user : req.user,
+							type : "tasks",
+							resultTes: tasksRes
+						});
+					}
+			});
+		}
+		else {
+			res.end("Forbidden access");
+		}
+	});
+
 	app.get('/home/reportBug', isLoggedIn, function(req, res) {
 		if(req.user.class == 1) {
 			var projects;
@@ -374,6 +395,25 @@ module.exports = function(app, passport, expressValidator) {
 		}
 	});
 
+	app.get('/home/devRejected', isLoggedIn, function(req, res) {
+		if(req.user.class == 2) {
+			connection.query("SELECT * FROM bugs WHERE developer_id = "+req.user.id+" AND (status = 'Review Reject' OR status = 'Approve Reject')", function(err, rejectRes){
+				if(err)
+					console.log(err);
+				else {
+					res.render('devBugReports.ejs', {
+						user : req.user,
+						type : "reject",
+						resultDev: rejectRes
+					});
+				}
+			});
+		}
+		else {
+			res.end("Forbidden access");
+		}
+	});
+
 	app.get('/home/devBugHistory', isLoggedIn, function(req, res) {
 		if(req.user.class == 2) {
 			connection.query("SELECT * FROM bugs WHERE developer_id = "+req.user.id+" AND status NOT IN ('Assigned', 'Resolving')", function(err, bugsRes){
@@ -503,31 +543,49 @@ module.exports = function(app, passport, expressValidator) {
 		}
 	});
 
+	function getTestersRem(req) {
+		return new Promise (function(resolve, reject) {
+			var errFlag = 0;
+			var dbQuery1 = "SELECT users.id AS testerId, users.name AS testerName, projects.id AS projectId FROM projects JOIN project_team JOIN users ON project_team.user_id = users.id AND projects.id = project_team.project_id AND users.class = 1 AND projects.manager_id = ?";
+			connection.query(dbQuery1,[req.user.id], function(err, testResRem) {
+				if(err) {
+					reject(err);
+				}
+				else {
+					resolve(testResRem);
+				}
+			});
+		});
+	}
 
+	function getTestersAdd(req, testResRem) {
+		return new Promise (function(resolve, reject) {
+			var dbQuery2 = "SELECT users.id AS testerId, users.name AS testerName, projects.id AS projectId FROM projects JOIN project_team JOIN users ON project_team.user_id = users.id AND projects.id = project_team.project_id AND users.class = 1 AND projects.manager_id != ? AND projects.id NOT IN (SELECT projects.id FROM projects WHERE manager_id = ?)";
+			connection.query(dbQuery2,[req.user.id, req.user.id], function(err, testResAdd) {
+				if(err) {
+					reject(err);
+				}
+				else {
+					resolve([testResRem, testResAdd]);
+				}
+			});
+		});
+	}
 
 	app.get('/home/manageTesters', isLoggedIn, function(req, res) {
 		if(req.user.class == 0) {
-			function getTesters() {
-				return new Promise (function(resolve, reject) {
-					var dbQuery = "SELECT users.id AS testerId, users.name AS testerName, projects.id AS projectId FROM projects JOIN project_team JOIN users ON project_team.user_id = users.id AND projects.id = project_team.project_id AND users.class = 1 AND projects.manager_id = ?";
-					connection.query(dbQuery,[req.user.id], function(err, testRes) {
-						if(err) {
-							console.log(err);
-						}
-						else {
-							resolve(testRes);
-						}
-					});
-				});
-			}
-			getTesters().then(function(testRes) {
+			getTestersRem(req).then(function(testResRem) {
+					return getTestersAdd(req, testResRem);
+			}).then(function(params) {
+				console.log(params[0], params[1]);
 				res.render('manageTesters.ejs', {
 					user : req.user,
-					testers : testRes
+					testersRem : params[0],
+					testersAdd : params[1]
 				});
 			}).catch(function(err) {
 				console.log(err);
-			})
+			});
 		}
 		else {
 			res.end("Forbidden access");
@@ -536,7 +594,62 @@ module.exports = function(app, passport, expressValidator) {
 
 	app.post('/home/manageTesters/addTesters', isLoggedIn, function(req, res) {
 		if(req.user.class == 0) {
-			console.log(req.body);
+			function addTester() {
+				return new Promise(function(resolve, reject) {
+					dbQuery = "SELECT id FROM projects WHERE manager_id = ?";
+					connection.query(dbQuery, [req.user.id], function(err, rows) {
+						if(err) {
+							reject(err);
+						}
+						else {
+							resolve(rows);
+						}
+					});
+				});
+			}
+			addTester().then(function(params) {
+				var vals = "";
+					req.body.testers.forEach(function(item, index) {
+						vals += "("+params[0].id+", "+item+"), ";
+					});
+					vals = vals.slice(0, -2);
+					console.log("OK "+vals);
+					dbQuery = "INSERT INTO project_team (project_id, user_id) VALUES "+vals;
+					console.log(dbQuery);
+					connection.query(dbQuery, function(err,rows) {
+						if(err) {
+							getTestersRem(req).then(function(testResRem) {
+									return getTestersAdd(req, testResRem);
+							}).then(function(params) {
+								res.render('manageTesters.ejs', {
+									user : req.user,
+									testersRem : params[0],
+									testersAdd : params[1],
+									msg : "failAdd"
+								});
+							}).catch(function(err) {
+								console.log(err);
+							});
+						}
+						else {
+							getTestersRem(req).then(function(testResRem) {
+									return getTestersAdd(req, testResRem);
+							}).then(function(params) {
+								console.log(params[0], params[1]);
+								res.render('manageTesters.ejs', {
+									user : req.user,
+									testersRem : params[0],
+									testersAdd : params[1],
+									msg : "successAdd"
+								});
+							}).catch(function(err) {
+								console.log(err);
+							});
+						}
+					});
+			}).catch(function(err) {
+				console.log(err);
+			});
 		}
 		else {
 			res.end("Forbidden access");
@@ -561,7 +674,6 @@ module.exports = function(app, passport, expressValidator) {
 			removeTester().then(function(params) {
 				// console.log(params[0].id);
 				console.log(req.body.testers);
-				return new Promise(function(resolve, reject) {
 					var t = "";
 					req.body.testers.forEach(function(item, index) {
 						t += item+", ";
@@ -570,21 +682,37 @@ module.exports = function(app, passport, expressValidator) {
 					dbQuery = "DELETE FROM project_team WHERE user_id IN (?) AND project_id = ?";
 					connection.query(dbQuery, [t, params[0].id], function(err,rows) {
 						if(err) {
-							reject(err);
+							getTestersRem(req).then(function(testResRem) {
+									return getTestersAdd(req, testResRem);
+							}).then(function(params) {
+								console.log(params[0], params[1]);
+								res.render('manageTesters.ejs', {
+									user : req.user,
+									testersRem : params[0],
+									testersAdd : params[1],
+									msg : "failRem"
+								});
+							}).catch(function(err) {
+								console.log(err);
+							});
 						}
 						else {
-							console.log("Success");
-							resolve();
+							getTestersRem(req).then(function(testResRem) {
+								return getTestersAdd(req, testResRem);
+							}).then(function(params) {
+								console.log(params[0], params[1]);
+								res.render('manageTesters.ejs', {
+									user : req.user,
+									testersRem : params[0],
+									testersAdd : params[1],
+									msg : "successRem"
+								});
+							}).catch(function(err) {
+								console.log(err);
+							});
 						}
 					});
-				});
-			}).then(function() {
-				res.render('manageTesters.ejs', {
-					user : req.user,
-					msg : "Tester removed from the project"
-				});
-			})
-			.catch(function(err) {
+			}).catch(function(err) {
 				console.log(err);
 			});
 		}
@@ -592,6 +720,185 @@ module.exports = function(app, passport, expressValidator) {
 			res.end("Forbidden access");
 		}
 	});
+
+	function getDevelopersRem(req) {
+	    return new Promise (function(resolve, reject) {
+	        var errFlag = 0;
+	        var dbQuery1 = "SELECT users.id AS developerId, users.name AS developerName, projects.id AS projectId FROM projects JOIN project_team JOIN users ON project_team.user_id = users.id AND projects.id = project_team.project_id AND users.class = 2 AND projects.manager_id = ?";
+	        connection.query(dbQuery1,[req.user.id], function(err, devResRem) {
+	            if(err) {
+	                reject(err);
+	            }
+	            else {
+	                resolve(devResRem);
+	            }
+	        });
+	    });
+	}
+
+	function getDevelopersAdd(req, devResRem) {
+	    return new Promise (function(resolve, reject) {
+	        var dbQuery2 = "SELECT users.id AS developerId, users.name AS developerName, projects.id AS projectId FROM projects JOIN project_team JOIN users ON project_team.user_id = users.id AND projects.id = project_team.project_id AND users.class = 2 AND projects.manager_id != ? AND projects.id NOT IN (SELECT projects.id FROM projects WHERE manager_id = ?)";
+	        connection.query(dbQuery2,[req.user.id, req.user.id], function(err, devResAdd) {
+	            if(err) {
+	                reject(err);
+	            }
+	            else {
+	                resolve([devResRem, devResAdd]);
+	            }
+	        });
+	    });
+	}
+
+	app.get('/home/manageDevelopers', isLoggedIn, function(req, res) {
+	    if(req.user.class == 0) {
+	        getDevelopersRem(req).then(function(devResRem) {
+	                return getDevelopersAdd(req, devResRem);
+	        }).then(function(params) {
+	            console.log(params[0], params[1]);
+	            res.render('manageDevelopers.ejs', {
+	                user : req.user,
+	                developersRem : params[0],
+	                developersAdd : params[1]
+	            });
+	        }).catch(function(err) {
+	            console.log(err);
+	        });
+	    }
+	    else {
+	        res.end("Forbidden access");
+	    }
+	});
+
+	app.post('/home/manageDevelopers/addDevelopers', isLoggedIn, function(req, res) {
+	    if(req.user.class == 0) {
+	        function addTester() {
+	            return new Promise(function(resolve, reject) {
+	                dbQuery = "SELECT id FROM projects WHERE manager_id = ?";
+	                connection.query(dbQuery, [req.user.id], function(err, rows) {
+	                    if(err) {
+	                        reject(err);
+	                    }
+	                    else {
+	                        resolve(rows);
+	                    }
+	                });
+	            });
+	        }
+	        addTester().then(function(params) {
+	            var vals = "";
+	                req.body.developers.forEach(function(item, index) {
+	                    vals += "("+params[0].id+", "+item+"), ";
+	                });
+	                vals = vals.slice(0, -2);
+	                console.log("OK "+vals);
+	                dbQuery = "INSERT INTO project_team (project_id, user_id) VALUES "+vals;
+	                console.log(dbQuery);
+	                connection.query(dbQuery, function(err,rows) {
+	                    if(err) {
+	                        getDevelopersRem(req).then(function(devResRem) {
+	                                return getDevelopersAdd(req, devResRem);
+	                        }).then(function(params) {
+	                            res.render('manageDevelopers.ejs', {
+	                                user : req.user,
+	                                developersRem : params[0],
+	                                developersAdd : params[1],
+	                                msg : "failAdd"
+	                            });
+	                        }).catch(function(err) {
+	                            console.log(err);
+	                        });
+	                    }
+	                    else {
+	                        getDevelopersRem(req).then(function(devResRem) {
+	                                return getDevelopersAdd(req, devResRem);
+	                        }).then(function(params) {
+	                            console.log(params[0], params[1]);
+	                            res.render('manageDevelopers.ejs', {
+	                                user : req.user,
+	                                developersRem : params[0],
+	                                developersAdd : params[1],
+	                                msg : "successAdd"
+	                            });
+	                        }).catch(function(err) {
+	                            console.log(err);
+	                        });
+	                    }
+	                });
+	        }).catch(function(err) {
+	            console.log(err);
+	        });
+	    }
+	    else {
+	        res.end("Forbidden access");
+	    }
+	});
+
+	app.post('/home/manageDevelopers/removeDevelopers', isLoggedIn, function(req, res) {
+	    if(req.user.class == 0) {
+	        function removeTester() {
+	            return new Promise(function(resolve, reject) {
+	                dbQuery = "SELECT id FROM projects WHERE manager_id = ?";
+	                connection.query(dbQuery, [req.user.id], function(err, rows) {
+	                    if(err) {
+	                        reject(err);
+	                    }
+	                    else {
+	                        resolve(rows);
+	                    }
+	                });
+	            });
+	        }
+	        removeTester().then(function(params) {
+	            // console.log(params[0].id);
+	            console.log(req.body.developers);
+	                var t = "";
+	                req.body.developers.forEach(function(item, index) {
+	                    t += item+", ";
+	                });
+	                t = t.slice(0, -2);
+	                dbQuery = "DELETE FROM project_team WHERE user_id IN (?) AND project_id = ?";
+	                connection.query(dbQuery, [t, params[0].id], function(err,rows) {
+	                    if(err) {
+	                        getDevelopersRem(req).then(function(devResRem) {
+	                                return getDevelopersAdd(req, devResRem);
+	                        }).then(function(params) {
+	                            console.log(params[0], params[1]);
+	                            res.render('manageDevelopers.ejs', {
+	                                user : req.user,
+	                                developersRem : params[0],
+	                                developersAdd : params[1],
+	                                msg : "failRem"
+	                            });
+	                        }).catch(function(err) {
+	                            console.log(err);
+	                        });
+	                    }
+	                    else {
+	                        getDevelopersRem(req).then(function(devResRem) {
+	                            return getDevelopersAdd(req, devResRem);
+	                        }).then(function(params) {
+	                            console.log(params[0], params[1]);
+	                            res.render('manageDevelopers.ejs', {
+	                                user : req.user,
+	                                developersRem : params[0],
+	                                developersAdd : params[1],
+	                                msg : "successRem"
+	                            });
+	                        }).catch(function(err) {
+	                            console.log(err);
+	                        });
+	                    }
+	                });
+	        }).catch(function(err) {
+	            console.log(err);
+	        });
+	    }
+	    else {
+	        res.end("Forbidden access");
+	    }
+	});
+
 
 	// Logout
 	app.get('/logout', function(req, res) {

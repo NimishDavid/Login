@@ -41,8 +41,8 @@
         							</tr>
         						</thead>
                                 <tbody>
-                                <% for(i=0; i<resultTes.length; i++) {%>
-                                    <% if((resultTes[i].status == 'Review')) {%>
+                                <% for(i=0; i<resultTes.length; i++) { %>
+                                    <% if((resultTes[i].status == 'Review')) { %>
 
                                         <tr>
                 							<td class="bug_id"><%= resultTes[i].id %></td>
@@ -57,7 +57,8 @@
                                             <td class="stat">
                                                  <select class="form-control" name="status" required>
                                                   <option value="">Select status</option>
-                                                  <option value="Approval">Approval</option>
+                                                  <option value="Review Reject">Reject</option>
+                                                  <option value="Approval">Request Approval</option>
                                                  </select>
                                                  <div class="help-block with-errors"></div>
                                             </td>
@@ -102,8 +103,8 @@
         							</tr>
         						</thead>
                             <tbody>
-                            <% for(i=0; i<resultTes.length; i++) {%>
-                                <% if(resultTes[i].status != 'Review') {%>
+                            <% for(i=0; i<resultTes.length; i++) { %>
+                                <% if(resultTes[i].status != 'Review') { %>
 
                                     <tr>
             								<td class="bug_id"><%= resultTes[i].id %></td>
@@ -124,6 +125,44 @@
         						</tbody>
         					</table>
                         <% } %>
+
+                        <% if(type == 'tasks') { %>
+                            <div class="panel panel-default">
+            					<div class="panel-heading">
+            						<h3 class="panel-title">Reported Bugs</h3>
+            						<div class="pull-right">
+            							<span class="clickable filter" data-toggle="tooltip" title="Toggle table filter" data-container="body">
+                                            <i class="fa fa-filter" aria-hidden="true"></i>
+            							</span>
+            						</div>
+            					</div>
+            					<div class="panel-body">
+            						<input type="text" class="form-control" id="dev-table-filter" data-action="filter" data-filters="#dev-table" placeholder="Filter Bugs" />
+            					</div>
+        					<table class="table table-responsive table-hover" id="dev-table">
+        						<thead>
+        							<tr>
+                                        <th>Project ID</th>
+                                        <th>Project Name</th>
+                                        <th>Manager ID</th>
+                                        <th>Manager Name</th>
+        							</tr>
+        						</thead>
+                            <tbody>
+                            <% resultTes.forEach(function(item, index) { %>
+
+                                    <tr>
+                                        <td><%= resultTes[index].projectId %></td>
+                                        <td><%= resultTes[index].projectName %></td>
+                                        <td><%= resultTes[index].managerId %></td>
+                                        <td><%= resultTes[index].managerName %></td>
+            							</tr>
+
+                                <% }); %>
+        						</tbody>
+        					</table>
+                        <% } %>
+
 
                     <% } %> <!--If tester -->
 				</div>
