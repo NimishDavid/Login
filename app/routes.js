@@ -503,6 +503,8 @@ module.exports = function(app, passport, expressValidator) {
 		}
 	});
 
+
+
 	app.get('/home/manageTesters', isLoggedIn, function(req, res) {
 		if(req.user.class == 0) {
 			function getTesters() {
@@ -519,7 +521,6 @@ module.exports = function(app, passport, expressValidator) {
 				});
 			}
 			getTesters().then(function(testRes) {
-				console.log(testRes);
 				res.render('manageTesters.ejs', {
 					user : req.user,
 					testers : testRes
@@ -544,7 +545,48 @@ module.exports = function(app, passport, expressValidator) {
 
 	app.post('/home/manageTesters/removeTesters', isLoggedIn, function(req, res) {
 		if(req.user.class == 0) {
-			console.log(req.body);
+			function removeTester() {
+				return new Promise(function(resolve, reject) {
+					dbQuery = "SELECT id FROM projects WHERE manager_id = ?";
+					connection.query(dbQuery, [req.user.id], function(err, rows) {
+						if(err) {
+							reject(err);
+						}
+						else {
+							resolve(rows);
+						}
+					});
+				});
+			}
+			removeTester().then(function(params) {
+				// console.log(params[0].id);
+				console.log(req.body.testers);
+				return new Promise(function(resolve, reject) {
+					var t = "";
+					req.body.testers.forEach(function(item, index) {
+						t += item+", ";
+					});
+					t = t.slice(0, -2);
+					dbQuery = "DELETE FROM project_team WHERE user_id IN (?) AND project_id = ?";
+					connection.query(dbQuery, [t, params[0].id], function(err,rows) {
+						if(err) {
+							reject(err);
+						}
+						else {
+							console.log("Success");
+							resolve();
+						}
+					});
+				});
+			}).then(function() {
+				res.render('manageTesters.ejs', {
+					user : req.user,
+					msg : "Tester removed from the project"
+				});
+			})
+			.catch(function(err) {
+				console.log(err);
+			});
 		}
 		else {
 			res.end("Forbidden access");
