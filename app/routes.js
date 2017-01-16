@@ -36,6 +36,15 @@ module.exports = function(app, passport, expressValidator) {
 
 	// Home page. Login verified using isLoggedIn.
 	app.get('/home', isLoggedIn, function(req, res) {
+		if(req.user.class == 0) {
+			res.redirect('/home/unassignedBugs');
+		}
+		if(req.user.class == 1) {
+			res.redirect('/home/testerTasks');
+		}
+		if(req.user.class == 2) {
+			res.redirect('/home/devBugReport');
+		}
 		res.render('home.ejs', {
 			user : req.user // Get the user out of session and pass to template.
 		});
@@ -89,13 +98,13 @@ module.exports = function(app, passport, expressValidator) {
 			var message;
 
 			req.assert('bug_name', 'Bug name is required').notEmpty();
-		    req.assert('bug_type', 'Bug type is required').notEmpty();
+		  req.assert('bug_type', 'Bug type is required').notEmpty();
 			req.assert('project', 'Project ID is required').notEmpty().isNumeric();
 			req.assert('bug_description', 'Bug Description is required').notEmpty().isLength(50,200);
 			req.assert('severity', 'Severity is required').notEmpty();
-			req.assert('class', 'Class is required').notEmpty();
 			req.assert('file', 'File is required').notEmpty();
 			req.assert('method', 'Method is required').notEmpty();
+			req.assert('priority', 'Priority is required').notEmpty();
 			req.assert('line', 'Line number is required').notEmpty().isNumeric();
 			// req.assert('tester_id', 'Tester ID is required').notEmpty().isNumeric();
 			// req.assert('status', 'Status is required').notEmpty();
@@ -103,7 +112,7 @@ module.exports = function(app, passport, expressValidator) {
 		    var errors = req.validationErrors();
 		    if( !errors){   //No errors were found.  Passed Validation!
 
-				var dbQuery = "INSERT INTO `bug_tracker`.`bugs` (`id`, `name`, `bug_type`, `description`, `project_id`, `file`, `method`, `line`, `class`, `severity`, `status`, `tester_id`, `developer_id`) VALUES (NULL, \""+req.body.bug_name+"\", \""+req.body.bug_type+"\", \""+req.body.bug_description+"\", \""+req.body.project+"\", \""+req.body.file+"\", \""+req.body.method+"\", \""+req.body.line+"\", \""+req.body.class+"\", \""+req.body.severity+"\", \"Open\", \""+ req.user.id +"\" , NULL)";
+				var dbQuery = "INSERT INTO `bug_tracker`.`bugs` (`id`, `name`, `bug_type`, `description`, `project_id`, `file`, `method`, `line`, `priority`, `severity`, `status`, `tester_id`, `developer_id`) VALUES (NULL, \""+req.body.bug_name+"\", \""+req.body.bug_type+"\", \""+req.body.bug_description+"\", \""+req.body.project+"\", \""+req.body.file+"\", \""+req.body.method+"\", \""+req.body.line+"\", \""+req.body.priority+"\", \""+req.body.severity+"\", \"Open\", \""+ req.user.id +"\" , NULL)";
 
 				connection.query(dbQuery, function(err, rows){
 					if(err)
@@ -120,6 +129,7 @@ module.exports = function(app, passport, expressValidator) {
 		    }
 		    else {   //Display errors to user
 				console.log("Bug report failed");
+				console.log(errors);
 				message = "error";
 				res.render('reportBug.ejs', {
 					user : req.user,
