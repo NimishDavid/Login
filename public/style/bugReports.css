@@ -16,3 +16,7 @@
 .panel-body{
     display: none;
 }
+
+.resp {
+  overflow: auto;
+}

@@ -48,6 +48,11 @@ module.exports = function(passport) {
             passReqToCallback : true // allows us to pass back the entire request to the callback
         },
         function(req, username, password, done) { // callback with email and password from our form
+          req.assert('username').notEmpty().isLength(3).isInt();
+          req.assert('password').notEmpty().isLength(6,20);
+          var errors = req.validationErrors();
+  		    if( !errors) {
+            console.log("No validation errors");
             connection.query("SELECT * FROM users WHERE employee_id = ?",[username], function(err, rows){
                 if (err)
                     return done(err);
@@ -62,6 +67,11 @@ module.exports = function(passport) {
                 // all is well, return successful user
                 return done(null, rows[0]);
             });
+          }
+          else {
+            console.log("Login failed");
+            return done(error);
+          }
         })
     );
 };

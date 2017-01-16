@@ -7,7 +7,7 @@ module.exports = function(app, passport, expressValidator) {
 
 	// Index page
 	app.get('/', function(req, res) {
-		res.render('index.ejs'); // load the index.ejs file
+		res.redirect('/login'); // load the index.ejs file
 	});
 
 	// Show the login page
@@ -560,7 +560,7 @@ module.exports = function(app, passport, expressValidator) {
 
 	function getTestersAdd(req, testResRem) {
 		return new Promise (function(resolve, reject) {
-			var dbQuery2 = "SELECT users.id AS testerId, users.name AS testerName, projects.id AS projectId FROM projects JOIN project_team JOIN users ON project_team.user_id = users.id AND projects.id = project_team.project_id AND users.class = 1 AND projects.manager_id != ? AND projects.id NOT IN (SELECT projects.id FROM projects WHERE manager_id = ?)";
+			var dbQuery2 = "SELECT DISTINCT(users.id) AS testerId, users.name AS testerName, projects.id AS projectId FROM users JOIN project_team JOIN projects ON projects.id = project_team.project_id AND users.class = 1 AND projects.manager_id != ? WHERE users.id NOT IN (SELECT users.id FROM projects JOIN project_team JOIN users ON project_team.user_id = users.id AND projects.id = project_team.project_id AND users.class = 1 AND projects.manager_id = ?)";
 			connection.query(dbQuery2,[req.user.id, req.user.id], function(err, testResAdd) {
 				if(err) {
 					reject(err);
@@ -594,7 +594,7 @@ module.exports = function(app, passport, expressValidator) {
 
 	app.post('/home/manageTesters/addTesters', isLoggedIn, function(req, res) {
 		if(req.user.class == 0) {
-			function addTester() {
+			function addTester() { // Get projects managed by the PM
 				return new Promise(function(resolve, reject) {
 					dbQuery = "SELECT id FROM projects WHERE manager_id = ?";
 					connection.query(dbQuery, [req.user.id], function(err, rows) {
@@ -679,8 +679,8 @@ module.exports = function(app, passport, expressValidator) {
 						t += item+", ";
 					});
 					t = t.slice(0, -2);
-					dbQuery = "DELETE FROM project_team WHERE user_id IN (?) AND project_id = ?";
-					connection.query(dbQuery, [t, params[0].id], function(err,rows) {
+					dbQuery = "DELETE FROM project_team WHERE user_id IN ("+ t +") AND project_id = ?";
+					connection.query(dbQuery, [params[0].id], function(err,rows) {
 						if(err) {
 							getTestersRem(req).then(function(testResRem) {
 									return getTestersAdd(req, testResRem);
@@ -738,7 +738,7 @@ module.exports = function(app, passport, expressValidator) {
 
 	function getDevelopersAdd(req, devResRem) {
 	    return new Promise (function(resolve, reject) {
-	        var dbQuery2 = "SELECT users.id AS developerId, users.name AS developerName, projects.id AS projectId FROM projects JOIN project_team JOIN users ON project_team.user_id = users.id AND projects.id = project_team.project_id AND users.class = 2 AND projects.manager_id != ? AND projects.id NOT IN (SELECT projects.id FROM projects WHERE manager_id = ?)";
+	        var dbQuery2 = "SELECT DISTINCT(users.id) AS developerId, users.name AS developerName, projects.id AS projectId FROM users JOIN project_team JOIN projects ON projects.id = project_team.project_id AND users.class = 2 AND projects.manager_id != ? WHERE users.id NOT IN (SELECT users.id FROM projects JOIN project_team JOIN users ON project_team.user_id = users.id AND projects.id = project_team.project_id AND users.class = 2 AND projects.manager_id = ?)";
 	        connection.query(dbQuery2,[req.user.id, req.user.id], function(err, devResAdd) {
 	            if(err) {
 	                reject(err);
@@ -772,7 +772,7 @@ module.exports = function(app, passport, expressValidator) {
 
 	app.post('/home/manageDevelopers/addDevelopers', isLoggedIn, function(req, res) {
 	    if(req.user.class == 0) {
-	        function addTester() {
+	        function addDeveloper() {
 	            return new Promise(function(resolve, reject) {
 	                dbQuery = "SELECT id FROM projects WHERE manager_id = ?";
 	                connection.query(dbQuery, [req.user.id], function(err, rows) {
@@ -785,15 +785,13 @@ module.exports = function(app, passport, expressValidator) {
 	                });
 	            });
 	        }
-	        addTester().then(function(params) {
+	        addDeveloper().then(function(params) {
 	            var vals = "";
 	                req.body.developers.forEach(function(item, index) {
 	                    vals += "("+params[0].id+", "+item+"), ";
 	                });
 	                vals = vals.slice(0, -2);
-	                console.log("OK "+vals);
 	                dbQuery = "INSERT INTO project_team (project_id, user_id) VALUES "+vals;
-	                console.log(dbQuery);
 	                connection.query(dbQuery, function(err,rows) {
 	                    if(err) {
 	                        getDevelopersRem(req).then(function(devResRem) {
@@ -813,7 +811,6 @@ module.exports = function(app, passport, expressValidator) {
 	                        getDevelopersRem(req).then(function(devResRem) {
 	                                return getDevelopersAdd(req, devResRem);
 	                        }).then(function(params) {
-	                            console.log(params[0], params[1]);
 	                            res.render('manageDevelopers.ejs', {
 	                                user : req.user,
 	                                developersRem : params[0],
@@ -836,7 +833,7 @@ module.exports = function(app, passport, expressValidator) {
 
 	app.post('/home/manageDevelopers/removeDevelopers', isLoggedIn, function(req, res) {
 	    if(req.user.class == 0) {
-	        function removeTester() {
+	        function removeDeveloper() {
 	            return new Promise(function(resolve, reject) {
 	                dbQuery = "SELECT id FROM projects WHERE manager_id = ?";
 	                connection.query(dbQuery, [req.user.id], function(err, rows) {
@@ -849,7 +846,7 @@ module.exports = function(app, passport, expressValidator) {
 	                });
 	            });
 	        }
-	        removeTester().then(function(params) {
+	        removeDeveloper().then(function(params) {
 	            // console.log(params[0].id);
 	            console.log(req.body.developers);
 	                var t = "";
@@ -857,13 +854,14 @@ module.exports = function(app, passport, expressValidator) {
 	                    t += item+", ";
 	                });
 	                t = t.slice(0, -2);
-	                dbQuery = "DELETE FROM project_team WHERE user_id IN (?) AND project_id = ?";
-	                connection.query(dbQuery, [t, params[0].id], function(err,rows) {
+									console.log(t);
+									console.log(params[0].id);
+	                dbQuery = "DELETE FROM project_team WHERE user_id IN ("+ t +") AND project_id = ?";
+	                connection.query(dbQuery, [params[0].id], function(err,rows) {
 	                    if(err) {
 	                        getDevelopersRem(req).then(function(devResRem) {
 	                                return getDevelopersAdd(req, devResRem);
 	                        }).then(function(params) {
-	                            console.log(params[0], params[1]);
 	                            res.render('manageDevelopers.ejs', {
 	                                user : req.user,
 	                                developersRem : params[0],
@@ -878,7 +876,6 @@ module.exports = function(app, passport, expressValidator) {
 	                        getDevelopersRem(req).then(function(devResRem) {
 	                            return getDevelopersAdd(req, devResRem);
 	                        }).then(function(params) {
-	                            console.log(params[0], params[1]);
 	                            res.render('manageDevelopers.ejs', {
 	                                user : req.user,
 	                                developersRem : params[0],
@@ -916,5 +913,5 @@ function isLoggedIn(req, res, next) {
 		return next();
 
 	// If they aren't, redirect them to the index page
-	res.redirect('/');
+	res.redirect('/login');
 }
