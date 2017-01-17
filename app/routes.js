@@ -52,7 +52,7 @@ module.exports = function(app, passport, expressValidator) {
     app.get('/home/testerTasks', isLoggedIn, function(req, res) {
         if (req.user.class == 1) {
             var projects;
-            connection.query("SELECT DISTINCT(projects.id) AS projectId, projects.name AS projectName, projects.manager_id AS managerId, users.name AS managerName  FROM project_team JOIN projects JOIN users ON project_team.project_id = projects.id AND projects.manager_id = users.id WHERE project_team.user_id = ?", [req.user.id], function(err, tasksRes) {
+            connection.query("SELECT DISTINCT(projects.id) AS projectId, projects.name AS projectName, projects.manager_id AS managerId, users.name AS managerName  FROM project_team JOIN projects JOIN users ON project_team.project_id = projects.id AND projects.manager_id = users.id WHERE project_team.user_id = ? AND projects.status = 'Open'", [req.user.id], function(err, tasksRes) {
                 if (err)
                     throw (err);
                 else {
@@ -72,7 +72,7 @@ module.exports = function(app, passport, expressValidator) {
     app.get('/home/reportBug', isLoggedIn, function(req, res) {
         if (req.user.class == 1) {
             var projects;
-            connection.query("SELECT * FROM project_team JOIN users JOIN projects ON users.id = project_team.user_id AND project_team.project_id = projects.id WHERE users.id = ?", [req.user.id], function(err, rows) {
+            connection.query("SELECT * FROM project_team JOIN users JOIN projects ON users.id = project_team.user_id AND project_team.project_id = projects.id WHERE users.id = ? AND projects.status = 'Open'", [req.user.id], function(err, rows) {
                 if (err)
                     throw (err);
                 else {
@@ -138,51 +138,9 @@ module.exports = function(app, passport, expressValidator) {
 
     });
 
-	// app.post('/home/editBugDetails', isLoggedIn, function(req, res) {
-    //     if (req.user.class == 1) {
-    //         function getProjectsTester() {
-	// 			return new Promise(function(resolve, reject) {
-	// 				connection.query("SELECT * FROM project_team JOIN users JOIN projects ON users.id = project_team.user_id AND project_team.project_id = projects.id WHERE users.id = ?", [req.user.id], function(err, projRes) {
-	// 	                if (err)
-	// 	                    reject(err);
-	// 	                else {
-	// 						console.log("Projects obtained\n");
-	// 						console.log(projRes);
-	// 						console.log("\n");
-	// 		                resolve(projRes);
-	// 	                }
-	// 	            });
-	// 			});
-	// 		}
-	// 		getProjectsTester().then(function(projRes) {
-	// 			connection.query("SELECT * FROM bugs WHERE bugs.id = ?", [req.body.params.bugID], function(err, bugsRes) {
-	// 				if (err)
-	// 					reject(err);
-	// 				else {
-	// 					console.log("Bugs obtained\n");
-	// 					console.log(bugsRes);
-	// 					console.log("\n");
-	//
-	// 					res.send({
-	//                         user: req.user,
-	//                         proj: projRes,
-	//                         len: projRes.length,
-	// 						bugs: bugsRes
-	//                     });
-	// 				}
-	// 			});
-	// 		}).catch(function(err) {
-	// 			console.log(err);
-	// 		});
-    //     }
-	// 	else {
-    //         res.end("Forbidden access");
-    //     }
-    // });
-
 	function getProjectsTester(req) {
 				return new Promise(function(resolve, reject) {
-					connection.query("SELECT * FROM project_team JOIN users JOIN projects ON users.id = project_team.user_id AND project_team.project_id = projects.id WHERE users.id = ?", [req.user.id], function(err, projRes) {
+					connection.query("SELECT * FROM project_team JOIN users JOIN projects ON users.id = project_team.user_id AND project_team.project_id = projects.id WHERE users.id = ? AND projects.status = 'Open'", [req.user.id], function(err, projRes) {
 						if (err)
 							reject(err);
 						else {
@@ -272,9 +230,9 @@ module.exports = function(app, passport, expressValidator) {
 	            var errors = req.validationErrors();
 	            if (!errors) { //No errors were found.  Passed Validation!
 
-	                var dbQuery = "UPDATE bugs SET name = ?, bug_type = ? WHERE bugs.id = ?";
+	                var dbQuery = "UPDATE bugs SET name = ?, bug_type = ?, project_id = ?, description = ?, file = ?, method = ?, line = ?, severity = ?, priority = ? WHERE bugs.id = ?";
 
-	                connection.query(dbQuery, [req.body.bug_name, req.body.bug_type, req.body.bug_id] , function(err, rows) {
+	                connection.query(dbQuery, [req.body.bug_name, req.body.bug_type, req.body.project, req.body.bug_description, req.body.file, req.body.method, req.body.line, req.body.severity, req.body.priority, req.body.bug_id] , function(err, rows) {
 	                    if (err)
 	                        throw (err);
 	                    else {
@@ -317,7 +275,7 @@ module.exports = function(app, passport, expressValidator) {
 
                 return new Promise(function(resolve, reject) {
 
-                    connection.query("SELECT id FROM projects WHERE manager_id = " + req.user.id, function(err, projectsRes) {
+                    connection.query("SELECT id FROM projects WHERE manager_id = ? AND projects.status = 'Open'", [req.user.id], function(err, projectsRes) {
                         if (err)
                             reject(err);
                         else {
@@ -332,7 +290,7 @@ module.exports = function(app, passport, expressValidator) {
             getProjects()
                 .then(function(projectsRes) {
                     return new Promise(function(resolve, reject) {
-                        connection.query("SELECT * FROM bugs WHERE project_id = " + projectsRes[0].id, function(err, bugsRes) {
+                        connection.query("SELECT * FROM bugs WHERE project_id = ?", [projectsRes[0].id], function(err, bugsRes) {
                             if (err)
                                 reject(err);
                             else {
@@ -402,7 +360,7 @@ module.exports = function(app, passport, expressValidator) {
 
 		return new Promise(function(resolve, reject) {
 
-			connection.query("SELECT id FROM projects WHERE manager_id = " + req.user.id, function(err, projectsRes) {
+			connection.query("SELECT id FROM projects WHERE manager_id = ? AND projects.status = 'Open'", [req.user.id], function(err, projectsRes) {
 				if (err)
 					reject(err);
 				else {
@@ -648,7 +606,7 @@ module.exports = function(app, passport, expressValidator) {
 
     app.get('/home/approveBugs', isLoggedIn, function(req, res) {
         if (req.user.class == 0) {
-            connection.query("SELECT bugs.id AS bugid, bugs.name AS bugname, bugs.bug_type AS bugtype, bugs.description AS description, bugs.priority AS priority, bugs.severity as severity, users.name AS assignedto, bugs.status AS status FROM projects JOIN bugs JOIN users ON bugs.project_id = projects.id AND projects.manager_id = ? AND bugs.developer_id = users.id AND bugs.status = 'Approval'", [req.user.id], function(err, bugsRes) {
+            connection.query("SELECT bugs.id AS bugid, bugs.name AS bugname, bugs.bug_type AS bugtype, bugs.description AS description, bugs.priority AS priority, bugs.severity as severity, users.name AS assignedto, bugs.status AS status FROM projects JOIN bugs JOIN users ON bugs.project_id = projects.id AND projects.manager_id = ? AND bugs.developer_id = users.id AND bugs.status = 'Approval' AND projects.status = 'Open'", [req.user.id], function(err, bugsRes) {
                 if (err)
                     console.log(err);
                 else {
@@ -692,7 +650,7 @@ module.exports = function(app, passport, expressValidator) {
     function getTestersRem(req) {
         return new Promise(function(resolve, reject) {
             var errFlag = 0;
-            var dbQuery1 = "SELECT users.id AS testerId, users.name AS testerName, projects.id AS projectId FROM projects JOIN project_team JOIN users ON project_team.user_id = users.id AND projects.id = project_team.project_id AND users.class = 1 AND projects.manager_id = ?";
+            var dbQuery1 = "SELECT users.id AS testerId, users.name AS testerName, projects.id AS projectId FROM projects JOIN project_team JOIN users ON project_team.user_id = users.id AND projects.id = project_team.project_id AND users.class = 1 AND projects.manager_id = ? AND projects.status = 'Open'";
             connection.query(dbQuery1, [req.user.id], function(err, testResRem) {
                 if (err) {
                     reject(err);
@@ -705,7 +663,7 @@ module.exports = function(app, passport, expressValidator) {
 
     function getTestersAdd(req, testResRem) {
         return new Promise(function(resolve, reject) {
-            var dbQuery2 = "SELECT DISTINCT(users.id) AS testerId, users.name AS testerName, projects.id AS projectId FROM users JOIN project_team JOIN projects ON projects.id = project_team.project_id AND users.class = 1 AND projects.manager_id != ? WHERE users.id NOT IN (SELECT users.id FROM projects JOIN project_team JOIN users ON project_team.user_id = users.id AND projects.id = project_team.project_id AND users.class = 1 AND projects.manager_id = ?)";
+            var dbQuery2 = "SELECT DISTINCT(users.id) AS testerId, users.name AS testerName, projects.id AS projectId FROM users JOIN project_team JOIN projects ON projects.id = project_team.project_id AND users.class = 1 AND projects.manager_id != ? AND projects.status = 'Open' WHERE users.id NOT IN (SELECT users.id FROM projects JOIN project_team JOIN users ON project_team.user_id = users.id AND projects.id = project_team.project_id AND users.class = 1 AND projects.manager_id = ?)";
             connection.query(dbQuery2, [req.user.id, req.user.id], function(err, testResAdd) {
                 if (err) {
                     reject(err);
@@ -739,7 +697,7 @@ module.exports = function(app, passport, expressValidator) {
         if (req.user.class == 0) {
             function addTester() { // Get projects managed by the PM
                 return new Promise(function(resolve, reject) {
-                    dbQuery = "SELECT id FROM projects WHERE manager_id = ?";
+                    dbQuery = "SELECT id FROM projects WHERE manager_id = ? AND projects.status = 'Open'";
                     connection.query(dbQuery, [req.user.id], function(err, rows) {
                         if (err) {
                             reject(err);
@@ -800,7 +758,7 @@ module.exports = function(app, passport, expressValidator) {
         if (req.user.class == 0) {
             function removeTester() {
                 return new Promise(function(resolve, reject) {
-                    dbQuery = "SELECT id FROM projects WHERE manager_id = ?";
+                    dbQuery = "SELECT id FROM projects WHERE manager_id = ? AND projects.status = 'Open'";
                     connection.query(dbQuery, [req.user.id], function(err, rows) {
                         if (err) {
                             reject(err);
@@ -861,7 +819,7 @@ module.exports = function(app, passport, expressValidator) {
     function getDevelopersRem(req) {
         return new Promise(function(resolve, reject) {
             var errFlag = 0;
-            var dbQuery1 = "SELECT users.id AS developerId, users.name AS developerName, projects.id AS projectId FROM projects JOIN project_team JOIN users ON project_team.user_id = users.id AND projects.id = project_team.project_id AND users.class = 2 AND projects.manager_id = ?";
+            var dbQuery1 = "SELECT users.id AS developerId, users.name AS developerName, projects.id AS projectId FROM projects JOIN project_team JOIN users ON project_team.user_id = users.id AND projects.id = project_team.project_id AND users.class = 2 AND projects.manager_id = ? AND projects.status = 'Open'";
             connection.query(dbQuery1, [req.user.id], function(err, devResRem) {
                 if (err) {
                     reject(err);
@@ -874,7 +832,7 @@ module.exports = function(app, passport, expressValidator) {
 
     function getDevelopersAdd(req, devResRem) {
         return new Promise(function(resolve, reject) {
-            var dbQuery2 = "SELECT DISTINCT(users.id) AS developerId, users.name AS developerName, projects.id AS projectId FROM users JOIN project_team JOIN projects ON projects.id = project_team.project_id AND users.class = 2 AND projects.manager_id != ? WHERE users.id NOT IN (SELECT users.id FROM projects JOIN project_team JOIN users ON project_team.user_id = users.id AND projects.id = project_team.project_id AND users.class = 2 AND projects.manager_id = ?)";
+            var dbQuery2 = "SELECT DISTINCT(users.id) AS developerId, users.name AS developerName, projects.id AS projectId FROM users JOIN project_team JOIN projects ON projects.id = project_team.project_id AND users.class = 2 AND projects.manager_id != ? AND projects.status = 'Open' WHERE users.id NOT IN (SELECT users.id FROM projects JOIN project_team JOIN users ON project_team.user_id = users.id AND projects.id = project_team.project_id AND users.class = 2 AND projects.manager_id = ?)";
             connection.query(dbQuery2, [req.user.id, req.user.id], function(err, devResAdd) {
                 if (err) {
                     reject(err);
@@ -908,7 +866,7 @@ module.exports = function(app, passport, expressValidator) {
         if (req.user.class == 0) {
             function addDeveloper() {
                 return new Promise(function(resolve, reject) {
-                    dbQuery = "SELECT id FROM projects WHERE manager_id = ?";
+                    dbQuery = "SELECT id FROM projects WHERE manager_id = ? AND projects.status = 'Open'";
                     connection.query(dbQuery, [req.user.id], function(err, rows) {
                         if (err) {
                             reject(err);
@@ -966,7 +924,7 @@ module.exports = function(app, passport, expressValidator) {
         if (req.user.class == 0) {
             function removeDeveloper() {
                 return new Promise(function(resolve, reject) {
-                    dbQuery = "SELECT id FROM projects WHERE manager_id = ?";
+                    dbQuery = "SELECT id FROM projects WHERE manager_id = ? AND projects.status = 'Open'";
                     connection.query(dbQuery, [req.user.id], function(err, rows) {
                         if (err) {
                             reject(err);
@@ -1024,7 +982,104 @@ module.exports = function(app, passport, expressValidator) {
         }
     });
 
-	
+    function getProjectsManage(req) {
+      return new Promise(function(resolve, reject) {
+        connection.query("SELECT * FROM projects WHERE manager_id = ? AND status = 'Open'", [req.user.id], function(err, projectsRes) {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(projectsRes);
+            }
+        });
+      });
+    }
+
+    app.get('/home/manageProjects', isLoggedIn, function(req, res) {
+        if (req.user.class == 0) {
+          getProjectsManage(req).then(function(projectsRes) {
+            res.render('manageProjects.ejs', {
+              user: req.user,
+              projects: projectsRes
+            });
+          }).catch(function(err) {
+            console.log(err);
+          });
+        } else {
+            res.end("Forbidden access");
+        }
+    });
+
+    app.post('/home/manageProjects/addProjects', isLoggedIn, function(req, res) {
+        if (req.user.class == 0) {
+          function addProject() {
+            return new Promise(function(resolve, reject) {
+              connection.query("INSERT INTO projects (name, manager_id) VALUES (?, ?)", [req.body.project_name, req.user.id], function(err, rows) {
+                  if (err) {
+                      reject(err);
+                  } else {
+                      resolve();
+                  }
+              });
+            });
+          }
+          addProject().then(function() {
+            return getProjectsManage(req);
+          }).then(function(projectsRes) {
+            res.render('manageProjects.ejs', {
+              user: req.user,
+              projects: projectsRes,
+              msg : "successAdd"
+            });
+          }).catch(function(err) {
+            res.render('manageProjects.ejs', {
+              user: req.user,
+              projects: projectsRes,
+              msg : "failAdd"
+            });
+          });
+        } else {
+            res.end("Forbidden access");
+        }
+    });
+
+    app.post('/home/manageProjects/removeProjects', isLoggedIn, function(req, res) {
+        if (req.user.class == 0) {
+          function removeProject() {
+            return new Promise(function(resolve, reject) {
+              var t = "";
+              req.body.projects.forEach(function(item, index) {
+                  t += item + ", ";
+              });
+              t = t.slice(0, -2);
+              dbQuery = "UPDATE projects SET status = 'Closed' WHERE id IN (" + t + ") AND manager_id = ?";
+              connection.query(dbQuery, [req.user.id], function(err, rows) {
+                  if (err) {
+                      reject(err);
+                  } else {
+                      resolve();
+                  }
+              });
+            });
+          }
+          removeProject().then(function() {
+            return getProjectsManage(req);
+          }).then(function(projectsRes) {
+            res.render('manageProjects.ejs', {
+              user: req.user,
+              projects: projectsRes,
+              msg : "successRem"
+            });
+          }).catch(function(err) {
+            res.render('manageProjects.ejs', {
+              user: req.user,
+              projects: projectsRes,
+              msg : "failRem"
+            });
+          });
+        } else {
+            res.end("Forbidden access");
+        }
+    });
 
     // Logout
     app.get('/logout', function(req, res) {

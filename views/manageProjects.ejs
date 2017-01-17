@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Manage Projects</title>
+        <link rel="stylesheet" href="/style/manageProjects.css">
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/1000hz-bootstrap-validator/0.11.9/validator.min.js"></script>
+    </head>
+    <body>
+
+        <% include navbar %>
+
+        <div class="container">
+        	<div class="row">
+    			<div class="col-md-12">
+                    <% if(typeof(msg) != 'undefined') { %>
+                        <%if(msg == 'successRem') {%>
+                            <div class="alert alert-success alert-dismissable fade in">
+                                <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                                <strong>Success!</strong>&nbspProjects(s) removed.
+                            </div>
+                        <% } else if(msg == 'failRem') {%>
+                            <div class="alert alert-danger alert-dismissable fade in">
+                                <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                                <strong>Error!</strong>&nbspFailed to remove Project(s).
+                            </div>
+                        <% } %>
+                        <%if(msg == 'successAdd') {%>
+                            <div class="alert alert-success alert-dismissable fade in">
+                                <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                                <strong>Success!</strong>&nbspNew Project added.
+                            </div>
+                        <% } else if(msg == 'failAdd') {%>
+                            <div class="alert alert-danger alert-dismissable fade in">
+                                <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                                <strong>Error!</strong>&nbspFailed to add new project.
+                            </div>
+                        <% } %>
+                    <% } %>
+                    <div class="panel panel-default resp">
+                		<div class="panel-heading">
+                			<h3 class="panel-title">Add Projects</h3>
+                		</div>
+                		<div class="panel-body fixed-panel resp">
+                          <div class="col-sm-12">
+                            <form class="" action="/home/manageProjects/addProjects" method="post" data-toggle="validator">
+
+                                <div class="col-sm-11 form-group">
+                                  <input type="text" name="project_name" placeholder="Project Name" class="form-control" required>
+                                  <div class="help-block with-errors"></div>
+                                </div>
+                                <div class="col-sm-1">
+                                  <input type="submit" class="btn btn-md btn-primary" value="Submit">
+                                </div>
+
+                            </form>
+                          </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+        			<div class="col-md-12">
+                    <div class="panel panel-default resp">
+                    		<div class="panel-heading">
+                    			<h3 class="panel-title">Remove Projects</h3>
+                    		</div>
+                    		<div class="panel-body fixed-panel">
+                          <div class="col-md-12">
+                            <div class="col-md-1"><input type="checkbox" name="developers" value= "" disabled></div>
+                            <div class="col-md-6"><strong><p>Project Name</p></strong></div>
+                            <div class="col-md-5"><strong><p>Manager ID</p></strong></div>
+                          </div>
+                          <form class="" action="/home/manageProjects/removeProjects" method="post">
+                              <% if(typeof(projects) != 'undefined') { %>
+                                <% projects.forEach(function(item, index) {%>
+                                  <div class="col-md-12">
+                                    <div class="col-md-1">
+                                        <label>
+                                            <input type="checkbox" name="projects[]" value= <%= item.id %> >
+                                        </label>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p> <%= item.name %> </p>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <p> <%= item.manager_id %> </p>
+                                    </div>
+                                  </div>
+                                <% }); %>
+                            <% } %>
+
+                              <input type="submit" class="btn btn-md btn-primary pull-right" value="Submit">
+                          </form>
+                        </div>
+                    </div>
+                </div>
+              </div>
+
+    </body>
+</html>
