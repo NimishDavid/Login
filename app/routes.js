@@ -1024,6 +1024,7 @@ module.exports = function(app, passport, expressValidator) {
         }
     });
 
+	
 
     // Logout
     app.get('/logout', function(req, res) {
