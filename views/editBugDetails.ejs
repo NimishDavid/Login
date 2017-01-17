@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Report Bug</title>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/1000hz-bootstrap-validator/0.11.9/validator.min.js">
+        </script>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    </head>
+    <body>
+
+    <% include navbar %>
+
+
+    <div class="container">
+    <% if(typeof(msg) != 'undefined') { %>
+        <%if(msg == 'success') {%>
+            <div class="alert alert-success alert-dismissable fade in">
+                <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                <strong>Success!</strong>&nbspBug reported successfully.
+            </div>
+        <% } else {%>
+            <div class="alert alert-danger alert-dismissable fade in">
+                <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                <strong>Error!</strong>&nbspBug report failed.
+            </div>
+        <% } %>
+    <% } %>
+
+    <h1 class="well">Edit Bug Details%> </h1>
+	<div class="col-lg-12 well">
+	<div class="row">
+				<form name="reportBugForm" id="reportBugForm" data-toggle="validator" method="post" action="">
+					<div class="col-sm-12">
+						<div class="row">
+							<div class="col-sm-5 form-group">
+								<label>Bug Name</label>
+								<input type="text" name = "bug_name" id = "bug_name" class="form-control" required value = <%= bugs[0].name %> >
+                                <div class="help-block with-errors"></div>
+							</div>
+							<div class="col-sm-3 form-group">
+								<label>Bug Type :</label>
+                                <select class="form-control" name="bug_type" required>
+                                 <option value= <%= bugs[0].bug_type %> > <%= bugs[0].bug_type %> </option>
+                                 <option value="Type A">Type A</option>
+                                 <option value="Type B">Type B</option>
+                                 <option value="Type C">Type C</option>
+                                </select>
+                                <div class="help-block with-errors"></div>
+							</div>
+                            <div class="col-sm-4 form-group">
+								<label>Project</label>
+                                <select class="form-control" name="project" required>
+                                    <% if(typeof(len) != 'undefined') { %>
+                                        <% if(len==0) { %>
+                                            <option value = "">No assigned projects!</option>
+                                        <% } else { %>
+                                            <option value= <%= bugs[0].project_id %> > <%= bugs[0].project_id %> </option>
+                                            <% for(i=0;i<len;i++) {%>
+                                            <option value = <%= proj[i].project_id %> > <%= proj[i].name %> </option>
+                                            <% } %>
+                                        <% } %>
+                                    <% } %>
+                                </select>
+                                <div class="help-block with-errors"></div>
+							</div>
+						</div>
+						<div class="form-group">
+							<label>Bug Description</label>
+							<textarea name="bug_description" rows="3" class="form-control" data-minlength = "50" required value = <%= bugs[0].description %> ></textarea>
+                            <div class="help-block with-errors"></div>
+						</div>
+						<div class="row">
+							<div class="col-sm-3 form-group">
+								<label>Severity</label>
+                                <select class="form-control" name="severity" required>
+                                 <option value= <%= bugs[0].severity %> > <%= bugs[0].severity %> </option>
+                                 <option value="Minor">Minor</option>
+                                 <option value="Major">Major</option>
+                                 <option value="Critical">Critical</option>
+                                </select>
+                                <div class="help-block with-errors"></div>
+							</div>
+                            <div class="col-sm-3 form-group">
+								<label>Priority</label>
+                                <select class="form-control" name="priority" required>
+                                    <option value= <%= bugs[0].priority %> > <%= bugs[0].priority %> </option>
+                                    <option value="Low">Low</option>
+                                    <option value="Moderate">Moderate</option>
+                                    <option value="High">High</option>
+                                </select>
+                                <div class="help-block with-errors"></div>
+							</div>
+							<div class="col-sm-6 form-group">
+								<label>File</label>
+								<input type="text" name = "file" class="form-control" required value= <%= bugs[0].file %> >
+                                <div class="help-block with-errors"></div>
+							</div>
+						</div>
+						<div class="row">
+                            <div class="col-sm-3 form-group">
+								<label>Method</label>
+								<input type="text" name="method" placeholder="Method" class="form-control" required value= <%= bugs[0].method %> >
+                                <div class="help-block with-errors"></div>
+							</div>
+							<div class="col-sm-3 form-group">
+								<label>Line</label>
+								<input type="number" name="line" placeholder="Line" class="form-control" required value= <%= bugs[0].line %> >
+                                <div class="help-block with-errors"></div>
+							</div>
+                            <!-- <div class="col-sm-4 form-group">
+								<label>Status</label>
+                                <select class="form-control" name="status" required>
+                                 <option value="">Select status</option>
+                                 <option value="Open">Open</option>
+                                 <option value="Assigned">Assigned</option>
+                                 <option value="Resolving">Resolving</option>
+                                 <option value="Review">Review</option>
+                                 <option value="Approval">Approval</option>
+                                 <option value="Closed">Closed</option>
+                                </select>
+                                <div class="help-block with-errors"></div>
+							</div> -->
+						</div>
+					<input type="submit" class="btn btn-primary" value="Submit">
+					</div>
+				</form>
+				</div>
+	</div>
+	</div>
+    <script src="/editBugs.js" charset="utf-8"></script>
+    <!-- <script src="/editBugDetails.js" charset="utf-8"></script> -->
+    <script>
+    document.getElementById("bug_name").value = bugs[0].name;
+    </script>
+    </body>
+</html>

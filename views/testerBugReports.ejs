@@ -106,7 +106,7 @@
                             <tbody>
                             <% for(i=0; i<resultTes.length; i++) { %>
                                 <% if(resultTes[i].status != 'Review') { %>
-
+                                    <% if(resultTes[i].status == 'Open') { %>
                                     <tr>
             								<td class="bug_id"><%= resultTes[i].id %></td>
             								<td><%= resultTes[i].name %></td>
@@ -118,9 +118,25 @@
                                             <td><%= resultTes[i].method %></td>
                                             <td><%= resultTes[i].line %></td>
                                             <td><%= resultTes[i].status %></td>
-                                            <td><%= resultTes[i].developer_id %></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-primary update">Edit Details</button>
+                                            </td>
             							</tr>
-
+                                        <% } else { %>
+                                            <tr>
+                    								<td class="bug_id"><%= resultTes[i].id %></td>
+                    								<td><%= resultTes[i].name %></td>
+                    								<td><%= resultTes[i].bug_type %></td>
+                    								<td><%= resultTes[i].description %></td>
+                                                    <td><%= resultTes[i].severity %></td>
+                                                    <td><%= resultTes[i].priority %></td>
+                                                    <td><%= resultTes[i].file %></td>
+                                                    <td><%= resultTes[i].method %></td>
+                                                    <td><%= resultTes[i].line %></td>
+                                                    <td><%= resultTes[i].status %></td>
+                                                    <td><%= resultTes[i].developer_id %></td>
+                    							</tr>
+                                        <% } %>
                                     <% } %>
                                 <% } %>
         						</tbody>
@@ -172,7 +188,12 @@
 	</div>
 
     <script src="/table.js" charset="utf-8"></script>
+    <% if(type == 'review') { %>
     <script src="/testerStatusUpdate.js" charset="utf-8"></script>
+    <% } %>
+    <% if(type == 'track') { %>
+        <script src="/editBugs.js" charset="utf-8"></script>
+    <% } %>
     <script src="/axios.min.js" charset="utf-8"></script>
 
     </body>
