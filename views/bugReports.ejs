@@ -103,13 +103,13 @@
                                     <% if(resultAdmin[i].status == 'Assigned') {%>
 
                                         <tr>
-            								<td class="bug_id"><%= resultAdmin[i].id %></td>
-            								<td><%= resultAdmin[i].name %></td>
-            								<td><%= resultAdmin[i].bug_type %></td>
+            								<td class="bug_id"><%= resultAdmin[i].bugID %></td>
+            								<td><%= resultAdmin[i].bugName %></td>
+            								<td><%= resultAdmin[i].bugType %></td>
             								<td><%= resultAdmin[i].description %></td>
                                             <td><%= resultAdmin[i].severity %></td>
                                             <td><%= resultAdmin[i].priority %></td>
-                                            <td><%= resultAdmin[i].developer_id %></td>
+                                            <td><%= resultAdmin[i].assignedTo %></td>
                                             <td><%= resultAdmin[i].status %></td>
             							</tr>
 
@@ -152,13 +152,13 @@
                                     <% if(resultAdmin[i].status == 'Closed') {%>
 
                                         <tr>
-            								<td class="bug_id"><%= resultAdmin[i].id %></td>
-            								<td><%= resultAdmin[i].name %></td>
-            								<td><%= resultAdmin[i].bug_type %></td>
+                                            <td class="bug_id"><%= resultAdmin[i].bugID %></td>
+            								<td><%= resultAdmin[i].bugName %></td>
+            								<td><%= resultAdmin[i].bugType %></td>
             								<td><%= resultAdmin[i].description %></td>
                                             <td><%= resultAdmin[i].severity %></td>
                                             <td><%= resultAdmin[i].priority %></td>
-                                            <td><%= resultAdmin[i].developer_id %></td>
+                                            <td><%= resultAdmin[i].assignedTo %></td>
                                             <td><%= resultAdmin[i].status %></td>
             							</tr>
 

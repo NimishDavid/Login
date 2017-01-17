@@ -19,31 +19,32 @@
         <%if(msg == 'success') {%>
             <div class="alert alert-success alert-dismissable fade in">
                 <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-                <strong>Success!</strong>&nbspBug reported successfully.
+                <strong>Success!</strong>&nbspBug edited successfully.
             </div>
         <% } else {%>
             <div class="alert alert-danger alert-dismissable fade in">
                 <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-                <strong>Error!</strong>&nbspBug report failed.
+                <strong>Error!</strong>&nbspBug edit failed.
             </div>
         <% } %>
     <% } %>
 
-    <h1 class="well">Edit Bug Details%> </h1>
+    <h1 class="well">Edit Bug # <%= bugs[0].id %> </h1>
 	<div class="col-lg-12 well">
 	<div class="row">
-				<form name="reportBugForm" id="reportBugForm" data-toggle="validator" method="post" action="">
+				<form name="reportBugForm" id="reportBugForm" data-toggle="validator" method="post" action="/home/editBugDetails">
 					<div class="col-sm-12">
 						<div class="row">
+                            <input type="hidden" name="bug_id" value="<%= bugs[0].id %>">
 							<div class="col-sm-5 form-group">
 								<label>Bug Name</label>
-								<input type="text" name = "bug_name" id = "bug_name" class="form-control" required value = <%= bugs[0].name %> >
+								<input type="text" name = "bug_name" id = "bug_name" class="form-control" required value = "<%= bugs[0].name %>" >
                                 <div class="help-block with-errors"></div>
 							</div>
 							<div class="col-sm-3 form-group">
 								<label>Bug Type :</label>
                                 <select class="form-control" name="bug_type" required>
-                                 <option value= <%= bugs[0].bug_type %> > <%= bugs[0].bug_type %> </option>
+                                 <option value= "<%= bugs[0].bug_type %>" > <%= bugs[0].bug_type %> </option>
                                  <option value="Type A">Type A</option>
                                  <option value="Type B">Type B</option>
                                  <option value="Type C">Type C</option>
@@ -69,7 +70,7 @@
 						</div>
 						<div class="form-group">
 							<label>Bug Description</label>
-							<textarea name="bug_description" rows="3" class="form-control" data-minlength = "50" required value = <%= bugs[0].description %> ></textarea>
+							<textarea name="bug_description" rows="3" class="form-control" data-minlength = "50" required > <%= bugs[0].description %> </textarea>
                             <div class="help-block with-errors"></div>
 						</div>
 						<div class="row">

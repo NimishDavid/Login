@@ -155,17 +155,17 @@
         						</thead>
                             <tbody>
                             <% for(i=0; i<resultDev.length; i++) {%>
-                                <% if((resultDev[i].status == 'Review Reject')||(resultDev[i].status == 'Approve Reject')) {%>
+                                <% if((resultDev[i].rejectType == 'Review Reject')||(resultDev[i].rejectType == 'Approve Reject')) {%>
 
                                     <tr>
-            								<td class="bug_id"><%= resultDev[i].id %></td>
-            								<td><%= resultDev[i].name %></td>
-            								<td><%= resultDev[i].bug_type %></td>
+            								<td class="bug_id"><%= resultDev[i].bugID %></td>
+            								<td><%= resultDev[i].bugName %></td>
+            								<td><%= resultDev[i].bugType %></td>
             								<td><%= resultDev[i].description %></td>
                                             <td><%= resultDev[i].severity %></td>
                                             <td><%= resultDev[i].priority %></td>
-                                            <td><%= resultDev[i].status %></td>
-                                            <td><%= resultDev[i].tester_id %></td>
+                                            <td><%= resultDev[i].rejectType %></td>
+                                            <td><%= resultDev[i].tester %></td>
                                             <td class="stat">
                                               <select class="form-control" name="status" required>
                                                <option value="">Select status</option>

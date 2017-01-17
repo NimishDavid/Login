@@ -180,40 +180,64 @@ module.exports = function(app, passport, expressValidator) {
     //     }
     // });
 
+	function getProjectsTester(req) {
+				return new Promise(function(resolve, reject) {
+					connection.query("SELECT * FROM project_team JOIN users JOIN projects ON users.id = project_team.user_id AND project_team.project_id = projects.id WHERE users.id = ?", [req.user.id], function(err, projRes) {
+						if (err)
+							reject(err);
+						else {
+							console.log("Projects obtained\n");
+							console.log(projRes[0].name);
+							console.log("\n");
+							resolve(projRes);
+						}
+					});
+				});
+	}
+
+	function getBugs(req, projRes) {
+		return new Promise(function(resolve, reject) {
+			connection.query("SELECT * FROM bugs WHERE bugs.id = ?", [req.params.params], function(err, bugsRes) {
+				if (err)
+					reject(err);
+				else {
+					console.log("Bugs obtained\n");
+					console.log(bugsRes[0].name);
+					console.log("\n");
+					resolve([projRes, bugsRes]);
+				}
+			});
+		});
+	}
+
+	function getBugsEdit(req, projRes) {
+		return new Promise(function(resolve, reject) {
+			connection.query("SELECT * FROM bugs WHERE bugs.id = ?", [req.body.bug_id], function(err, bugsRes) {
+				if (err)
+					reject(err);
+				else {
+					console.log("Bugs obtained\n");
+					console.log(bugsRes[0].name);
+					console.log("\n");
+					resolve([projRes, bugsRes]);
+				}
+			});
+		});
+	}
+
 	app.get('/home/editBugDetails/:params', isLoggedIn, function(req, res) {
         if (req.user.class == 1) {
 			console.log(req.params.params);
-			function getProjectsTester() {
-						return new Promise(function(resolve, reject) {
-							connection.query("SELECT * FROM project_team JOIN users JOIN projects ON users.id = project_team.user_id AND project_team.project_id = projects.id WHERE users.id = ?", [req.user.id], function(err, projRes) {
-				                if (err)
-				                    reject(err);
-				                else {
-									console.log("Projects obtained\n");
-									console.log(projRes[0].name);
-									console.log("\n");
-					                resolve(projRes);
-				                }
-				            });
-						});
-			}
-			getProjectsTester().then(function(projRes) {
-						connection.query("SELECT * FROM bugs WHERE bugs.id = ?", [req.params.params], function(err, bugsRes) {
-							if (err)
-								reject(err);
-							else {
-								console.log("Bugs obtained\n");
-								console.log(bugsRes[0].name);
-								console.log("\n");
 
-								res.render('editBugDetails.ejs', {
-			                        user: req.user,
-			                        proj: projRes,
-			                        len: projRes.length,
-									bugs: bugsRes
-			                    });
-							}
-						});
+			getProjectsTester(req).then(function(projRes) {
+                return getBugs(req, projRes);
+            }).then(function(params) {
+				res.render('editBugDetails.ejs', {
+					user: req.user,
+					proj: params[0],
+					len: params[0].length,
+					bugs: params[1]
+				});
 			}).catch(function(err) {
 				console.log(err);
 			});
@@ -221,6 +245,69 @@ module.exports = function(app, passport, expressValidator) {
 		else {
             res.end("Forbidden access");
         }
+    });
+
+	app.post('/home/editBugDetails', isLoggedIn, function(req, res) {
+
+        if (req.user.class == 1) {
+
+			getProjectsTester(req).then(function(projRes) {
+                return getBugsEdit(req, projRes);
+            }).then(function(params) {
+
+				var message;
+
+	            req.assert('bug_name', 'Bug name is required').notEmpty();
+	            req.assert('bug_type', 'Bug type is required').notEmpty();
+	            req.assert('project', 'Project ID is required').notEmpty().isNumeric();
+	            req.assert('bug_description', 'Bug Description is required').notEmpty().isLength(50, 200);
+	            req.assert('severity', 'Severity is required').notEmpty();
+	            req.assert('file', 'File is required').notEmpty();
+	            req.assert('method', 'Method is required').notEmpty();
+	            req.assert('priority', 'Priority is required').notEmpty();
+	            req.assert('line', 'Line number is required').notEmpty().isNumeric();
+	            // req.assert('tester_id', 'Tester ID is required').notEmpty().isNumeric();
+	            // req.assert('status', 'Status is required').notEmpty();
+
+	            var errors = req.validationErrors();
+	            if (!errors) { //No errors were found.  Passed Validation!
+
+	                var dbQuery = "UPDATE bugs SET name = ?, bug_type = ? WHERE bugs.id = ?";
+
+	                connection.query(dbQuery, [req.body.bug_name, req.body.bug_type, req.body.bug_id] , function(err, rows) {
+	                    if (err)
+	                        throw (err);
+	                    else {
+	                        console.log("Bug edit successful");
+	                        message = "success";
+	                        res.render('editBugDetails.ejs', {
+	                            user: req.user,
+	                            msg: message,
+								proj: params[0],
+								len: params[0].length,
+								bugs: params[1]
+	                        });
+	                    }
+	                });
+	            } else { //Display errors to user
+	                console.log("Bug edit failed");
+	                console.log(errors);
+	                message = "error";
+	                res.render('editBugDetails.ejs', {
+	                    user: req.user,
+	                    msg: message,
+						proj: params[0],
+						len: params[0].length,
+						bugs: params[1]
+	                });
+	            }
+			}).catch(function(err) {
+				console.log(err);
+			});
+        } else {
+            res.end("Forbidden access");
+        }
+
     });
 
     app.get('/home/unassignedBugs', isLoggedIn, function(req, res) {
@@ -311,28 +398,29 @@ module.exports = function(app, passport, expressValidator) {
         }
     });
 
+	function getProjects(req) {
+
+		return new Promise(function(resolve, reject) {
+
+			connection.query("SELECT id FROM projects WHERE manager_id = " + req.user.id, function(err, projectsRes) {
+				if (err)
+					reject(err);
+				else {
+					resolve(projectsRes);
+				}
+			});
+
+		});
+
+	}
+
     app.get('/home/assignedBugs', isLoggedIn, function(req, res) {
         if (req.user.class == 0) {
-            function getProjects() {
 
-                return new Promise(function(resolve, reject) {
-
-                    connection.query("SELECT id FROM projects WHERE manager_id = " + req.user.id, function(err, projectsRes) {
-                        if (err)
-                            reject(err);
-                        else {
-                            resolve(projectsRes);
-                        }
-                    });
-
-                });
-
-            }
-
-            getProjects()
+            getProjects(req)
                 .then(function(projectsRes) {
                     return new Promise(function(resolve, reject) {
-                        connection.query("SELECT * FROM bugs WHERE project_id = " + projectsRes[0].id, function(err, bugsRes) {
+                        connection.query("SELECT bugs.id AS bugID, bugs.name AS bugName, bugs.bug_type AS bugType, bugs.description AS description, bugs.severity AS severity, bugs.priority AS priority, users.name AS assignedTo, bugs.status AS status FROM bugs JOIN users WHERE bugs.developer_id = users.id AND project_id = ?",[projectsRes[0].id], function(err, bugsRes) {
                             if (err)
                                 reject(err);
                             else {
@@ -375,26 +463,11 @@ module.exports = function(app, passport, expressValidator) {
 
     app.get('/home/closedBugs', isLoggedIn, function(req, res) {
         if (req.user.class == 0) {
-            function getProjects() {
 
-                return new Promise(function(resolve, reject) {
-
-                    connection.query("SELECT id FROM projects WHERE manager_id = " + req.user.id, function(err, projectsRes) {
-                        if (err)
-                            reject(err);
-                        else {
-                            resolve(projectsRes);
-                        }
-                    });
-
-                });
-
-            }
-
-            getProjects()
+            getProjects(req)
                 .then(function(projectsRes) {
                     return new Promise(function(resolve, reject) {
-                        connection.query("SELECT * FROM bugs WHERE project_id = " + projectsRes[0].id, function(err, bugsRes) {
+                        connection.query("SELECT bugs.id AS bugID, bugs.name AS bugName, bugs.bug_type AS bugType, bugs.description AS description, bugs.severity AS severity, bugs.priority AS priority, users.name AS assignedTo, bugs.status AS status FROM bugs JOIN users WHERE bugs.developer_id = users.id AND project_id = ?",[projectsRes[0].id], function(err, bugsRes) {
                             if (err)
                                 reject(err);
                             else {
@@ -479,7 +552,7 @@ module.exports = function(app, passport, expressValidator) {
 
     app.get('/home/devRejected', isLoggedIn, function(req, res) {
         if (req.user.class == 2) {
-            connection.query("SELECT * FROM bugs WHERE developer_id = " + req.user.id + " AND (status = 'Review Reject' OR status = 'Approve Reject')", function(err, rejectRes) {
+            connection.query("SELECT bugs.id AS bugID, bugs.name AS bugName, bugs.bug_type AS bugType, bugs.description AS description, bugs.severity AS severity, bugs.priority AS priority, bugs.status AS rejectType, users.name AS tester FROM bugs JOIN users WHERE developer_id = ? AND (status = 'Review Reject' OR status = 'Approve Reject') AND users.id = bugs.tester_id", [req.user.id], function(err, rejectRes) {
                 if (err)
                     console.log(err);
                 else {
