@@ -6,7 +6,7 @@ $(".update").click(function() {
     }
     else {
         var $bug = $(this).closest("tr").find(".bug_id").text();         // Retrieves the text within <td>
-        axios.post('/home/approveBugs', {
+        axios.post('/admin/approveBugs', {
             status : $stat,
             bug : $bug
           })

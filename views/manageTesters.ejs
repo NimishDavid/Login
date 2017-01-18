@@ -50,7 +50,7 @@
                               <div class="col-md-6"><strong><p>Tester Name</p></strong></div>
                               <div class="col-md-5"><strong><p>User ID</p></strong></div>
                             </div>
-                            <form class="" action="/home/manageTesters/addTesters" method="post" data-toggle="validator">
+                            <form class="" action="/admin/manageProjectTeam/manageTesters/addTesters" method="post" data-toggle="validator">
                                 <% if(typeof(testersAdd) != 'undefined') { %>
                                   <% testersAdd.forEach(function(item, index) {%>
                                     <div class="col-md-12">
@@ -103,7 +103,7 @@
                             <div class="col-md-6"><strong><p>Tester Name</p></strong></div>
                             <div class="col-md-5"><strong><p>User ID</p></strong></div>
                           </div>
-                          <form class="" action="/home/manageTesters/removeTesters" method="post">
+                          <form class="" action="/admin/manageProjectTeam/manageTesters/removeTesters" method="post">
                               <% if(typeof(testersRem) != 'undefined') { %>
                                 <% testersRem.forEach(function(item, index) {%>
                                   <div class="col-md-12">

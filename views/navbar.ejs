@@ -7,7 +7,7 @@
         <link rel="stylesheet" href="/style/font-awesome-4.7.0/css/font-awesome.min.css">
         <script src="/jquery.min.js"></script>
         <script src="/bootstrap.min.js"></script>
-        
+
 
     </head>
     <body>
@@ -31,33 +31,33 @@
                       <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Bug Report&nbsp<span class="caret"></span></a>
                         <ul class="dropdown-menu">
-                          <li><a href="/home/unassignedBugs">Unassigned</a></li>
-                          <li><a href="/home/assignedBugs">Assigned</a></li>
-                          <li><a href="/home/closedBugs">Closed</a></li>
+                          <li><a href="/admin/bugReports/unassignedBugs">Unassigned</a></li>
+                          <li><a href="/admin/bugReports/assignedBugs">Assigned</a></li>
+                          <li><a href="/admin/bugReports/closedBugs">Closed</a></li>
                         </ul>
                       </li>
-                    <li><a href="/home/approveBugs">Approve Resolved Bugs<span class="sr-only">(current)</span></a></li>
+                    <li><a href="/admin/approveBugs">Approve Resolved Bugs<span class="sr-only">(current)</span></a></li>
                     <li class="dropdown">
                       <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Manage Project Team&nbsp<span class="caret"></span></a>
                       <ul class="dropdown-menu">
-                        <li><a href="/home/manageTesters">Manage Testers</a></li>
-                        <li><a href="/home/manageDevelopers">Manage Developers</a></li>
+                        <li><a href="/admin/manageProjectTeam/manageTesters">Manage Testers</a></li>
+                        <li><a href="/admin/manageProjectTeam/manageDevelopers">Manage Developers</a></li>
                       </ul>
                     </li>
-                    <li><a href="/home/manageProjects">Manage Projects</a></li>
+                    <li><a href="/admin/manageProjects">Manage Projects</a></li>
                   </ul>
               <% } else if(user.class == 1) {%>
                   <ul class="nav navbar-nav">
-                    <li><a href="/home/testerTasks">Tasks</a></li>
-                    <li><a href="/home/reportBug">Report Bugs<span class="sr-only">(current)</span></a></li>
-                    <li><a href="/home/reviewBugs">Review Bugs</a></li>
-                    <li><a href="/home/trackBugs">Track Bugs</a></li>
+                    <li><a href="/tester/testerTasks">Tasks</a></li>
+                    <li><a href="/tester/reportBug">Report Bugs<span class="sr-only">(current)</span></a></li>
+                    <li><a href="/tester/reviewBugs">Review Bugs</a></li>
+                    <li><a href="/tester/trackBugs">Track Bugs</a></li>
                   </ul>
               <% } else if(user.class == 2) {%>
                   <ul class="nav navbar-nav">
-                    <li><a href="/home/devBugReport">Bug Report</a></li>
-                    <li><a href="/home/devBugHistory">Bug History<span class="sr-only">(current)</span></a></li>
-                    <li><a href="/home/devRejected">Rejected Bugs</a></li>
+                    <li><a href="/developer/bugReport">Bug Report</a></li>
+                    <li><a href="/developer/bugHistory">Bug History<span class="sr-only">(current)</span></a></li>
+                    <li><a href="/developer/rejectedBugs">Rejected Bugs</a></li>
                   </ul>
               <% } %>
               <ul class="nav navbar-nav navbar-right">

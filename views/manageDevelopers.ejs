@@ -49,7 +49,7 @@
                               <div class="col-md-6"><strong><p>Tester Name</p></strong></div>
                               <div class="col-md-5"><strong><p>User ID</p></strong></div>
                             </div>
-                            <form class="" action="/home/manageDevelopers/addDevelopers" method="post" data-toggle="validator">
+                            <form class="" action="/admin/manageProjectTeam/manageDevelopers/addDevelopers" method="post" data-toggle="validator">
                                 <% if(typeof(developersAdd) != 'undefined') { %>
                                   <% developersAdd.forEach(function(item, index) {%>
                                     <div class="col-md-12">
@@ -102,7 +102,7 @@
                             <div class="col-md-6"><strong><p>Tester Name</p></strong></div>
                             <div class="col-md-5"><strong><p>User ID</p></strong></div>
                           </div>
-                          <form class="" action="/home/manageDevelopers/removeDevelopers" method="post">
+                          <form class="" action="/admin/manageProjectTeam/manageDevelopers/removeDevelopers" method="post">
                               <% if(typeof(developersRem) != 'undefined') { %>
                                 <% developersRem.forEach(function(item, index) {%>
                                   <div class="col-md-12">

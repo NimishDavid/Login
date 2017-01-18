@@ -45,7 +45,7 @@
                 		</div>
                 		<div class="panel-body fixed-panel resp">
                           <div class="col-sm-12">
-                            <form class="" action="/home/manageProjects/addProjects" method="post" data-toggle="validator">
+                            <form class="" action="/admin/manageProjects/addProjects" method="post" data-toggle="validator">
 
                                 <div class="col-sm-11 form-group">
                                   <input type="text" name="project_name" placeholder="Project Name" class="form-control" required>
@@ -73,7 +73,7 @@
                             <div class="col-md-6"><strong><p>Project Name</p></strong></div>
                             <div class="col-md-5"><strong><p>Manager ID</p></strong></div>
                           </div>
-                          <form class="" action="/home/manageProjects/removeProjects" method="post">
+                          <form class="" action="/admin/manageProjects/removeProjects" method="post">
                               <% if(typeof(projects) != 'undefined') { %>
                                 <% projects.forEach(function(item, index) {%>
                                   <div class="col-md-12">
