@@ -550,28 +550,27 @@ module.exports = function(app, passport, expressValidator) {
         }
     });
 
-    function getTestersRem(req) {
+    function getTestersRem(req, projectsRes) {
         return new Promise(function(resolve, reject) {
-            var errFlag = 0;
             var dbQuery1 = "SELECT users.id AS testerId, users.name AS testerName, projects.id AS projectId FROM projects JOIN project_team JOIN users ON project_team.user_id = users.id AND projects.id = project_team.project_id AND users.class = 1 AND projects.manager_id = ? AND projects.status = 'Open'";
             connection.query(dbQuery1, [req.user.id], function(err, testResRem) {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve(testResRem);
+                    resolve([projectsRes, testResRem]);
                 }
             });
         });
     }
 
-    function getTestersAdd(req, testResRem) {
+    function getTestersAdd(req, projectsRes, testResRem) {
         return new Promise(function(resolve, reject) {
             var dbQuery2 = "SELECT DISTINCT(users.id) AS testerId, users.name AS testerName, projects.id AS projectId FROM users JOIN project_team JOIN projects ON projects.id = project_team.project_id AND users.class = 1 AND projects.manager_id != ? AND projects.status = 'Open' WHERE users.id NOT IN (SELECT users.id FROM projects JOIN project_team JOIN users ON project_team.user_id = users.id AND projects.id = project_team.project_id AND users.class = 1 AND projects.manager_id = ?)";
             connection.query(dbQuery2, [req.user.id, req.user.id], function(err, testResAdd) {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve([testResRem, testResAdd]);
+                    resolve([projectsRes, testResRem, testResAdd]);
                 }
             });
         });
@@ -579,14 +578,16 @@ module.exports = function(app, passport, expressValidator) {
 
     app.get('/home/manageTesters', isLoggedIn, function(req, res) {
         if (req.user.class == 0) {
-            getTestersRem(req).then(function(testResRem) {
-                return getTestersAdd(req, testResRem);
+            getProjectsManage(req).then(function(projectsRes) {
+                return getTestersRem(req, projectsRes);
+            }).then(function(params){
+                return getTestersAdd(req, params[0], params[1]);
             }).then(function(params) {
-                console.log(params[0], params[1]);
                 res.render('manageTesters.ejs', {
                     user: req.user,
-                    testersRem: params[0],
-                    testersAdd: params[1]
+                    projects: params[0],
+                    testersRem: params[1],
+                    testersAdd: params[2]
                 });
             }).catch(function(err) {
                 console.log(err);
@@ -598,50 +599,41 @@ module.exports = function(app, passport, expressValidator) {
 
     app.post('/home/manageTesters/addTesters', isLoggedIn, function(req, res) {
         if (req.user.class == 0) {
-            function addTester() { // Get projects managed by the PM
-                return new Promise(function(resolve, reject) {
-                    dbQuery = "SELECT id FROM projects WHERE manager_id = ? AND projects.status = 'Open'";
-                    connection.query(dbQuery, [req.user.id], function(err, rows) {
-                        if (err) {
-                            reject(err);
-                        } else {
-                            resolve(rows);
-                        }
-                    });
-                });
-            }
-            addTester().then(function(params) {
                 var vals = "";
                 req.body.testers.forEach(function(item, index) {
-                    vals += "(" + params[0].id + ", " + item + "), ";
+                    vals += "(" + req.body.project_id + ", " + item + "), ";
                 });
                 vals = vals.slice(0, -2);
-                console.log("OK " + vals);
                 dbQuery = "INSERT INTO project_team (project_id, user_id) VALUES " + vals;
                 console.log(dbQuery);
                 connection.query(dbQuery, function(err, rows) {
                     if (err) {
-                        getTestersRem(req).then(function(testResRem) {
-                            return getTestersAdd(req, testResRem);
+                        getProjectsManage(req).then(function(projectsRes) {
+                            return getTestersRem(req, projectsRes);
+                        }).then(function(params){
+                            return getTestersAdd(req, params[0], params[1]);
                         }).then(function(params) {
                             res.render('manageTesters.ejs', {
                                 user: req.user,
-                                testersRem: params[0],
-                                testersAdd: params[1],
+                                projects: params[0],
+                                testersRem: params[1],
+                                testersAdd: params[2],
                                 msg: "failAdd"
                             });
                         }).catch(function(err) {
                             console.log(err);
                         });
                     } else {
-                        getTestersRem(req).then(function(testResRem) {
-                            return getTestersAdd(req, testResRem);
+                        getProjectsManage(req).then(function(projectsRes) {
+                            return getTestersRem(req, projectsRes);
+                        }).then(function(params){
+                            return getTestersAdd(req, params[0], params[1]);
                         }).then(function(params) {
-                            console.log(params[0], params[1]);
                             res.render('manageTesters.ejs', {
                                 user: req.user,
-                                testersRem: params[0],
-                                testersAdd: params[1],
+                                projects: params[0],
+                                testersRem: params[1],
+                                testersAdd: params[2],
                                 msg: "successAdd"
                             });
                         }).catch(function(err) {
@@ -649,9 +641,6 @@ module.exports = function(app, passport, expressValidator) {
                         });
                     }
                 });
-            }).catch(function(err) {
-                console.log(err);
-            });
         } else {
             res.end("Forbidden access");
         }
@@ -682,29 +671,33 @@ module.exports = function(app, passport, expressValidator) {
                 dbQuery = "DELETE FROM project_team WHERE user_id IN (" + t + ") AND project_id = ?";
                 connection.query(dbQuery, [params[0].id], function(err, rows) {
                     if (err) {
-                        getTestersRem(req).then(function(testResRem) {
-                            return getTestersAdd(req, testResRem);
+                        getProjectsManage(req).then(function(projectsRes) {
+                            return getTestersRem(req, projectsRes);
+                        }).then(function(params){
+                            return getTestersAdd(req, params[0], params[1]);
                         }).then(function(params) {
-                            console.log(params[0], params[1]);
                             res.render('manageTesters.ejs', {
                                 user: req.user,
-                                testersRem: params[0],
-                                testersAdd: params[1],
-                                msg: "failRem"
+                                projects: params[0],
+                                testersRem: params[1],
+                                testersAdd: params[2],
+                                msg: "failAdd"
                             });
                         }).catch(function(err) {
                             console.log(err);
                         });
                     } else {
-                        getTestersRem(req).then(function(testResRem) {
-                            return getTestersAdd(req, testResRem);
+                        getProjectsManage(req).then(function(projectsRes) {
+                            return getTestersRem(req, projectsRes);
+                        }).then(function(params){
+                            return getTestersAdd(req, params[0], params[1]);
                         }).then(function(params) {
-                            console.log(params[0], params[1]);
                             res.render('manageTesters.ejs', {
                                 user: req.user,
-                                testersRem: params[0],
-                                testersAdd: params[1],
-                                msg: "successRem"
+                                projects: params[0],
+                                testersRem: params[1],
+                                testersAdd: params[2],
+                                msg: "successAdd"
                             });
                         }).catch(function(err) {
                             console.log(err);
@@ -719,28 +712,27 @@ module.exports = function(app, passport, expressValidator) {
         }
     });
 
-    function getDevelopersRem(req) {
+    function getDevelopersRem(req, projectsRes) {
         return new Promise(function(resolve, reject) {
-            var errFlag = 0;
             var dbQuery1 = "SELECT users.id AS developerId, users.name AS developerName, projects.id AS projectId FROM projects JOIN project_team JOIN users ON project_team.user_id = users.id AND projects.id = project_team.project_id AND users.class = 2 AND projects.manager_id = ? AND projects.status = 'Open'";
             connection.query(dbQuery1, [req.user.id], function(err, devResRem) {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve(devResRem);
+                    resolve([projectsRes, devResRem]);
                 }
             });
         });
     }
 
-    function getDevelopersAdd(req, devResRem) {
+    function getDevelopersAdd(req, projectsRes, devResRem) {
         return new Promise(function(resolve, reject) {
             var dbQuery2 = "SELECT DISTINCT(users.id) AS developerId, users.name AS developerName, projects.id AS projectId FROM users JOIN project_team JOIN projects ON projects.id = project_team.project_id AND users.class = 2 AND projects.manager_id != ? AND projects.status = 'Open' WHERE users.id NOT IN (SELECT users.id FROM projects JOIN project_team JOIN users ON project_team.user_id = users.id AND projects.id = project_team.project_id AND users.class = 2 AND projects.manager_id = ?)";
             connection.query(dbQuery2, [req.user.id, req.user.id], function(err, devResAdd) {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve([devResRem, devResAdd]);
+                    resolve([projectsRes, devResRem, devResAdd]);
                 }
             });
         });
@@ -748,14 +740,16 @@ module.exports = function(app, passport, expressValidator) {
 
     app.get('/home/manageDevelopers', isLoggedIn, function(req, res) {
         if (req.user.class == 0) {
-            getDevelopersRem(req).then(function(devResRem) {
-                return getDevelopersAdd(req, devResRem);
+            getProjectsManage(req).then(function(projectsRes) {
+                return getDevelopersRem(req, projectsRes);
+            }).then(function(params){
+                return getDevelopersAdd(req, params[0], params[1]);
             }).then(function(params) {
-                console.log(params[0], params[1]);
                 res.render('manageDevelopers.ejs', {
                     user: req.user,
-                    developersRem: params[0],
-                    developersAdd: params[1]
+                    projects: params[0],
+                    developersRem: params[1],
+                    developersAdd: params[2]
                 });
             }).catch(function(err) {
                 console.log(err);
@@ -767,47 +761,40 @@ module.exports = function(app, passport, expressValidator) {
 
     app.post('/home/manageDevelopers/addDevelopers', isLoggedIn, function(req, res) {
         if (req.user.class == 0) {
-            function addDeveloper() {
-                return new Promise(function(resolve, reject) {
-                    dbQuery = "SELECT id FROM projects WHERE manager_id = ? AND projects.status = 'Open'";
-                    connection.query(dbQuery, [req.user.id], function(err, rows) {
-                        if (err) {
-                            reject(err);
-                        } else {
-                            resolve(rows);
-                        }
-                    });
-                });
-            }
-            addDeveloper().then(function(params) {
                 var vals = "";
                 req.body.developers.forEach(function(item, index) {
-                    vals += "(" + params[0].id + ", " + item + "), ";
+                    vals += "(" + req.body.project_id + ", " + item + "), ";
                 });
                 vals = vals.slice(0, -2);
                 dbQuery = "INSERT INTO project_team (project_id, user_id) VALUES " + vals;
                 connection.query(dbQuery, function(err, rows) {
                     if (err) {
-                        getDevelopersRem(req).then(function(devResRem) {
-                            return getDevelopersAdd(req, devResRem);
+                        getProjectsManage(req).then(function(projectsRes) {
+                            return getDevelopersRem(req, projectsRes);
+                        }).then(function(params){
+                            return getDevelopersAdd(req, params[0], params[1]);
                         }).then(function(params) {
                             res.render('manageDevelopers.ejs', {
                                 user: req.user,
-                                developersRem: params[0],
-                                developersAdd: params[1],
+                                projects: params[0],
+                                developersRem: params[1],
+                                developersAdd: params[2],
                                 msg: "failAdd"
                             });
                         }).catch(function(err) {
                             console.log(err);
                         });
                     } else {
-                        getDevelopersRem(req).then(function(devResRem) {
-                            return getDevelopersAdd(req, devResRem);
+                        getProjectsManage(req).then(function(projectsRes) {
+                            return getDevelopersRem(req, projectsRes);
+                        }).then(function(params){
+                            return getDevelopersAdd(req, params[0], params[1]);
                         }).then(function(params) {
                             res.render('manageDevelopers.ejs', {
                                 user: req.user,
-                                developersRem: params[0],
-                                developersAdd: params[1],
+                                projects: params[0],
+                                developersRem: params[1],
+                                developersAdd: params[2],
                                 msg: "successAdd"
                             });
                         }).catch(function(err) {
@@ -815,9 +802,6 @@ module.exports = function(app, passport, expressValidator) {
                         });
                     }
                 });
-            }).catch(function(err) {
-                console.log(err);
-            });
         } else {
             res.end("Forbidden access");
         }
@@ -850,26 +834,32 @@ module.exports = function(app, passport, expressValidator) {
                 dbQuery = "DELETE FROM project_team WHERE user_id IN (" + t + ") AND project_id = ?";
                 connection.query(dbQuery, [params[0].id], function(err, rows) {
                     if (err) {
-                        getDevelopersRem(req).then(function(devResRem) {
-                            return getDevelopersAdd(req, devResRem);
+                        getProjectsManage(req).then(function(projectsRes) {
+                            return getDevelopersRem(req, projectsRes);
+                        }).then(function(params){
+                            return getDevelopersAdd(req, params[0], params[1]);
                         }).then(function(params) {
                             res.render('manageDevelopers.ejs', {
                                 user: req.user,
-                                developersRem: params[0],
-                                developersAdd: params[1],
+                                projects: params[0],
+                                developersRem: params[1],
+                                developersAdd: params[2],
                                 msg: "failRem"
                             });
                         }).catch(function(err) {
                             console.log(err);
                         });
                     } else {
-                        getDevelopersRem(req).then(function(devResRem) {
-                            return getDevelopersAdd(req, devResRem);
+                        getProjectsManage(req).then(function(projectsRes) {
+                            return getDevelopersRem(req, projectsRes);
+                        }).then(function(params){
+                            return getDevelopersAdd(req, params[0], params[1]);
                         }).then(function(params) {
                             res.render('manageDevelopers.ejs', {
                                 user: req.user,
-                                developersRem: params[0],
-                                developersAdd: params[1],
+                                projects: params[0],
+                                developersRem: params[1],
+                                developersAdd: params[2],
                                 msg: "successRem"
                             });
                         }).catch(function(err) {
