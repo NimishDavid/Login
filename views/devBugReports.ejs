@@ -46,9 +46,9 @@
                                 <% if((resultDev[i].status == 'Assigned')||(resultDev[i].status == 'Resolving')) {%>
 
                                     <tr>
-            								<td class="bug_id"><%= resultDev[i].id %></td>
-            								<td><%= resultDev[i].name %></td>
-            								<td><%= resultDev[i].bug_type %></td>
+            								<td class="bug_id"><%= resultDev[i].bugID %></td>
+            								<td><%= resultDev[i].bugName %></td>
+            								<td><%= resultDev[i].bugType %></td>
             								<td><%= resultDev[i].description %></td>
                                             <td><%= resultDev[i].severity %></td>
                                             <td><%= resultDev[i].priority %></td>
