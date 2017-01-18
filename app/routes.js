@@ -145,38 +145,32 @@ module.exports = function(app, passport, expressValidator) {
 							reject(err);
 						else {
 							console.log("Projects obtained\n");
-							console.log(projRes[0].name);
-							console.log("\n");
 							resolve(projRes);
 						}
 					});
 				});
 	}
 
-	function getBugs(req, projRes) {
+	function getBugDetails(req, projRes) { // Get complete details of the bug
 		return new Promise(function(resolve, reject) {
 			connection.query("SELECT * FROM bugs WHERE bugs.id = ?", [req.params.params], function(err, bugsRes) {
 				if (err)
 					reject(err);
 				else {
 					console.log("Bugs obtained\n");
-					console.log(bugsRes[0].name);
-					console.log("\n");
 					resolve([projRes, bugsRes]);
 				}
 			});
 		});
 	}
 
-	function getBugsEdit(req, projRes) {
+	function getBugsEdit(req, projRes) { // For getting bug details after updating details.
 		return new Promise(function(resolve, reject) {
 			connection.query("SELECT * FROM bugs WHERE bugs.id = ?", [req.body.bug_id], function(err, bugsRes) {
 				if (err)
 					reject(err);
 				else {
 					console.log("Bugs obtained\n");
-					console.log(bugsRes[0].name);
-					console.log("\n");
 					resolve([projRes, bugsRes]);
 				}
 			});
@@ -185,10 +179,8 @@ module.exports = function(app, passport, expressValidator) {
 
 	app.get('/home/editBugDetails/:params', isLoggedIn, function(req, res) {
         if (req.user.class == 1) {
-			console.log(req.params.params);
-
 			getProjectsTester(req).then(function(projRes) {
-                return getBugs(req, projRes);
+                return getBugDetails(req, projRes);
             }).then(function(params) {
 				res.render('editBugDetails.ejs', {
 					user: req.user,
@@ -268,53 +260,40 @@ module.exports = function(app, passport, expressValidator) {
 
     });
 
+    function getBugsAdmin(req) {
+
+        return new Promise(function(resolve, reject) {
+
+            connection.query("SELECT DISTINCT(bugs.id) AS bugID, project_team.project_id AS projectID, bugs.name AS bugName, bugs.bug_type AS bugType, bugs.description AS description, bugs.severity AS severity, bugs.priority AS priority, bugs.status AS status, bugs.developer_id AS assignedTo FROM projects JOIN project_team JOIN bugs WHERE projects.manager_id = ? AND project_team.project_id = bugs.project_id AND bugs.project_id = projects.id AND projects.status = 'Open'", [req.user.id], function(err, bugsRes) {
+                if (err)
+                    reject(err);
+                else {
+                    resolve(bugsRes);
+                }
+            });
+
+        });
+
+    }
+
     app.get('/home/unassignedBugs', isLoggedIn, function(req, res) {
 
         if (req.user.class == 0) {
-            function getProjects() {
 
-                return new Promise(function(resolve, reject) {
-
-                    connection.query("SELECT id FROM projects WHERE manager_id = ? AND projects.status = 'Open'", [req.user.id], function(err, projectsRes) {
-                        if (err)
-                            reject(err);
-                        else {
-                            resolve(projectsRes);
-                        }
-                    });
-
-                });
-
-            }
-
-            getProjects()
-                .then(function(projectsRes) {
+            getBugsAdmin(req).then(function(bugsRes) {
                     return new Promise(function(resolve, reject) {
-                        connection.query("SELECT * FROM bugs WHERE project_id = ?", [projectsRes[0].id], function(err, bugsRes) {
+                        var dbQuery = "SELECT project_team.user_id AS devID, users.name AS devName FROM projects JOIN project_team JOIN users ON projects.manager_id = ? AND projects.id = project_team.project_id AND project_team.user_id = users.id AND users.class = 2";
+                        connection.query(dbQuery, [req.user.id], function(err, devRes) {
                             if (err)
                                 reject(err);
                             else {
-                                resolve([projectsRes, bugsRes]);
+                                resolve([bugsRes, devRes]);
                             }
                         });
                     });
                 }).then(function(params) {
-                    return new Promise(function(resolve, reject) {
-                        var projectsRes = params[0];
-                        var bugsRes = params[1];
-                        var dbQuery = "SELECT * FROM project_team JOIN users ON users.id = project_team.user_id WHERE class = 2 AND project_id = " + projectsRes[0].id;
-                        connection.query(dbQuery, function(err, devRes) {
-                            if (err)
-                                reject(err);
-                            else {
-                                resolve([projectsRes, bugsRes, devRes]);
-                            }
-                        });
-                    });
-                }).then(function(params) {
-                    var projectsRes = params[0];
-                    var bugsRes = params[1];
-                    var devRes = params[2];
+                    var bugsRes = params[0];
+                    var devRes = params[1];
 
                     res.render('bugReports.ejs', {
                         user: req.user,
@@ -338,8 +317,8 @@ module.exports = function(app, passport, expressValidator) {
             req.assert('bug').notEmpty().isInt();
             var errors = req.validationErrors();
             if (!errors) {
-                var dbQuery = "UPDATE bugs SET developer_id = " + req.body.dev + ", status = 'Assigned' WHERE id = " + req.body.bug;
-                connection.query(dbQuery, function(err, devRes) {
+                var dbQuery = "UPDATE bugs SET developer_id = ?, status = 'Assigned' WHERE id = ?";
+                connection.query(dbQuery, [req.body.dev, req.body.bug], function(err, devRes) {
                     if (err)
                         console.log(err);
                     else {
@@ -356,60 +335,14 @@ module.exports = function(app, passport, expressValidator) {
         }
     });
 
-	function getProjects(req) {
-
-		return new Promise(function(resolve, reject) {
-
-			connection.query("SELECT id FROM projects WHERE manager_id = ? AND projects.status = 'Open'", [req.user.id], function(err, projectsRes) {
-				if (err)
-					reject(err);
-				else {
-					resolve(projectsRes);
-				}
-			});
-
-		});
-
-	}
-
     app.get('/home/assignedBugs', isLoggedIn, function(req, res) {
         if (req.user.class == 0) {
 
-            getProjects(req)
-                .then(function(projectsRes) {
-                    return new Promise(function(resolve, reject) {
-                        connection.query("SELECT bugs.id AS bugID, bugs.name AS bugName, bugs.bug_type AS bugType, bugs.description AS description, bugs.severity AS severity, bugs.priority AS priority, users.name AS assignedTo, bugs.status AS status FROM bugs JOIN users WHERE bugs.developer_id = users.id AND project_id = ?",[projectsRes[0].id], function(err, bugsRes) {
-                            if (err)
-                                reject(err);
-                            else {
-                                resolve([projectsRes, bugsRes]);
-                            }
-                        });
-                    });
-                }).then(function(params) {
-                    return new Promise(function(resolve, reject) {
-                        var projectsRes = params[0];
-                        var bugsRes = params[1];
-                        var dbQuery = "SELECT * FROM project_team JOIN users ON users.id = project_team.user_id WHERE class = 2 AND project_id = " + projectsRes[0].id;
-                        connection.query(dbQuery, function(err, devRes) {
-                            if (err)
-                                reject(err);
-                            else {
-                                resolve([projectsRes, bugsRes, devRes]);
-                            }
-                        });
-                    });
-                }).then(function(params) {
-                    var projectsRes = params[0];
-                    var bugsRes = params[1];
-                    var devRes = params[2];
-                    console.log(devRes);
-
+            getBugsAdmin(req).then(function(bugsRes) {
                     res.render('bugReports.ejs', {
                         user: req.user,
                         state: "assigned",
-                        resultAdmin: bugsRes,
-                        devs: devRes
+                        resultAdmin: bugsRes
                     });
                 }).catch(function(err) {
                     console.log(err);
@@ -422,41 +355,11 @@ module.exports = function(app, passport, expressValidator) {
     app.get('/home/closedBugs', isLoggedIn, function(req, res) {
         if (req.user.class == 0) {
 
-            getProjects(req)
-                .then(function(projectsRes) {
-                    return new Promise(function(resolve, reject) {
-                        connection.query("SELECT bugs.id AS bugID, bugs.name AS bugName, bugs.bug_type AS bugType, bugs.description AS description, bugs.severity AS severity, bugs.priority AS priority, users.name AS assignedTo, bugs.status AS status FROM bugs JOIN users WHERE bugs.developer_id = users.id AND project_id = ?",[projectsRes[0].id], function(err, bugsRes) {
-                            if (err)
-                                reject(err);
-                            else {
-                                resolve([projectsRes, bugsRes]);
-                            }
-                        });
-                    });
-                }).then(function(params) {
-                    return new Promise(function(resolve, reject) {
-                        var projectsRes = params[0];
-                        var bugsRes = params[1];
-                        var dbQuery = "SELECT * FROM project_team JOIN users ON users.id = project_team.user_id WHERE class = 2 AND project_id = " + projectsRes[0].id;
-                        connection.query(dbQuery, function(err, devRes) {
-                            if (err)
-                                reject(err);
-                            else {
-                                resolve([projectsRes, bugsRes, devRes]);
-                            }
-                        });
-                    });
-                }).then(function(params) {
-                    var projectsRes = params[0];
-                    var bugsRes = params[1];
-                    var devRes = params[2];
-                    console.log(devRes);
-
+            getBugsAdmin(req).then(function(bugsRes) {
                     res.render('bugReports.ejs', {
                         user: req.user,
                         state: "closed",
-                        resultAdmin: bugsRes,
-                        devs: devRes
+                        resultAdmin: bugsRes
                     });
                 }).catch(function(err) {
                     console.log(err);
@@ -546,7 +449,7 @@ module.exports = function(app, passport, expressValidator) {
 
     app.get('/home/reviewBugs', isLoggedIn, function(req, res) {
         if (req.user.class == 1) {
-            connection.query("SELECT * FROM bugs WHERE tester_id = " + req.user.id + " AND status = 'Review'", function(err, bugsRes) {
+            connection.query("SELECT bugs.id AS bugID, bugs.name AS bugName, bugs.bug_type AS bugType, bugs.description AS description, bugs.severity AS severity, bugs.priority AS priority, bugs.file AS file, bugs.method AS method, bugs.line AS line, bugs.status AS status, bugs.developer_id AS assignedTo FROM bugs JOIN projects ON bugs.project_id = projects.id AND projects.status = 'Open' AND tester_id = ? AND bugs.status = 'Review'", [req.user.id], function(err, bugsRes) {
                 if (err)
                     console.log(err);
                 else {
@@ -588,7 +491,7 @@ module.exports = function(app, passport, expressValidator) {
 
     app.get('/home/trackBugs', isLoggedIn, function(req, res) {
         if (req.user.class == 1) {
-            connection.query("SELECT * FROM bugs WHERE tester_id = " + req.user.id + " AND status NOT IN ('Review')", function(err, bugsRes) {
+            connection.query("SELECT bugs.id AS bugID, bugs.name AS bugName, bugs.bug_type AS bugType, bugs.description AS description, bugs.severity AS severity, bugs.priority AS priority, bugs.file AS file, bugs.method AS method, bugs.line AS line, bugs.status AS status, bugs.developer_id AS assignedTo FROM bugs JOIN projects ON bugs.project_id = projects.id AND projects.status = 'Open' AND tester_id = ? AND bugs.status NOT IN ('Review')", [req.user.id], function(err, bugsRes) {
                 if (err)
                     console.log(err);
                 else {

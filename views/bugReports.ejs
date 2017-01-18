@@ -43,9 +43,9 @@
                                     <% if(resultAdmin[i].status == 'Open') {%>
 
                                         <tr>
-            								<td class="bug_id"><%= resultAdmin[i].id %></td>
-            								<td><%= resultAdmin[i].name %></td>
-            								<td><%= resultAdmin[i].bug_type %></td>
+            								<td class="bug_id"><%= resultAdmin[i].bugID %></td>
+            								<td><%= resultAdmin[i].bugName %></td>
+            								<td><%= resultAdmin[i].bugType %></td>
             								<td><%= resultAdmin[i].description %></td>
                                             <td><%= resultAdmin[i].severity %></td>
                                             <td><%= resultAdmin[i].priority %></td>
@@ -54,7 +54,7 @@
                                                     <select class="form-control" name="developer"  required>
                                                      <option value="">Select Developer</option>
                                                          <% for(j=0;j<devs.length;j++) {%>
-                                                             <option value= <%= devs[j].id %> > <%= devs[j].name %>  </option>
+                                                             <option value= <%= devs[j].devID %> > <%= devs[j].devName %>  </option>
                                                         <% } %>
                                                     </select>
                                                     <div class="help-block with-errors"></div>
@@ -100,7 +100,7 @@
         						</thead>
                                 <tbody>
                                 <% for(i=0; i<resultAdmin.length; i++) {%>
-                                    <% if(resultAdmin[i].status == 'Assigned') {%>
+                                    <% if((resultAdmin[i].status != 'Open') && (resultAdmin[i].status != 'Closed')) {%>
 
                                         <tr>
             								<td class="bug_id"><%= resultAdmin[i].bugID %></td>

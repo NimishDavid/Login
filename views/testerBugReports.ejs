@@ -46,9 +46,9 @@
                                     <% if((resultTes[i].status == 'Review')) { %>
 
                                         <tr>
-                							<td class="bug_id"><%= resultTes[i].id %></td>
-                							<td><%= resultTes[i].name %></td>
-                							<td><%= resultTes[i].bug_type %></td>
+                							<td class="bug_id"><%= resultTes[i].bugID %></td>
+                							<td><%= resultTes[i].bugName %></td>
+                							<td><%= resultTes[i].bugType %></td>
                 							<td><%= resultTes[i].description %></td>
                                             <td><%= resultTes[i].severity %></td>
                                             <td><%= resultTes[i].priority %></td>
@@ -108,9 +108,9 @@
                                 <% if(resultTes[i].status != 'Review') { %>
                                     <% if(resultTes[i].status == 'Open') { %>
                                     <tr>
-            								<td class="bug_id"><%= resultTes[i].id %></td>
-            								<td><%= resultTes[i].name %></td>
-            								<td><%= resultTes[i].bug_type %></td>
+            								<td class="bug_id"><%= resultTes[i].bugID %></td>
+            								<td><%= resultTes[i].bugName %></td>
+            								<td><%= resultTes[i].bugType %></td>
             								<td><%= resultTes[i].description %></td>
                                             <td><%= resultTes[i].severity %></td>
                                             <td><%= resultTes[i].priority %></td>
@@ -124,9 +124,9 @@
             							</tr>
                                         <% } else { %>
                                             <tr>
-                    								<td class="bug_id"><%= resultTes[i].id %></td>
-                    								<td><%= resultTes[i].name %></td>
-                    								<td><%= resultTes[i].bug_type %></td>
+                    								<td class="bug_id"><%= resultTes[i].bugID %></td>
+                    								<td><%= resultTes[i].bugName %></td>
+                    								<td><%= resultTes[i].bugType %></td>
                     								<td><%= resultTes[i].description %></td>
                                                     <td><%= resultTes[i].severity %></td>
                                                     <td><%= resultTes[i].priority %></td>
