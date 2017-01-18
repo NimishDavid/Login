@@ -98,31 +98,39 @@
                     		</div>
                     		<div class="panel-body fixed-panel">
                           <div class="col-md-12">
-                            <div class="col-md-1"><input type="checkbox" name="developers" value= "" disabled></div>
-                            <div class="col-md-6"><strong><p>Tester Name</p></strong></div>
-                            <div class="col-md-5"><strong><p>User ID</p></strong></div>
+                            <div class="col-md-2"><strong><p>User ID</p></strong></div>
+                            <div class="col-md-3"><strong><p>Developer Name</p></strong></div>
+                            <div class="col-md-2"><strong><p>Project ID</p></strong></div>
+                            <div class="col-md-3"><strong><p>Project Name</p></strong></div>
+                            <div class="col-md-2"><strong><p>Remove</p></strong></div>
                           </div>
-                          <form class="" action="/admin/manageProjectTeam/manageDevelopers/removeDevelopers" method="post">
                               <% if(typeof(developersRem) != 'undefined') { %>
                                 <% developersRem.forEach(function(item, index) {%>
                                   <div class="col-md-12">
-                                    <div class="col-md-1">
-                                        <label>
-                                            <input type="checkbox" name="developers[]" value= <%= item.developerId %> >
-                                        </label>
-                                    </div>
-                                    <div class="col-md-6">
+                                    <form class="" action="/admin/manageProjectTeam/manageDevelopers/removeDevelopers" method="post">
+                                      <div class="col-md-2">
+                                          <p> <%= item.developerId %> </p>
+                                          <input type="hidden" name="user_id" value=" <%= item.developerId %> ">
+                                      </div>
+                                    <div class="col-md-3">
                                         <p> <%= item.developerName %> </p>
                                     </div>
-                                    <div class="col-md-5">
-                                        <p> <%= item.developerId %> </p>
+                                    <div class="col-md-2">
+                                        <p> <%= item.projectId %> </p>
+                                        <input type="hidden" name="project_id" value=" <%= item.projectId %> ">
                                     </div>
+                                    <div class="col-md-3">
+                                        <p> <%= item.projectName %> </p>
+                                    </div>
+                                    <div class="col-md-2">
+                                      <button type="submit" class="">
+                                        <i class="fa fa-trash" aria-hidden="true"></i>
+                                      </button>
+                                    </div>
+                                    </form>
                                   </div>
                                 <% }); %>
                             <% } %>
-
-                              <input type="submit" class="btn btn-md btn-primary pull-right" value="Submit">
-                          </form>
                         </div>
                     </div>
                 </div>

@@ -99,31 +99,40 @@
                     		</div>
                     		<div class="panel-body fixed-panel">
                           <div class="col-md-12">
-                            <div class="col-md-1"><input type="checkbox" name="testers" value= "" disabled></div>
-                            <div class="col-md-6"><strong><p>Tester Name</p></strong></div>
-                            <div class="col-md-5"><strong><p>User ID</p></strong></div>
+                            <div class="col-md-2"><strong><p>User ID</p></strong></div>
+                            <div class="col-md-3"><strong><p>Tester Name</p></strong></div>
+                            <div class="col-md-2"><strong><p>Project ID</p></strong></div>
+                            <div class="col-md-3"><strong><p>Project Name</p></strong></div>
+                            <div class="col-md-2"><strong><p>Remove</p></strong></div>
                           </div>
-                          <form class="" action="/admin/manageProjectTeam/manageTesters/removeTesters" method="post">
                               <% if(typeof(testersRem) != 'undefined') { %>
                                 <% testersRem.forEach(function(item, index) {%>
                                   <div class="col-md-12">
-                                    <div class="col-md-1">
-                                        <label>
-                                            <input type="checkbox" name="testers[]" value= <%= item.testerId %> >
-                                        </label>
-                                    </div>
-                                    <div class="col-md-6">
+                                    <form class="" action="/admin/manageProjectTeam/manageTesters/removeTesters" method="post">
+                                      <div class="col-md-2">
+                                          <p> <%= item.testerId %> </p>
+                                          <input type="hidden" name="user_id" value=" <%= item.testerId %> ">
+                                      </div>
+                                    <div class="col-md-3">
                                         <p> <%= item.testerName %> </p>
                                     </div>
-                                    <div class="col-md-5">
-                                        <p> <%= item.testerId %> </p>
+                                    <div class="col-md-2">
+                                        <p> <%= item.projectId %> </p>
+                                        <input type="hidden" name="project_id" value=" <%= item.projectId %> ">
                                     </div>
+                                    <div class="col-md-3">
+                                        <p> <%= item.projectName %> </p>
+                                    </div>
+                                    <div class="col-md-2">
+                                      <button type="submit" class="">
+                                        <i class="fa fa-trash" aria-hidden="true"></i>
+                                      </button>
+                                    </div>
+                                    </form>
                                   </div>
                                 <% }); %>
                             <% } %>
 
-                              <input type="submit" class="btn btn-md btn-primary pull-right checkBtn" value="Submit">
-                          </form>
                         </div>
                     </div>
                 </div>
