@@ -55,7 +55,7 @@ module.exports = function(app, passport, expressValidator) {
 
         if (req.user.class == 0) {
 
-            getBugsAdmin(req).then(function(bugsRes) {
+            getBugsAdminUnassigned(req).then(function(bugsRes) {
                     return new Promise(function(resolve, reject) {
                         var dbQuery = "SELECT project_team.user_id AS devID, users.name AS devName FROM projects JOIN project_team JOIN users ON projects.manager_id = ? AND projects.id = project_team.project_id AND project_team.user_id = users.id AND users.class = 2";
                         connection.query(dbQuery, [req.user.id], function(err, devRes) {
@@ -861,11 +861,27 @@ module.exports = function(app, passport, expressValidator) {
 		});
 	}
 
-    function getBugsAdmin(req) {
+    function getBugsAdminUnassigned(req) {
 
         return new Promise(function(resolve, reject) {
 
             connection.query("SELECT DISTINCT(bugs.id) AS bugID, project_team.project_id AS projectID, bugs.name AS bugName, bugs.bug_type AS bugType, bugs.description AS description, bugs.severity AS severity, bugs.priority AS priority, bugs.status AS status, bugs.developer_id AS assignedTo FROM projects JOIN project_team JOIN bugs WHERE projects.manager_id = ? AND project_team.project_id = bugs.project_id AND bugs.project_id = projects.id AND projects.status = 'Open'", [req.user.id], function(err, bugsRes) {
+                if (err)
+                    reject(err);
+                else {
+                    resolve(bugsRes);
+                }
+            });
+
+        });
+
+    }
+
+    function getBugsAdmin(req) {
+
+        return new Promise(function(resolve, reject) {
+
+            connection.query("SELECT DISTINCT(bugs.id) AS bugID, project_team.project_id AS projectID, bugs.name AS bugName, bugs.bug_type AS bugType, bugs.description AS description, bugs.severity AS severity, bugs.priority AS priority, bugs.status AS status, bugs.developer_id AS assignedTo, users.name AS assignedToName FROM projects JOIN project_team JOIN bugs JOIN users WHERE projects.manager_id = ? AND project_team.project_id = bugs.project_id AND bugs.project_id = projects.id AND projects.status = 'Open' AND bugs.developer_id = users.id", [req.user.id], function(err, bugsRes) {
                 if (err)
                     reject(err);
                 else {
