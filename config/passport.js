@@ -49,7 +49,7 @@ module.exports = function(passport) {
         },
         function(req, username, password, done) { // callback with email and password from our form
           req.assert('username').notEmpty().isLength(3).isInt();
-          req.assert('password').notEmpty().isLength(6,20);
+          req.assert('password').notEmpty().isLength(6,50);
           var errors = req.validationErrors();
   		    if( !errors) {
             console.log("No validation errors");

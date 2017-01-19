@@ -55,7 +55,7 @@
                                     <div class="col-md-12">
                                       <div class="col-md-1">
                                           <label>
-                                              <input type="checkbox" name="developers[]" value= <%= item.developerId %> >
+                                              <input type="checkbox" name="developers[]" value= "<%= item.developerId %>" >
                                           </label>
                                       </div>
                                       <div class="col-md-6">
@@ -74,7 +74,7 @@
                                             <option value="">Select Project</option>
                                             <% if(typeof(projects) != 'undefined') { %>
                                                 <% projects.forEach(function(item, index) { %>
-                                                    <option value=" <%= item.id %> "> <%= item.name %> </option>
+                                                    <option value="<%= item.id %>"> <%= item.name %> </option>
                                                 <% }); %>
                                             <% } %>
                                         </select>
@@ -110,14 +110,14 @@
                                     <form class="" action="/admin/manageProjectTeam/manageDevelopers/removeDevelopers" method="post">
                                       <div class="col-md-2">
                                           <p> <%= item.developerId %> </p>
-                                          <input type="hidden" name="user_id" value=" <%= item.developerId %> ">
+                                          <input type="hidden" name="user_id" value="<%= item.developerId %>">
                                       </div>
                                     <div class="col-md-3">
                                         <p> <%= item.developerName %> </p>
                                     </div>
                                     <div class="col-md-2">
                                         <p> <%= item.projectId %> </p>
-                                        <input type="hidden" name="project_id" value=" <%= item.projectId %> ">
+                                        <input type="hidden" name="project_id" value="<%= item.projectId %>">
                                     </div>
                                     <div class="col-md-3">
                                         <p> <%= item.projectName %> </p>

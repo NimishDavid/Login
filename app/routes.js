@@ -81,6 +81,7 @@ module.exports = function(app, passport, expressValidator) {
                 });
 
         } else {
+            console.log("Forbidden access");
             res.end("Forbidden access");
         }
 
@@ -106,6 +107,7 @@ module.exports = function(app, passport, expressValidator) {
                 res.end("Invalid input");
             }
         } else {
+            console.log("Forbidden access");
             res.end("Forbidden access");
         }
     });
@@ -123,6 +125,7 @@ module.exports = function(app, passport, expressValidator) {
                     console.log(err);
                 });
         } else {
+            console.log("Forbidden access");
             res.end("Forbidden access");
         }
     });
@@ -140,6 +143,7 @@ module.exports = function(app, passport, expressValidator) {
                     console.log(err);
                 });
         } else {
+            console.log("Forbidden access");
             res.end("Forbidden access");
         }
     });
@@ -159,13 +163,14 @@ module.exports = function(app, passport, expressValidator) {
                 }
             });
         } else {
+            console.log("Forbidden access");
             res.end("Forbidden access");
         }
     });
 
     app.post('/admin/approveBugs', isLoggedIn, function(req, res) {
         if (req.user.class == 0) {
-            req.assert('status').notEmpty();
+            req.assert('status').notEmpty().isIn(['Approve Reject', 'Closed']);
             req.assert('bug').notEmpty().isInt();
             var errors = req.validationErrors();
             if (!errors) {
@@ -183,6 +188,7 @@ module.exports = function(app, passport, expressValidator) {
                 res.end("Invalid input");
             }
         } else {
+            console.log("Forbidden access");
             res.end("Forbidden access");
         }
     });
@@ -204,12 +210,18 @@ module.exports = function(app, passport, expressValidator) {
                 console.log(err);
             });
         } else {
+            console.log("Forbidden access");
             res.end("Forbidden access");
         }
     });
 
     app.post('/admin/manageProjectTeam/manageTesters/addTesters', isLoggedIn, function(req, res) {
         if (req.user.class == 0) {
+            req.assert('testers').notEmpty();
+            req.assert('project_id').notEmpty().isInt();
+            var errors = req.validationErrors();
+            if (!errors) {
+                console.log("No validation errors!");
                 var vals = "";
                 req.body.testers.forEach(function(item, index) {
                     vals += "(" + req.body.project_id + ", " + item + "), ";
@@ -252,21 +264,25 @@ module.exports = function(app, passport, expressValidator) {
                         });
                     }
                 });
+
+            } else {
+                console.log("Invalid input");
+                res.end("Invalid input");
+            }
         } else {
+            console.log("Forbidden access");
             res.end("Forbidden access");
         }
     });
 
     app.post('/admin/manageProjectTeam/manageTesters/removeTesters', isLoggedIn, function(req, res) {
         if (req.user.class == 0) {
-                console.log(req.body.testers);
-                // var t = "";
-                // req.body.testers.forEach(function(item, index) {
-                //     t += item + ", ";
-                // });
-                // t = t.slice(0, -2);
+            req.assert('user_id').notEmpty().isInt();
+            req.assert('project_id').notEmpty().isInt();
+            var errors = req.validationErrors();
+            if (!errors) {
+                console.log("No validation errors!");
                 dbQuery = "DELETE FROM project_team WHERE user_id = ? AND project_id = ?";
-                console.log(req.body.project_id);
                 connection.query(dbQuery, [req.body.user_id, req.body.project_id], function(err, rows) {
                     if (err) {
                         getProjectsManage(req).then(function(projectsRes) {
@@ -302,7 +318,13 @@ module.exports = function(app, passport, expressValidator) {
                         });
                     }
                 });
+            }
+            else {
+                console.log("Invalid input");
+                res.end("Invalid input");
+            }
         } else {
+            console.log("Forbidden access");
             res.end("Forbidden access");
         }
     });
@@ -324,12 +346,18 @@ module.exports = function(app, passport, expressValidator) {
                 console.log(err);
             });
         } else {
+            console.log("Forbidden access");
             res.end("Forbidden access");
         }
     });
 
     app.post('/admin/manageProjectTeam/manageDevelopers/addDevelopers', isLoggedIn, function(req, res) {
         if (req.user.class == 0) {
+            req.assert('developers').notEmpty();
+            req.assert('project_id').notEmpty().isInt();
+            var errors = req.validationErrors();
+            if (!errors) {
+                console.log("No validation errors!");
                 var vals = "";
                 req.body.developers.forEach(function(item, index) {
                     vals += "(" + req.body.project_id + ", " + item + "), ";
@@ -371,13 +399,24 @@ module.exports = function(app, passport, expressValidator) {
                         });
                     }
                 });
+            }
+            else {
+                console.log("Invalid input");
+                res.end("Invalid input");
+            }
         } else {
+            console.log("Forbidden access");
             res.end("Forbidden access");
         }
     });
 
     app.post('/admin/manageProjectTeam/manageDevelopers/removeDevelopers', isLoggedIn, function(req, res) {
         if (req.user.class == 0) {
+            req.assert('user_id').notEmpty().isInt();
+            req.assert('project_id').notEmpty().isInt();
+            var errors = req.validationErrors();
+            if (!errors) {
+                console.log("No validation errors!");
                 dbQuery = "DELETE FROM project_team WHERE user_id = ? AND project_id = ?";
                 connection.query(dbQuery, [req.body.user_id, req.body.project_id], function(err, rows) {
                     if (err) {
@@ -414,7 +453,13 @@ module.exports = function(app, passport, expressValidator) {
                         });
                     }
                 });
+            }
+            else {
+                console.log("Invalid input");
+                res.end("Invalid input");
+            }
         } else {
+            console.log("Forbidden access");
             res.end("Forbidden access");
         }
     });
@@ -430,78 +475,99 @@ module.exports = function(app, passport, expressValidator) {
             console.log(err);
           });
         } else {
+            console.log("Forbidden access");
             res.end("Forbidden access");
         }
     });
 
     app.post('/admin/manageProjects/addProjects', isLoggedIn, function(req, res) {
         if (req.user.class == 0) {
-          function addProject() {
-            return new Promise(function(resolve, reject) {
-              connection.query("INSERT INTO projects (name, manager_id) VALUES (?, ?)", [req.body.project_name, req.user.id], function(err, rows) {
-                  if (err) {
-                      reject(err);
-                  } else {
-                      resolve();
+            req.assert('project_name').notEmpty();
+            var errors = req.validationErrors();
+            if (!errors) {
+                console.log("No validation errors!");
+                  function addProject() {
+                    return new Promise(function(resolve, reject) {
+                      connection.query("INSERT INTO projects (name, manager_id) VALUES (?, ?)", [req.body.project_name, req.user.id], function(err, rows) {
+                          if (err) {
+                              reject(err);
+                          } else {
+                              resolve();
+                          }
+                      });
+                    });
                   }
-              });
-            });
-          }
-          addProject().then(function() {
-            return getProjectsManage(req);
-          }).then(function(projectsRes) {
-            res.render('manageProjects.ejs', {
-              user: req.user,
-              projects: projectsRes,
-              msg : "successAdd"
-            });
-          }).catch(function(err) {
-            res.render('manageProjects.ejs', {
-              user: req.user,
-              projects: projectsRes,
-              msg : "failAdd"
-            });
-          });
+                  addProject().then(function() {
+                    return getProjectsManage(req);
+                  }).then(function(projectsRes) {
+                    res.render('manageProjects.ejs', {
+                      user: req.user,
+                      projects: projectsRes,
+                      msg : "successAdd"
+                    });
+                  }).catch(function(err) {
+                    res.render('manageProjects.ejs', {
+                      user: req.user,
+                      projects: projectsRes,
+                      msg : "failAdd"
+                    });
+                  });
+            }
+            else {
+                console.log("Invalid input");
+                res.end("Invalid input");
+            }
         } else {
+            console.log("Forbidden access");
             res.end("Forbidden access");
         }
     });
 
     app.post('/admin/manageProjects/removeProjects', isLoggedIn, function(req, res) {
         if (req.user.class == 0) {
-          function removeProject() {
-            return new Promise(function(resolve, reject) {
-              var t = "";
-              req.body.projects.forEach(function(item, index) {
-                  t += item + ", ";
+            req.assert('projects').notEmpty();
+            var errors = req.validationErrors();
+            if (!errors) {
+                console.log("No validation errors!");
+              function removeProject() {
+                return new Promise(function(resolve, reject) {
+                  var t = "";
+                  req.body.projects.forEach(function(item, index) {
+                      t += item + ", ";
+                  });
+                  t = t.slice(0, -2);
+                  dbQuery = "UPDATE projects SET status = 'Closed' WHERE id IN (" + t + ") AND manager_id = ?";
+                  connection.query(dbQuery, [req.user.id], function(err, rows) {
+                      if (err) {
+                          reject(err);
+                      } else {
+                          resolve();
+                      }
+                  });
+                });
+              }
+              removeProject().then(function() {
+                return getProjectsManage(req);
+              }).then(function(projectsRes) {
+                res.render('manageProjects.ejs', {
+                  user: req.user,
+                  projects: projectsRes,
+                  msg : "successRem"
+                });
+              }).catch(function(err) {
+                res.render('manageProjects.ejs', {
+                  user: req.user,
+                  projects: projectsRes,
+                  msg : "failRem"
+                });
               });
-              t = t.slice(0, -2);
-              dbQuery = "UPDATE projects SET status = 'Closed' WHERE id IN (" + t + ") AND manager_id = ?";
-              connection.query(dbQuery, [req.user.id], function(err, rows) {
-                  if (err) {
-                      reject(err);
-                  } else {
-                      resolve();
-                  }
-              });
-            });
           }
-          removeProject().then(function() {
-            return getProjectsManage(req);
-          }).then(function(projectsRes) {
-            res.render('manageProjects.ejs', {
-              user: req.user,
-              projects: projectsRes,
-              msg : "successRem"
-            });
-          }).catch(function(err) {
-            res.render('manageProjects.ejs', {
-              user: req.user,
-              projects: projectsRes,
-              msg : "failRem"
-            });
-          });
+          else {
+              console.log("Invalid input");
+              res.end("Invalid input");
+          }
         } else {
+            console.log("Forbidden access");
             res.end("Forbidden access");
         }
     });
@@ -524,6 +590,7 @@ module.exports = function(app, passport, expressValidator) {
                 }
             });
         } else {
+            console.log("Forbidden access");
             res.end("Forbidden access");
         }
     });
@@ -544,6 +611,7 @@ module.exports = function(app, passport, expressValidator) {
                 }
             });
         } else {
+            console.log("Forbidden access");
             res.end("Forbidden access");
         }
     });
@@ -553,17 +621,15 @@ module.exports = function(app, passport, expressValidator) {
         if (req.user.class == 1) {
             var message;
 
-            req.assert('bug_name', 'Bug name is required').notEmpty();
-            req.assert('bug_type', 'Bug type is required').notEmpty();
+            req.assert('bug_name', 'Bug name is required').notEmpty().isLength(5, 50);
+            req.assert('bug_type', 'Bug type is required').notEmpty().isIn(['Type A', 'Type B', 'Type C']);
             req.assert('project', 'Project ID is required').notEmpty().isNumeric();
-            req.assert('bug_description', 'Bug Description is required').notEmpty().isLength(50, 200);
-            req.assert('severity', 'Severity is required').notEmpty();
+            req.assert('bug_description', 'Bug Description is required').notEmpty().isLength(50, 500);
+            req.assert('severity', 'Severity is required').notEmpty().isIn(['Major', 'Minor', 'Critical']);
             req.assert('file', 'File is required').notEmpty();
             req.assert('method', 'Method is required').notEmpty();
-            req.assert('priority', 'Priority is required').notEmpty();
+            req.assert('priority', 'Priority is required').notEmpty().isIn(['Low', 'Moderate', 'High']);
             req.assert('line', 'Line number is required').notEmpty().isNumeric();
-            // req.assert('tester_id', 'Tester ID is required').notEmpty().isNumeric();
-            // req.assert('status', 'Status is required').notEmpty();
 
             var errors = req.validationErrors();
             if (!errors) { //No errors were found.  Passed Validation!
@@ -592,6 +658,7 @@ module.exports = function(app, passport, expressValidator) {
                 });
             }
         } else {
+            console.log("Forbidden access");
             res.end("Forbidden access");
         }
 
@@ -611,13 +678,14 @@ module.exports = function(app, passport, expressValidator) {
                 }
             });
         } else {
+            console.log("Forbidden access");
             res.end("Forbidden access");
         }
     });
 
     app.post('/tester/reviewBugs', isLoggedIn, function(req, res) {
         if (req.user.class == 1) {
-            req.assert('status').notEmpty();
+            req.assert('status').notEmpty().isIn(['Review Reject', 'Approval']);
             req.assert('bug').notEmpty().isInt();
             var errors = req.validationErrors();
             if (!errors) {
@@ -635,6 +703,7 @@ module.exports = function(app, passport, expressValidator) {
                 res.end("Invalid input");
             }
         } else {
+            console.log("Forbidden access");
             res.end("Forbidden access");
         }
     });
@@ -653,6 +722,7 @@ module.exports = function(app, passport, expressValidator) {
                 }
             });
         } else {
+            console.log("Forbidden access");
             res.end("Forbidden access");
         }
     });
@@ -673,6 +743,7 @@ module.exports = function(app, passport, expressValidator) {
             });
         }
         else {
+            console.log("Forbidden access");
             res.end("Forbidden access");
         }
     });
@@ -687,17 +758,15 @@ module.exports = function(app, passport, expressValidator) {
 
                 var message;
 
-                req.assert('bug_name', 'Bug name is required').notEmpty();
-                req.assert('bug_type', 'Bug type is required').notEmpty();
+                req.assert('bug_name', 'Bug name is required').notEmpty().isLength(5, 50);
+                req.assert('bug_type', 'Bug type is required').notEmpty().isIn(['Type A', 'Type B', 'Type C']);
                 req.assert('project', 'Project ID is required').notEmpty().isNumeric();
-                req.assert('bug_description', 'Bug Description is required').notEmpty().isLength(50, 200);
-                req.assert('severity', 'Severity is required').notEmpty();
+                req.assert('bug_description', 'Bug Description is required').notEmpty().isLength(50, 500);
+                req.assert('severity', 'Severity is required').notEmpty().isIn(['Major', 'Minor', 'Critical']);
                 req.assert('file', 'File is required').notEmpty();
                 req.assert('method', 'Method is required').notEmpty();
-                req.assert('priority', 'Priority is required').notEmpty();
+                req.assert('priority', 'Priority is required').notEmpty().isIn(['Low', 'Moderate', 'High']);
                 req.assert('line', 'Line number is required').notEmpty().isNumeric();
-                // req.assert('tester_id', 'Tester ID is required').notEmpty().isNumeric();
-                // req.assert('status', 'Status is required').notEmpty();
 
                 var errors = req.validationErrors();
                 if (!errors) { //No errors were found.  Passed Validation!
@@ -735,6 +804,7 @@ module.exports = function(app, passport, expressValidator) {
                 console.log(err);
             });
         } else {
+            console.log("Forbidden access");
             res.end("Forbidden access");
         }
 
@@ -756,13 +826,14 @@ module.exports = function(app, passport, expressValidator) {
                 }
             });
         } else {
+            console.log("Forbidden access");
             res.end("Forbidden access");
         }
     });
 
     app.post('/developer/bugReport', isLoggedIn, function(req, res) {
         if (req.user.class == 2) {
-            req.assert('status').notEmpty();
+            req.assert('status').notEmpty().isIn(['Resolving', 'Review']);
             req.assert('bug').notEmpty().isInt();
             var errors = req.validationErrors();
             if (!errors) {
@@ -780,6 +851,7 @@ module.exports = function(app, passport, expressValidator) {
                 res.end("Invalid input");
             }
         } else {
+            console.log("Forbidden access");
             res.end("Forbidden access");
         }
     });
@@ -798,6 +870,7 @@ module.exports = function(app, passport, expressValidator) {
                 }
             });
         } else {
+            console.log("Forbidden access");
             res.end("Forbidden access");
         }
     });
@@ -816,6 +889,7 @@ module.exports = function(app, passport, expressValidator) {
                 }
             });
         } else {
+            console.log("Forbidden access");
             res.end("Forbidden access");
         }
     });

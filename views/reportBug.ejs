@@ -36,8 +36,8 @@
 						<div class="row">
 							<div class="col-sm-5 form-group">
 								<label>Bug Name</label>
-								<input type="text" name = "bug_name" placeholder="Bug Name" class="form-control" required>
-                                <div class="help-block with-errors"></div>
+								<input type="text" name = "bug_name" placeholder="Bug Name" class="form-control" data-minlength = "5" maxlength="50" required>
+                                <div class="help-block with-errors">Minimum length of 5</div>
 							</div>
 							<div class="col-sm-3 form-group">
 								<label>Bug Type :</label>
@@ -68,8 +68,8 @@
 						</div>
 						<div class="form-group">
 							<label>Bug Description</label>
-							<textarea name="bug_description" placeholder="Bug description" rows="3" class="form-control" data-minlength = "50" required></textarea>
-                            <div class="help-block with-errors"></div>
+							<textarea name="bug_description" placeholder="Bug description" rows="3" class="form-control" data-minlength = "50" maxlength= "500" required></textarea>
+                            <div class="help-block with-errors">Minimum length of 50</div>
 						</div>
 						<div class="row">
 							<div class="col-sm-3 form-group">
