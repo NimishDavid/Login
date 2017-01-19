@@ -4,7 +4,7 @@ module.exports = function(app, passport, expressValidator) {
     var mysql = require('mysql');
     var connection = mysql.createConnection(dbconfig.connection);
     connection.query('USE ' + dbconfig.database);
-
+    var nodemailer = require('nodemailer');
     // Index page
     app.get('/', function(req, res) {
         res.redirect('/login');
@@ -50,25 +50,54 @@ module.exports = function(app, passport, expressValidator) {
     });
 
     // Admin routes
-    require('./adminRoutes.js')(app, passport, expressValidator, connection, isLoggedIn);
+    require('./adminRoutes.js')(app, passport, expressValidator, connection, isLoggedIn, sendMail);
 
 
     // Tester routes
-    require('./testerRoutes.js')(app, passport, expressValidator, connection, isLoggedIn);
+    require('./testerRoutes.js')(app, passport, expressValidator, connection, isLoggedIn, sendMail);
 
 
     // Developer routes
-    require('./developerRoutes.js')(app, passport, expressValidator, connection, isLoggedIn);
+    require('./developerRoutes.js')(app, passport, expressValidator, connection, isLoggedIn, sendMail);
 
+    function sendMail(toAddress, subject, mailContent) {
+        return new Promise(function(resolve, reject) {
+            var transporter = nodemailer.createTransport({
+                service: 'Gmail',
+                auth: {
+                    user: 'bugtrackerndm@gmail.com', // Your email id
+                    pass: 'bugtracker' // Your password
+                }
+            }, function(err) {
+                reject(err);
+            });
+
+            var mailOptions = {
+                from: 'bugtrackerndm@gmail.com', // sender address
+                to: toAddress, // list of receivers
+                subject: subject, // Subject line
+                text: mailContent //, // plaintext body
+                // html: '<b>Hello world ✔</b>' // You can choose to send an HTML body instead
+            };
+
+            transporter.sendMail(mailOptions, function(error, info){
+                if(error){
+                    reject(error);
+                }else{
+                    console.log('Message sent: ' + info.response);
+                    resolve(info.response);
+                };
+            });
+        });
+    }
 
     // Logout
     app.get('/logout', function(req, res) {
         req.logout();
         res.redirect('/');
     });
-    
-};
 
+};
 
 // Route middleware to verify login.
 function isLoggedIn(req, res, next) {

@@ -1,4 +1,6 @@
-module.exports = function (app, passport, expressValidator, connection, isLoggedIn) {
+module.exports = function (app, passport, expressValidator, connection, isLoggedIn, sendMail) {
+var nodemailer = require('nodemailer');
+// mailer = require('./mailer.js');
 
     app.get('/admin/bugReports/unassignedBugs', isLoggedIn, function(req, res) {
 
@@ -42,15 +44,42 @@ module.exports = function (app, passport, expressValidator, connection, isLogged
             req.assert('bug').notEmpty().isInt();
             var errors = req.validationErrors();
             if (!errors) {
-                var dbQuery = "UPDATE bugs SET developer_id = ?, status = 'Assigned' WHERE id = ?";
-                connection.query(dbQuery, [req.body.dev, req.body.bug], function(err, devRes) {
-                    if (err)
-                        console.log(err);
-                    else {
-                        console.log("Bug assigned to developer");
-                        res.send("Bug assigned to developer");
-                    }
-                });
+                function assignBug() {
+                    return new Promise(function(resolve, reject) {
+                        var dbQuery = "UPDATE bugs SET developer_id = ?, status = 'Assigned' WHERE id = ?";
+                        connection.query(dbQuery, [req.body.dev, req.body.bug], function(err, devRes) {
+                            if (err)
+                                reject(err);
+                            else {
+                                resolve([req.body.dev, req.body.bug]);
+                            }
+                        });
+                    });
+                }
+                assignBug().then(function(params) {
+                    return new Promise(function(resolve, reject) {
+                        var devID = params[0];
+                        var bugID = params[1];
+                        var dbQuery = "SELECT bugs.id AS bugid, bugs.name AS bugname, bugs.bug_type AS bugtype, bugs.description AS description, bugs.priority AS priority, bugs.severity as severity, users.name AS assignedto, bugs.status AS status, users.email AS email FROM bugs JOIN users ON bugs.developer_id = users.id AND users.id = ? AND bugs.id = ?";
+                        connection.query(dbQuery, [devID, bugID], function(err, emailRes) {
+                            if (err)
+                                reject(err);
+                            else {
+                                resolve(emailRes);
+                            }
+                        });
+                    });
+            }).then(function(emailRes) {
+                    var toAddress = emailRes[0].email;
+                    var subject = "New bug assigned!"
+                    var text = "Dear "+emailRes[0].assignedto+",\nA new bug has been assigned to you :\nBug name : "+emailRes[0].bugname+"\nBug type : "+emailRes[0].bugtype+"\nDescription : "+emailRes[0].description+"\nSeverity : "+emailRes[0].severity+"\nPriority : "+emailRes[0].priority+"\nStatus : "+emailRes[0].status;
+                    return sendMail(toAddress, subject, text);
+            }).then(function(response) {
+                console.log(response);
+                res.send("Bug assigned to developer");
+            }).catch(function(err) {
+                console.log(err);
+            });
             } else {
                 console.log("Invalid input");
                 res.end("Invalid input");
@@ -616,5 +645,5 @@ module.exports = function (app, passport, expressValidator, connection, isLogged
         });
       });
     }
-    
+
 };

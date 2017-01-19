@@ -1,4 +1,4 @@
-module.exports = function (app, passport, expressValidator, connection, isLoggedIn) {
+module.exports = function (app, passport, expressValidator, connection, isLoggedIn, sendMail) {
 
     app.get('/tester/testerTasks', isLoggedIn, function(req, res) {
         if (req.user.class == 1) {
