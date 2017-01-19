@@ -52,10 +52,8 @@ module.exports = function(app, passport, expressValidator) {
     // Admin routes
     require('./adminRoutes.js')(app, passport, expressValidator, connection, isLoggedIn, sendMail);
 
-
     // Tester routes
     require('./testerRoutes.js')(app, passport, expressValidator, connection, isLoggedIn, sendMail);
-
 
     // Developer routes
     require('./developerRoutes.js')(app, passport, expressValidator, connection, isLoggedIn, sendMail);
@@ -76,8 +74,7 @@ module.exports = function(app, passport, expressValidator) {
                 from: 'bugtrackerndm@gmail.com', // sender address
                 to: toAddress, // list of receivers
                 subject: subject, // Subject line
-                text: mailContent //, // plaintext body
-                // html: '<b>Hello world ✔</b>' // You can choose to send an HTML body instead
+                text: mailContent // plaintext body
             };
 
             transporter.sendMail(mailOptions, function(error, info){

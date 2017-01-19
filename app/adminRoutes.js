@@ -8,7 +8,7 @@ var nodemailer = require('nodemailer');
 
             getBugsAdminUnassigned(req).then(function(bugsRes) {
                     return new Promise(function(resolve, reject) {
-                        var dbQuery = "SELECT project_team.user_id AS devID, users.name AS devName FROM projects JOIN project_team JOIN users ON projects.manager_id = ? AND projects.id = project_team.project_id AND project_team.user_id = users.id AND users.class = 2";
+                        var dbQuery = "SELECT project_team.user_id AS devID, users.name AS devName FROM projects JOIN project_team JOIN users ON projects.manager_id = ? AND projects.id = project_team.project_id AND project_team.user_id = users.id AND users.class = 2 AND projects.status = 'Open'";
                         connection.query(dbQuery, [req.user.id], function(err, devRes) {
                             if (err)
                                 reject(err);
@@ -72,7 +72,7 @@ var nodemailer = require('nodemailer');
             }).then(function(emailRes) {
                     var toAddress = emailRes[0].email;
                     var subject = "New bug assigned!"
-                    var text = "Dear "+emailRes[0].assignedto+",\nA new bug has been assigned to you :\nBug name : "+emailRes[0].bugname+"\nBug type : "+emailRes[0].bugtype+"\nDescription : "+emailRes[0].description+"\nSeverity : "+emailRes[0].severity+"\nPriority : "+emailRes[0].priority+"\nStatus : "+emailRes[0].status;
+                    var text = "Dear "+emailRes[0].assignedto+",\n\nA new bug has been assigned to you :\n\nBug name : "+emailRes[0].bugname+"\nBug type : "+emailRes[0].bugtype+"\nDescription : "+emailRes[0].description+"\nSeverity : "+emailRes[0].severity+"\nPriority : "+emailRes[0].priority+"\nStatus : "+emailRes[0].status;
                     return sendMail(toAddress, subject, text);
             }).then(function(response) {
                 console.log(response);
@@ -152,15 +152,57 @@ var nodemailer = require('nodemailer');
             req.assert('bug').notEmpty().isInt();
             var errors = req.validationErrors();
             if (!errors) {
-                var dbQuery = "UPDATE bugs SET status = '" + req.body.status + "' WHERE id = " + req.body.bug;
-                connection.query(dbQuery, function(err, devRes) {
-                    if (err)
-                        console.log(err);
-                    else {
-                        // console.log("Database update successful");
-                        res.send("Bug status changed successfully");
-                    }
-                });
+                function updateBugStatusAdmin() {
+                  return new Promise(function(resolve, reject) {
+                    var dbQuery = "UPDATE bugs SET status = '" + req.body.status + "' WHERE id = " + req.body.bug;
+                    connection.query(dbQuery, function(err, devRes) {
+                        if (err)
+                            reject(err);
+                        else {
+                            resolve([req.body.status, req.body.bug]);
+                        }
+                    });
+                  });
+                }
+                updateBugStatusAdmin().then(function(params) {
+                  return new Promise(function(resolve, reject) {
+                    var status = params[0];
+                    var bugId = params[1];
+                    var dbQuery = "SELECT * FROM bugs WHERE id = ?";
+                    connection.query(dbQuery, [bugId], function(err, bugsRes) {
+                        if (err)
+                            reject(err);
+                        else {
+                            resolve(bugsRes);
+                        }
+                    });
+                  });
+                }).then(function(bugsRes) {
+                  return new Promise(function(resolve, reject) {
+                    var dbQuery = "SELECT * FROM users WHERE id IN("+bugsRes[0].developer_id+", "+bugsRes[0].tester_id+")";
+                    connection.query(dbQuery, function(err, usersRes) {
+                        if (err)
+                            reject(err);
+                        else {
+                            resolve([bugsRes, usersRes]);
+                        }
+                    });
+                  });
+                }).then(function(params) {
+                  var bugsRes = params[0];
+                  var usersRes = params[1];
+                  usersRes.forEach(function(item, index) {
+                    var toAddress = item.email;
+                    var subject = "Bug status changed!"
+                    var text = "Dear "+item.name+",\n\nThe status of a bug that you are involved in has been changed recently :\n\nBug ID : "+bugsRes[0].id+"\n\nBug name : "+bugsRes[0].name+"\nBug type : "+bugsRes[0].bug_type+"\nDescription : "+bugsRes[0].description+"\nSeverity : "+bugsRes[0].severity+"\nPriority : "+bugsRes[0].priority+"\nStatus : "+bugsRes[0].status;
+                    return sendMail(toAddress, subject, text);
+                  });
+                }).then(function(response) {
+                  console.log(response);
+                  res.send("Bug status changed successfully.")
+                }).catch(function(err) {
+                  console.log(err);
+                })
             } else {
                 console.log("Invalid input");
                 res.end("Invalid input");
