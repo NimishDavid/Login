@@ -939,7 +939,7 @@ module.exports = function(app, passport, expressValidator) {
 
         return new Promise(function(resolve, reject) {
 
-            connection.query("SELECT DISTINCT(bugs.id) AS bugID, project_team.project_id AS projectID, bugs.name AS bugName, bugs.bug_type AS bugType, bugs.description AS description, bugs.severity AS severity, bugs.priority AS priority, bugs.status AS status, bugs.developer_id AS assignedTo FROM projects JOIN project_team JOIN bugs WHERE projects.manager_id = ? AND project_team.project_id = bugs.project_id AND bugs.project_id = projects.id AND projects.status = 'Open'", [req.user.id], function(err, bugsRes) {
+            connection.query("SELECT DISTINCT(bugs.id) AS bugID, project_team.project_id AS projectID, bugs.name AS bugName, bugs.bug_type AS bugType, bugs.description AS description, bugs.severity AS severity, bugs.priority AS priority, bugs.status AS status, bugs.developer_id AS assignedTo FROM projects JOIN project_team JOIN bugs WHERE projects.manager_id = ? AND project_team.project_id = bugs.project_id AND bugs.project_id = projects.id AND projects.status = 'Open' ORDER BY bugs.id DESC", [req.user.id], function(err, bugsRes) {
                 if (err)
                     reject(err);
                 else {
@@ -955,7 +955,7 @@ module.exports = function(app, passport, expressValidator) {
 
         return new Promise(function(resolve, reject) {
 
-            connection.query("SELECT DISTINCT(bugs.id) AS bugID, project_team.project_id AS projectID, bugs.name AS bugName, bugs.bug_type AS bugType, bugs.description AS description, bugs.severity AS severity, bugs.priority AS priority, bugs.status AS status, bugs.developer_id AS assignedTo, users.name AS assignedToName FROM projects JOIN project_team JOIN bugs JOIN users WHERE projects.manager_id = ? AND project_team.project_id = bugs.project_id AND bugs.project_id = projects.id AND projects.status = 'Open' AND bugs.developer_id = users.id", [req.user.id], function(err, bugsRes) {
+            connection.query("SELECT DISTINCT(bugs.id) AS bugID, project_team.project_id AS projectID, bugs.name AS bugName, bugs.bug_type AS bugType, bugs.description AS description, bugs.severity AS severity, bugs.priority AS priority, bugs.status AS status, bugs.developer_id AS assignedTo, users.name AS assignedToName FROM projects JOIN project_team JOIN bugs JOIN users WHERE projects.manager_id = ? AND project_team.project_id = bugs.project_id AND bugs.project_id = projects.id AND projects.status = 'Open' AND bugs.developer_id = users.id ORDER BY bugs.id DESC", [req.user.id], function(err, bugsRes) {
                 if (err)
                     reject(err);
                 else {

@@ -2,3 +2,9 @@
     max-height: 240px;
     overflow-y: auto;
 }
+
+.removeBtn {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+}
