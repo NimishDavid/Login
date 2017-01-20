@@ -1,0 +1,36 @@
+
+
+.navbar-primary .navbar-nav > li > a:hover, .navbar-primary .navbar-nav > li > a:focus {
+    background-color: #2d6a9f;
+    color: white;  /*Sets the text hover color on navbar*/
+}
+
+.navbar-primary .navbar-nav > .active > a, .navbar-primary .navbar-nav > .active >
+ a:hover, .navbar-primary .navbar-nav > .active > a:focus {
+    color: white; /*BACKGROUND color for active*/
+    background-color: #2d6a9f;
+}
+
+.navbar-primary {
+    background-color: #337AB7;
+    border-color: #337AB7;
+}
+
+
+.dropdown-menu > li > a:hover,
+.dropdown-menu > li > a:focus {
+    color: white;
+    text-decoration: none;
+    background-color: #66CCFF;  /*change color of links in drop down here*/
+}
+
+.nav > li > a:hover,
+.nav > li > a:focus {
+    text-decoration: none;
+    background-color: silver; /*Change rollover cell color here*/
+}
+
+
+.navbar-primary .navbar-nav > li > a {
+   color: white; /*Change active text color here*/
+}

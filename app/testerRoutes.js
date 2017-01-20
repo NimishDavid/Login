@@ -200,7 +200,7 @@ module.exports = function (app, passport, expressValidator, connection, isLogged
                   res.send("Bug status changed successfully.")
                 }).catch(function(err) {
                   console.log(err);
-                })
+              });
             } else {
                 console.log("Invalid input");
                 res.end("Invalid input");

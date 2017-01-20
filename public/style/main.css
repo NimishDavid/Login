@@ -1,16 +1,17 @@
 
 body {
-  background: url(/secure.jpg) no-repeat center center fixed;
+  background: url(/Website-Design-Background-1.jpg) no-repeat center center fixed;
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
   background-size: cover;
 }
 
-.panel-default {
-opacity: 0.9;
+.panel {
+    color: white;
+    background-color: rgba(10, 11, 15, 0.5);
 }
 .form-group.last { margin-bottom:0px; }
 .vertical-center {
-    margin-top: 200px;
+    margin-top: 150px;
 }
