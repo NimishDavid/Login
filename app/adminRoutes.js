@@ -51,6 +51,7 @@ var nodemailer = require('nodemailer');
                             if (err)
                                 reject(err);
                             else {
+                                res.send("Bug assigned to developer");
                                 resolve([req.body.dev, req.body.bug]);
                             }
                         });
@@ -76,7 +77,6 @@ var nodemailer = require('nodemailer');
                     return sendMail(toAddress, subject, text);
             }).then(function(response) {
                 console.log(response);
-                res.send("Bug assigned to developer");
             }).catch(function(err) {
                 console.log(err);
             });
@@ -267,6 +267,7 @@ var nodemailer = require('nodemailer');
                             console.log(err);
                         });
                     } else {
+
                         getProjectsManage(req).then(function(projectsRes) {
                             return getTestersRem(req, projectsRes);
                         }).then(function(params){
@@ -278,6 +279,24 @@ var nodemailer = require('nodemailer');
                                 testersRem: params[1],
                                 testersAdd: params[2],
                                 msg: "successAdd"
+                            });
+                            var t = "";
+                            req.body.testers.forEach(function(item, index) {
+                                t += item+", ";
+                            });
+                            t = t.slice(0, -2);
+                            var dbQuery = "SELECT users.name AS testerName, projects.name AS projectName, users.email AS email, projects.id AS projectId FROM users JOIN project_team JOIN projects ON users.id IN("+ t +") AND project_team.user_id = users.id AND projects.id = project_team.project_id AND projects.id = ?";
+                            connection.query(dbQuery, req.body.project_id, function(err, usersRes) {
+                                if (err)
+                                    console.log(err);
+                                else {
+                                    usersRes.forEach(function(item, index) {
+                                      var toAddress = item.email;
+                                      var subject = "New task for you!"
+                                      var text = "Dear "+item.testerName+",\n\nA new project has been assigned to you for testing :\n\nProject ID : "+item.projectId+"\n\nProject name : "+item.projectName;
+                                      return sendMail(toAddress, subject, text);
+                                    });
+                                }
                             });
                         }).catch(function(err) {
                             console.log(err);
@@ -413,6 +432,24 @@ var nodemailer = require('nodemailer');
                                 developersRem: params[1],
                                 developersAdd: params[2],
                                 msg: "successAdd"
+                            });
+                            var t = "";
+                            req.body.developers.forEach(function(item, index) {
+                                t += item+", ";
+                            });
+                            t = t.slice(0, -2);
+                            var dbQuery = "SELECT users.name AS developerName, projects.name AS projectName, users.email AS email, projects.id AS projectId FROM users JOIN project_team JOIN projects ON users.id IN("+ t +") AND project_team.user_id = users.id AND projects.id = project_team.project_id AND projects.id = ?";
+                            connection.query(dbQuery, req.body.project_id, function(err, usersRes) {
+                                if (err)
+                                    console.log(err);
+                                else {
+                                    usersRes.forEach(function(item, index) {
+                                      var toAddress = item.email;
+                                      var subject = "New project!"
+                                      var text = "Dear "+item.developerName+",\n\nYou have been added to a new project :\n\nProject ID : "+item.projectId+"\n\nProject name : "+item.projectName;
+                                      return sendMail(toAddress, subject, text);
+                                    });
+                                }
                             });
                         }).catch(function(err) {
                             console.log(err);
