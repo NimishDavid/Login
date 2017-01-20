@@ -60,6 +60,8 @@ module.exports = function(app, passport, expressValidator) {
     // Developer routes
     require('./developerRoutes.js')(app, passport, expressValidator, connection, isLoggedIn, sendMail);
 
+
+
     function sendMail(toAddress, subject, mailContent) {
         return new Promise(function(resolve, reject) {
             var transporter = nodemailer.createTransport({
