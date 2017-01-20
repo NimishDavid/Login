@@ -59,20 +59,50 @@ module.exports = function (app, passport, expressValidator, connection, isLogged
 
             var errors = req.validationErrors();
             if (!errors) { //No errors were found.  Passed Validation!
+                function reportBug() {
+                    return new Promise(function(resolve, reject) {
+                        var dbQuery = "INSERT INTO `bug_tracker`.`bugs` (`id`, `name`, `bug_type`, `description`, `project_id`, `file`, `method`, `line`, `priority`, `severity`, `status`, `tester_id`, `developer_id`) VALUES (NULL, \"" + req.body.bug_name + "\", \"" + req.body.bug_type + "\", \"" + req.body.bug_description + "\", \"" + req.body.project + "\", \"" + req.body.file + "\", \"" + req.body.method + "\", \"" + req.body.line + "\", \"" + req.body.priority + "\", \"" + req.body.severity + "\", \"Open\", \"" + req.user.id + "\" , NULL)";
 
-                var dbQuery = "INSERT INTO `bug_tracker`.`bugs` (`id`, `name`, `bug_type`, `description`, `project_id`, `file`, `method`, `line`, `priority`, `severity`, `status`, `tester_id`, `developer_id`) VALUES (NULL, \"" + req.body.bug_name + "\", \"" + req.body.bug_type + "\", \"" + req.body.bug_description + "\", \"" + req.body.project + "\", \"" + req.body.file + "\", \"" + req.body.method + "\", \"" + req.body.line + "\", \"" + req.body.priority + "\", \"" + req.body.severity + "\", \"Open\", \"" + req.user.id + "\" , NULL)";
-
-                connection.query(dbQuery, function(err, rows) {
-                    if (err)
-                        throw (err);
-                    else {
-                        console.log("Bug report successful");
-                        message = "success";
-                        res.render('reportBug.ejs', {
-                            user: req.user,
-                            msg: message
+                        connection.query(dbQuery, function(err, rows) {
+                            if (err)
+                                reject(err);
+                            else {
+                                console.log("Bug report successful");
+                                message = "success";
+                                res.render('reportBug.ejs', {
+                                    user: req.user,
+                                    msg: message
+                                });
+                                resolve([req.body.project, req.body.bug_name, req.body.bug_type, req.body.bug_description, req.body.priority, req.body.severity, req.user.id]);
+                            }
                         });
-                    }
+                    });
+                }
+                reportBug().then(function(params) {
+                    var projectId = params[0];
+                    var bugName = params[1];
+                    var bugType = params[2];
+                    var description = params[3];
+                    var priority = params[4];
+                    var severity = params[5];
+                    var testerId = params[6];
+                    var dbQuery = "SELECT users.name AS managerName, projects.name AS projectName, users.email AS email FROM users JOIN projects ON projects.manager_id = users.id AND projects.id = ?"
+                    connection.query(dbQuery, [params[0]], function(err, rows) {
+                        if (err)
+                            console.log(err);
+                        else {
+                            rows.forEach(function(item, index) {
+                                var toAddress = item.email;
+                                var subject = "New bug reported!"
+                                var text = "Dear "+item.managerName+",\n\nA new bug has been reported in a project that you manage :\n\nProject : "+ item.projectName +"\n\nBug name : "+bugName+"\nBug type : "+bugType+"\nDescription : "+description+"\nSeverity : "+severity+"\nPriority : "+priority+"\nTester ID : "+testerId;
+                                return sendMail(toAddress, subject, text);
+                            });
+                        }
+                    });
+                }).then(function(response) {
+                    console.log(response);
+                }).catch(function(err) {
+                    console.log(err);
                 });
             } else { //Display errors to user
                 console.log("Bug report failed");
@@ -115,15 +145,62 @@ module.exports = function (app, passport, expressValidator, connection, isLogged
             req.assert('bug').notEmpty().isInt();
             var errors = req.validationErrors();
             if (!errors) {
-                var dbQuery = "UPDATE bugs SET status = '" + req.body.status + "' WHERE id = " + req.body.bug;
-                connection.query(dbQuery, function(err, devRes) {
-                    if (err)
-                        console.log(err);
-                    else {
-                        // console.log("Database update successful");
-                        res.send("Bug status changed successfully");
-                    }
-                });
+                function updateBugStatusTester() {
+                    return new Promise(function(resolve, reject) {
+                        var dbQuery = "UPDATE bugs SET status = '" + req.body.status + "' WHERE id = " + req.body.bug;
+                        connection.query(dbQuery, function(err, devRes) {
+                            if (err)
+                                reject(err);
+                            else {
+                                // console.log("Database update successful");
+                                resolve([req.body.status, req.body.bug]);
+                            }
+                        });
+                    });
+                }
+                updateBugStatusTester().then(function(params) {
+                  return new Promise(function(resolve, reject) {
+                    var status = params[0];
+                    var bugId = params[1];
+                    var dbQuery = "SELECT * FROM projects JOIN bugs WHERE bugs.id = ? AND bugs.project_id = projects.id";
+                    connection.query(dbQuery, [bugId], function(err, bugsRes) {
+                        if (err)
+                            reject(err);
+                        else {
+                            resolve(bugsRes);
+                        }
+                    });
+                  });
+                }).then(function(bugsRes) {
+                  return new Promise(function(resolve, reject) {
+                    var dbQuery = "SELECT * FROM users WHERE id IN("+bugsRes[0].developer_id+", "+bugsRes[0].manager_id+")";
+                    connection.query(dbQuery, function(err, usersRes) {
+                        if (err)
+                            reject(err);
+                        else {
+                            resolve([bugsRes, usersRes]);
+                        }
+                    });
+                  });
+                }).then(function(params) {
+                  var bugsRes = params[0];
+                  console.log("Params :\n");
+                  console.log(params[0]);
+                  console.log("Bugs :\n");
+                  console.log(bugsRes);
+                  var usersRes = params[1];
+                  usersRes.forEach(function(item, index) {
+                    var toAddress = item.email;
+                    var subject = "Bug status changed!"
+                    var text = "Dear "+item.name+",\n\nThe status of a bug that you are involved in has been changed recently :\n\nBug ID : "+bugsRes[0].id+"\n\nBug name : "+bugsRes[0].name+"\nBug type : "+bugsRes[0].bug_type+"\nDescription : "+bugsRes[0].description+"\nSeverity : "+bugsRes[0].severity+"\nPriority : "+bugsRes[0].priority+"\nStatus : "+bugsRes[0].status;
+                    return sendMail(toAddress, subject, text);
+                  });
+                }).then(function(response) {
+                  console.log(response);
+                  res.send("Bug status changed successfully.")
+                }).catch(function(err) {
+                  console.log(err);
+                })
             } else {
                 console.log("Invalid input");
                 res.end("Invalid input");
