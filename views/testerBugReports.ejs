@@ -28,17 +28,16 @@
         					<table class="table table-responsive table-hover" id="dev-table">
         						<thead>
         							<tr>
-        								<th>#</th>
+                                        <th>Bug #</th>
         								<th>Name</th>
         								<th>Type</th>
-        								<th>Description</th>
                                         <th>Severity</th>
                                         <th>Priority</th>
-                                        <th>File</th>
-                                        <th>Method</th>
-                                        <th>Line</th>
+                                        <th>Project</th>
+                                        <th>Assigned to</th>
                                         <th>Status</th>
-                                        <th>Save</th>
+                                        <th></th>
+                                        <th></th>
         							</tr>
         						</thead>
                                 <tbody>
@@ -49,12 +48,10 @@
                 							<td class="bug_id"><%= resultTes[i].bugID %></td>
                 							<td><%= resultTes[i].bugName %></td>
                 							<td><%= resultTes[i].bugType %></td>
-                							<td><%= resultTes[i].description %></td>
                                             <td><%= resultTes[i].severity %></td>
                                             <td><%= resultTes[i].priority %></td>
-                                            <td><%= resultTes[i].file %></td>
-                                            <td><%= resultTes[i].method %></td>
-                                            <td><%= resultTes[i].line %></td>
+                                            <td><%= resultTes[i].projectName %></td>
+                                            <td><%= resultTes[i].assignedToName %></td>
                                             <td class="stat">
                                                  <select class="form-control" name="status" required>
                                                   <option value="">Select status</option>
@@ -63,7 +60,10 @@
                                                  </select>
                                                  <div class="help-block with-errors"></div>
                                             </td>
-                                            <td>
+                                            <td class="text-center">
+                                                <button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#exampleModal" data-bug="<%= resultTes[i].bugID %>">View More</button>
+                                            </td>
+                                            <td class="text-center">
                                                 <button class="btn btn-sm btn-primary update">Save</button>
                                             </td>
                 						</tr>
@@ -90,17 +90,14 @@
         					<table class="table table-responsive table-hover" id="dev-table">
         						<thead>
         							<tr>
-        								<th>#</th>
+        								<th>Bug #</th>
         								<th>Name</th>
         								<th>Type</th>
-        								<th>Description</th>
-                        <th>Severity</th>
-                        <th>Priority</th>
-                        <th>File</th>
-                        <th>Method</th>
-                        <th>Line</th>
-                        <th>Status</th>
-                        <th>Developer ID / Edit</th>
+                                        <th>Severity</th>
+                                        <th>Priority</th>
+                                        <th>Status</th>
+                                        <th></th>
+                                        <th class="text-center">Developer ID</th>
         							</tr>
         						</thead>
                             <tbody>
@@ -111,15 +108,14 @@
             								<td class="bug_id"><%= resultTes[i].bugID %></td>
             								<td><%= resultTes[i].bugName %></td>
             								<td><%= resultTes[i].bugType %></td>
-            								<td><%= resultTes[i].description %></td>
                                             <td><%= resultTes[i].severity %></td>
                                             <td><%= resultTes[i].priority %></td>
-                                            <td><%= resultTes[i].file %></td>
-                                            <td><%= resultTes[i].method %></td>
-                                            <td><%= resultTes[i].line %></td>
                                             <td><%= resultTes[i].status %></td>
-                                            <td>
-                                                <button class="btn btn-sm btn-primary update">Edit</button>
+                                            <td class="text-center">
+                                                <button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#exampleModal" data-bug="<%= resultTes[i].bugID %>">View More</button>
+                                            </td>
+                                            <td class="text-center">
+                                                <button class="btn btn-sm btn-primary update">Edit Bug Details</button>
                                             </td>
             							</tr>
                                         <% } else { %>
@@ -127,14 +123,13 @@
                     								<td class="bug_id"><%= resultTes[i].bugID %></td>
                     								<td><%= resultTes[i].bugName %></td>
                     								<td><%= resultTes[i].bugType %></td>
-                    								<td><%= resultTes[i].description %></td>
                                                     <td><%= resultTes[i].severity %></td>
                                                     <td><%= resultTes[i].priority %></td>
-                                                    <td><%= resultTes[i].file %></td>
-                                                    <td><%= resultTes[i].method %></td>
-                                                    <td><%= resultTes[i].line %></td>
                                                     <td><%= resultTes[i].status %></td>
-                                                    <td><%= resultTes[i].assignedTo %></td>
+                                                    <td class="text-center">
+                                                        <button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#exampleModal" data-bug="<%= resultTes[i].bugID %>">View More</button>
+                                                    </td>
+                                                    <td class="text-center"><%= resultTes[i].assignedTo %></td>
                     							</tr>
                                         <% } %>
                                     <% } %>
@@ -195,6 +190,6 @@
         <script src="/editBugs.js" charset="utf-8"></script>
     <% } %>
     <script src="/axios.min.js" charset="utf-8"></script>
-
+    <script src="/getBugDetails.js" charset="utf-8"></script>
     </body>
 </html>

@@ -12,6 +12,97 @@
 
     </head>
     <body>
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h5 class="modal-title" id="exampleModalLabel"><h3>Bug Details</h3></h5>
+              </div>
+              <div class="modal-body">
+                <form>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                              <label for="bug_name" class="form-control-label">Bug Name</label>
+                              <input type="text" class="form-control" id="bug_name" value="" disabled>
+                            </div>
+                        </div>
+                    </div>
+                  <div class="row">
+                      <div class="col-sm-6">
+                          <div class="form-group">
+                            <label for="bug_id" class="form-control-label">Bug ID</label>
+                            <input type="text" class="form-control" id="bug_id" value="" disabled>
+                          </div>
+                      </div>
+                      <div class="col-sm-6">
+                          <div class="form-group">
+                            <label for="bug_type" class="form-control-label">Bug Type</label>
+                            <input type="text" class="form-control" id="bug_type" value="" disabled>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="row">
+                      <div class="col-sm-12">
+                          <label for="description" class="form-control-label">Description</label>
+                          <textarea class="form-control" id="description" disabled></textarea>
+                      </div>
+                  </div>
+                  <div class="row">
+                      <div class="col-sm-4">
+                          <label for="priority" class="form-control-label">Priority</label>
+                          <input type="text" class="form-control" id="priority" value="" disabled>
+                      </div>
+                      <div class="col-sm-4">
+                          <label for="severity" class="form-control-label">Severity</label>
+                          <input type="text" class="form-control" id="severity" value="" disabled>
+                      </div>
+                      <div class="col-sm-4">
+                          <label for="status" class="form-control-label">Status</label>
+                          <input type="text" class="form-control" id="status" value="" disabled>
+                      </div>
+                  </div>
+                  <div class="row">
+                      <div class="col-sm-4">
+                          <label for="project_id" class="form-control-label">Project ID</label>
+                          <input type="text" class="form-control" id="project_id" value="" disabled>
+                      </div>
+                      <div class="col-sm-4">
+                          <label for="tester_id" class="form-control-label">Tester ID</label>
+                          <input type="text" class="form-control" id="tester_id" value="" disabled>
+                      </div>
+                      <div class="col-sm-4">
+                          <label for="developer_id" class="form-control-label">Developer ID</label>
+                          <input type="text" class="form-control" id="developer_id" value="" disabled>
+                      </div>
+                  </div>
+                  <div class="row">
+                      <div class="col-sm-12">
+                          <label for="file" class="form-control-label">File</label>
+                          <input type="text" class="form-control" id="file" value="" disabled>
+                      </div>
+                  </div>
+                  <div class="row">
+                      <div class="col-sm-10">
+                          <label for="method" class="form-control-label">Method</label>
+                          <input type="text" class="form-control" id="method" value="" disabled>
+                      </div>
+                      <div class="col-sm-2">
+                          <label for="file" class="form-control-label">Line</label>
+                          <input type="line" class="form-control" id="line" value="" disabled>
+                      </div>
+                  </div>
+                </form>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Modal -->
         <nav class="navbar navbar-primary">
           <div class="container-fluid">
             <!-- Brand and toggle get grouped for better mobile display -->

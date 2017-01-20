@@ -49,6 +49,19 @@ module.exports = function(app, passport, expressValidator) {
         }
     });
 
+    app.post('/getBugDetails', isLoggedIn, function(req, res) {
+        var dbQuery = "SELECT * FROM bugs WHERE bugs.id = ?";
+        console.log(req.body.bug);
+        connection.query(dbQuery, req.body.bug, function(err, bugsRes) {
+            if (err)
+                res.send(err);
+            else {
+                console.log(bugsRes);
+                res.send(bugsRes);
+            }
+        });
+    });
+
     // Admin routes
     require('./adminRoutes.js')(app, passport, expressValidator, connection, isLoggedIn, sendMail);
 
