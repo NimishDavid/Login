@@ -1,5 +1,6 @@
 module.exports = function (app, passport, expressValidator, connection, isLoggedIn, sendMail) {
 
+    // Get list of projects in which tester is present in the team
     app.get('/tester/testerTasks', isLoggedIn, function(req, res) {
         if (req.user.class == 1) {
             var projects;
@@ -21,6 +22,7 @@ module.exports = function (app, passport, expressValidator, connection, isLogged
         }
     });
 
+    // Display report bug form. Also get list of projects the tester is present in.
     app.get('/tester/reportBug', isLoggedIn, function(req, res) {
         if (req.user.class == 1) {
             var projects;
@@ -42,6 +44,7 @@ module.exports = function (app, passport, expressValidator, connection, isLogged
         }
     });
 
+    // Insert bug details into the Database
     app.post('/tester/reportBug', isLoggedIn, function(req, res) {
 
         if (req.user.class == 1) {
@@ -120,6 +123,7 @@ module.exports = function (app, passport, expressValidator, connection, isLogged
 
     });
 
+    // Get list of bugs pending tester review
     app.get('/tester/reviewBugs', isLoggedIn, function(req, res) {
         if (req.user.class == 1) {
             connection.query("SELECT bugs.id AS bugID, bugs.name AS bugName, bugs.bug_type AS bugType, bugs.description AS description, bugs.severity AS severity, bugs.priority AS priority, bugs.file AS file, bugs.method AS method, bugs.line AS line, bugs.status AS status, bugs.developer_id AS assignedTo, projects.name AS projectName, users.name AS assignedToName FROM bugs JOIN projects JOIN users ON bugs.project_id = projects.id AND projects.status = 'Open' AND tester_id = ? AND bugs.status = 'Review' AND bugs.developer_id = users.id", [req.user.id], function(err, bugsRes) {
@@ -139,6 +143,7 @@ module.exports = function (app, passport, expressValidator, connection, isLogged
         }
     });
 
+    // Update database with new staus of the bugs after review
     app.post('/tester/reviewBugs', isLoggedIn, function(req, res) {
         if (req.user.class == 1) {
             req.assert('status').notEmpty().isIn(['Review Reject', 'Approval']);
@@ -211,6 +216,7 @@ module.exports = function (app, passport, expressValidator, connection, isLogged
         }
     });
 
+    // Get list of bugs that were reported by the tester
     app.get('/tester/trackBugs', isLoggedIn, function(req, res) {
         if (req.user.class == 1) {
             connection.query("SELECT bugs.id AS bugID, bugs.name AS bugName, bugs.bug_type AS bugType, bugs.description AS description, bugs.severity AS severity, bugs.priority AS priority, bugs.file AS file, bugs.method AS method, bugs.line AS line, bugs.status AS status, bugs.developer_id AS assignedTo FROM bugs JOIN projects ON bugs.project_id = projects.id AND projects.status = 'Open' AND tester_id = ? AND bugs.status NOT IN ('Review')", [req.user.id], function(err, bugsRes) {
@@ -230,23 +236,27 @@ module.exports = function (app, passport, expressValidator, connection, isLogged
         }
     });
 
+    // Edit details of a bug reported by the tester
     app.get('/tester/reportBug/editBugDetails/:params', isLoggedIn, function(req, res) {
         if (req.user.class == 1) {
             getProjectsTester(req).then(function(projRes) {
                 return getBugDetails(req, projRes);
             }).then(function(params) {
-              console.log(params[1][0].tester_id);
-              console.log(req.user.id);
-              if(params[1][0].tester_id != req.user.id) {
-                res.end("Forbidden acces");
+              if(params[1].length != 0) { // If bug exists
+                if(params[1][0].tester_id != req.user.id) {
+                  res.end("Forbidden acces");
+                }
+                else {
+                  res.render('editBugDetails.ejs', {
+                      user: req.user,
+                      proj: params[0],
+                      len: params[0].length,
+                      bugs: params[1]
+                  });
+                }
               }
               else {
-                res.render('editBugDetails.ejs', {
-                    user: req.user,
-                    proj: params[0],
-                    len: params[0].length,
-                    bugs: params[1]
-                });
+                res.end("Invalid Bug ID");
               }
             }).catch(function(err) {
                 console.log(err);
@@ -258,6 +268,7 @@ module.exports = function (app, passport, expressValidator, connection, isLogged
         }
     });
 
+    // Update the database with the edited bug details
     app.post('/tester/reportBug/editBugDetails/', isLoggedIn, function(req, res) {
 
         if (req.user.class == 1) {
@@ -320,6 +331,7 @@ module.exports = function (app, passport, expressValidator, connection, isLogged
 
     });
 
+    // Get list of projects in which the tester is present
     function getProjectsTester(req) {
 				return new Promise(function(resolve, reject) {
 					connection.query("SELECT * FROM project_team JOIN users JOIN projects ON users.id = project_team.user_id AND project_team.project_id = projects.id WHERE users.id = ? AND projects.status = 'Open'", [req.user.id], function(err, projRes) {
@@ -333,6 +345,7 @@ module.exports = function (app, passport, expressValidator, connection, isLogged
 				});
 	}
 
+  // Get complete details of a bug
 	function getBugDetails(req, projRes) { // Get complete details of the bug
 		return new Promise(function(resolve, reject) {
 			connection.query("SELECT * FROM bugs WHERE bugs.id = ?", [req.params.params], function(err, bugsRes) {
@@ -346,7 +359,8 @@ module.exports = function (app, passport, expressValidator, connection, isLogged
 		});
 	}
 
-	function getBugsEdit(req, projRes) { // For getting bug details after updating details.
+  // Get the details of the bug to be edited
+	function getBugsEdit(req, projRes) {
 		return new Promise(function(resolve, reject) {
 			connection.query("SELECT * FROM bugs WHERE bugs.id = ?", [req.body.bug_id], function(err, bugsRes) {
 				if (err)

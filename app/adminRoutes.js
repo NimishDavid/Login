@@ -2,6 +2,7 @@ module.exports = function (app, passport, expressValidator, connection, isLogged
 var nodemailer = require('nodemailer');
 // mailer = require('./mailer.js');
 
+    // Get list of unassigned bugs
     app.get('/admin/bugReports/unassignedBugs', isLoggedIn, function(req, res) {
 
         if (req.user.class == 0) {
@@ -38,6 +39,7 @@ var nodemailer = require('nodemailer');
 
     });
 
+    // Assign bug to a developer
     app.post('/admin/bugReports/unassignedBugs', isLoggedIn, function(req, res) {
         if (req.user.class == 0) {
             req.assert('dev').notEmpty().isInt();
@@ -90,6 +92,7 @@ var nodemailer = require('nodemailer');
         }
     });
 
+    // Get list of assigned bugs
     app.get('/admin/bugReports/assignedBugs', isLoggedIn, function(req, res) {
         if (req.user.class == 0) {
 
@@ -108,6 +111,7 @@ var nodemailer = require('nodemailer');
         }
     });
 
+    // Get list of closed bugs
     app.get('/admin/bugReports/closedBugs', isLoggedIn, function(req, res) {
         if (req.user.class == 0) {
 
@@ -126,6 +130,7 @@ var nodemailer = require('nodemailer');
         }
     });
 
+    // Get list of resolved bugs pending approval
     app.get('/admin/approveBugs', isLoggedIn, function(req, res) {
         if (req.user.class == 0) {
             connection.query("SELECT bugs.id AS bugid, bugs.name AS bugname, bugs.bug_type AS bugtype, bugs.description AS description, bugs.priority AS priority, bugs.severity as severity, users.name AS assignedto, bugs.status AS status, projects.name AS projectName FROM projects JOIN bugs JOIN users ON bugs.project_id = projects.id AND projects.manager_id = ? AND bugs.developer_id = users.id AND bugs.status = 'Approval' AND projects.status = 'Open'", [req.user.id], function(err, bugsRes) {
@@ -146,6 +151,7 @@ var nodemailer = require('nodemailer');
         }
     });
 
+    // Update the status of bugs pending approval
     app.post('/admin/approveBugs', isLoggedIn, function(req, res) {
         if (req.user.class == 0) {
             req.assert('status').notEmpty().isIn(['Approve Reject', 'Closed']);
@@ -213,6 +219,7 @@ var nodemailer = require('nodemailer');
         }
     });
 
+    // Get a list of testers who are already in the team and another list of testers who are not part of the team
     app.get('/admin/manageProjectTeam/manageTesters', isLoggedIn, function(req, res) {
         if (req.user.class == 0) {
             getProjectsManage(req).then(function(projectsRes) {
@@ -235,6 +242,7 @@ var nodemailer = require('nodemailer');
         }
     });
 
+    // Add selected testers into the team
     app.post('/admin/manageProjectTeam/manageTesters/addTesters', isLoggedIn, function(req, res) {
         if (req.user.class == 0) {
             req.assert('testers').notEmpty();
@@ -314,6 +322,7 @@ var nodemailer = require('nodemailer');
         }
     });
 
+    // Remove selected testers from the existing team
     app.post('/admin/manageProjectTeam/manageTesters/removeTesters', isLoggedIn, function(req, res) {
         if (req.user.class == 0) {
             req.assert('user_id').notEmpty().isInt();
@@ -368,6 +377,7 @@ var nodemailer = require('nodemailer');
         }
     });
 
+    // Get a list of developers in the existing team and another list of develpers who are not in the team
     app.get('/admin/manageProjectTeam/manageDevelopers', isLoggedIn, function(req, res) {
         if (req.user.class == 0) {
             getProjectsManage(req).then(function(projectsRes) {
@@ -390,6 +400,7 @@ var nodemailer = require('nodemailer');
         }
     });
 
+    // Add selected developers in to the team.
     app.post('/admin/manageProjectTeam/manageDevelopers/addDevelopers', isLoggedIn, function(req, res) {
         if (req.user.class == 0) {
             req.assert('developers').notEmpty();
@@ -467,6 +478,7 @@ var nodemailer = require('nodemailer');
         }
     });
 
+    // Remove selected devlopers from the team
     app.post('/admin/manageProjectTeam/manageDevelopers/removeDevelopers', isLoggedIn, function(req, res) {
         if (req.user.class == 0) {
             req.assert('user_id').notEmpty().isInt();
@@ -521,6 +533,7 @@ var nodemailer = require('nodemailer');
         }
     });
 
+    // Get list of projects managed by the admin
     app.get('/admin/manageProjects', isLoggedIn, function(req, res) {
         if (req.user.class == 0) {
           getProjectsManage(req).then(function(projectsRes) {
@@ -537,6 +550,7 @@ var nodemailer = require('nodemailer');
         }
     });
 
+    // Add a new project
     app.post('/admin/manageProjects/addProjects', isLoggedIn, function(req, res) {
         if (req.user.class == 0) {
             req.assert('project_name').notEmpty();
@@ -580,6 +594,7 @@ var nodemailer = require('nodemailer');
         }
     });
 
+    // Remove an existing project
     app.post('/admin/manageProjects/removeProjects', isLoggedIn, function(req, res) {
         if (req.user.class == 0) {
             req.assert('projects').notEmpty();
@@ -629,6 +644,7 @@ var nodemailer = require('nodemailer');
         }
     });
 
+    // Get the list of unassigned bugs
     function getBugsAdminUnassigned(req) {
 
         return new Promise(function(resolve, reject) {
@@ -645,6 +661,7 @@ var nodemailer = require('nodemailer');
 
     }
 
+    // Get list of bugs in the projects managed by the admin.
     function getBugsAdmin(req) {
 
         return new Promise(function(resolve, reject) {
@@ -661,6 +678,7 @@ var nodemailer = require('nodemailer');
 
     }
 
+    // Get list of testers in the existing project team
     function getTestersRem(req, projectsRes) {
         return new Promise(function(resolve, reject) {
             var dbQuery1 = "SELECT users.id AS testerId, users.name AS testerName, projects.id AS projectId, projects.name AS projectName FROM projects JOIN project_team JOIN users ON project_team.user_id = users.id AND projects.id = project_team.project_id AND users.class = 1 AND projects.manager_id = ? AND projects.status = 'Open'";
@@ -674,6 +692,7 @@ var nodemailer = require('nodemailer');
         });
     }
 
+    // Get list of testers who are not yet in at least one of the projects managed by the admin
     function getTestersAdd(req, projectsRes, testResRem) {
         return new Promise(function(resolve, reject) {
             var dbQuery2 = "SELECT DISTINCT(users.id) AS testerId, users.name AS testerName, projects.id AS projectId FROM users JOIN project_team JOIN projects ON projects.id = project_team.project_id AND users.class = 1 AND projects.manager_id != ? AND projects.status = 'Open'";
@@ -687,6 +706,7 @@ var nodemailer = require('nodemailer');
         });
     }
 
+    // Get list of developers who are in the existing project team
     function getDevelopersRem(req, projectsRes) {
         return new Promise(function(resolve, reject) {
             var dbQuery1 = "SELECT users.id AS developerId, users.name AS developerName, projects.id AS projectId, projects.name AS projectName FROM projects JOIN project_team JOIN users ON project_team.user_id = users.id AND projects.id = project_team.project_id AND users.class = 2 AND projects.manager_id = ? AND projects.status = 'Open'";
@@ -700,6 +720,7 @@ var nodemailer = require('nodemailer');
         });
     }
 
+    // Get list of developers who are not in at least one of the projects managed by the admin
     function getDevelopersAdd(req, projectsRes, devResRem) {
         return new Promise(function(resolve, reject) {
             var dbQuery2 = "SELECT DISTINCT(users.id) AS developerId, users.name AS developerName, projects.id AS projectId FROM users JOIN project_team JOIN projects ON projects.id = project_team.project_id AND users.class = 2 AND projects.manager_id != ? AND projects.status = 'Open'";
@@ -713,6 +734,7 @@ var nodemailer = require('nodemailer');
         });
     }
 
+    // Get the list of projects managed by the admin
     function getProjectsManage(req) {
       return new Promise(function(resolve, reject) {
         connection.query("SELECT * FROM projects WHERE manager_id = ? AND status = 'Open'", [req.user.id], function(err, projectsRes) {

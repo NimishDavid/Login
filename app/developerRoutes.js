@@ -1,5 +1,6 @@
 module.exports = function (app, passport, expressValidator, connection, isLoggedIn, sendMail) {
 
+    // Get the list of bugs assigned to the developer
     app.get('/developer/bugReport', isLoggedIn, function(req, res) {
         if (req.user.class == 2) {
             connection.query("SELECT bugs.id AS bugID, bugs.name AS bugName, bugs.bug_type AS bugType, bugs.description AS description, bugs.severity AS severity, bugs.priority AS priority, bugs.file AS file, bugs.method AS method, bugs.line AS line, bugs.status AS status, bugs.developer_id AS assignedTo, projects.name AS projectName FROM bugs JOIN projects ON bugs.project_id = projects.id AND projects.status = 'Open' AND bugs.developer_id = ? AND (bugs.status = 'Assigned' OR bugs.status = 'Review' OR bugs.status = 'Resolving')", [req.user.id], function(err, bugsRes) {
@@ -19,6 +20,7 @@ module.exports = function (app, passport, expressValidator, connection, isLogged
         }
     });
 
+    // Update status of the bugs assigned to the developer
     app.post('/developer/bugReport', isLoggedIn, function(req, res) {
         if (req.user.class == 2) {
             req.assert('status').notEmpty().isIn(['Resolving', 'Review']);
@@ -91,6 +93,7 @@ module.exports = function (app, passport, expressValidator, connection, isLogged
         }
     });
 
+    // Get the list of bugs that were rejected in review either by the admin or the tester.
     app.get('/developer/rejectedBugs', isLoggedIn, function(req, res) {
         if (req.user.class == 2) {
             connection.query("SELECT bugs.id AS bugID, bugs.name AS bugName, bugs.bug_type AS bugType, bugs.description AS description, bugs.severity AS severity, bugs.priority AS priority, bugs.status AS rejectType, users.name AS tester, projects.name AS projectName FROM bugs JOIN users JOIN projects WHERE developer_id = ? AND (bugs.status = 'Review Reject' OR bugs.status = 'Approve Reject') AND users.id = bugs.tester_id AND bugs.project_id = projects.id AND projects.status = 'Open'", [req.user.id], function(err, rejectRes) {
@@ -110,9 +113,10 @@ module.exports = function (app, passport, expressValidator, connection, isLogged
         }
     });
 
+    // Get the list of bugs previously assigned to the developer
     app.get('/developer/bugHistory', isLoggedIn, function(req, res) {
         if (req.user.class == 2) {
-            connection.query("SELECT bugs.id AS bugId, bugs.name AS bugName, bugs.bug_type AS bugType, bugs.severity AS severity, bugs.priority AS priority, projects.name AS projectName, bugs.status AS status FROM bugs JOIN projects ON bugs.developer_id = ? AND bugs.status NOT IN ('Assigned', 'Resolving') AND bugs.project_id = projects.id", [req.user.id], function(err, bugsRes) {
+            connection.query("SELECT bugs.id AS bugId, bugs.name AS bugName, bugs.bug_type AS bugType, bugs.severity AS severity, bugs.priority AS priority, projects.name AS projectName, bugs.status AS status FROM bugs JOIN projects ON bugs.developer_id = ? AND bugs.status NOT IN ('Assigned', 'Resolving') AND bugs.project_id = projects.id AND projects.status = 'Open'", [req.user.id], function(err, bugsRes) {
                 if (err)
                     console.log(err);
                 else {
