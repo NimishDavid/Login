@@ -6,17 +6,40 @@ $(".update").click(function() {
     }
     else {
         var $bug = $(this).closest("tr").find(".bug_id").text();         // Retrieves the text within <td>
-        axios.post('/admin/approveBugs', {
-            status : $stat,
-            bug : $bug
-          })
-          .then(function (response) {
-              var resText = response.data;
-              alert(resText);
-              location.reload({ msg : "success" });
-          })
-          .catch(function (error) {
-            console.log(error);
-          });
+        if($stat == 'Approve Reject') {
+          var $reason = $(this).closest("tr").find(".stat").find(".ifReject").find(".reason").val();
+          if(!$reason) {
+            alert("Please enter a reason");
+          }
+          else {
+            axios.post('/admin/approveBugs', {
+                reason : $reason,
+                status : $stat,
+                bug : $bug
+              })
+              .then(function (response) {
+                  var resText = response.data;
+                  alert(resText);
+                  location.reload({ msg : "success" });
+              })
+              .catch(function (error) {
+                console.log(error);
+              });
+          }
+        }
+        else {
+          axios.post('/admin/approveBugs', {
+              status : $stat,
+              bug : $bug
+            })
+            .then(function (response) {
+                var resText = response.data;
+                alert(resText);
+                location.reload({ msg : "success" });
+            })
+            .catch(function (error) {
+              console.log(error);
+            });
+        }
     }
 });

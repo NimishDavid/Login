@@ -146,69 +146,138 @@ module.exports = function (app, passport, expressValidator, connection, isLogged
     // Update database with new staus of the bugs after review
     app.post('/tester/reviewBugs', isLoggedIn, function(req, res) {
         if (req.user.class == 1) {
-            req.assert('status').notEmpty().isIn(['Review Reject', 'Approval']);
-            req.assert('bug').notEmpty().isInt();
-            var errors = req.validationErrors();
-            if (!errors) {
-                function updateBugStatusTester() {
+            if(typeof(req.body.reason) != 'undefined') {
+              req.assert('status').notEmpty().isIn(['Review Reject', 'Approval']);
+              req.assert('bug').notEmpty().isInt();
+              req.assert('reason').notEmpty();
+              var errors = req.validationErrors();
+              if (!errors) {
+                  function updateBugStatusTester() {
+                      return new Promise(function(resolve, reject) {
+                        var dbQuery = "UPDATE bugs SET status = ?, reject_reason = ? WHERE id = ?";
+                        connection.query(dbQuery, [req.body.status, req.body.reason, req.body.bug], function(err, devRes) {
+                              if (err)
+                                  reject(err);
+                              else {
+                                  // console.log("Database update successful");
+                                  resolve([req.body.status, req.body.bug]);
+                              }
+                          });
+                      });
+                  }
+                  updateBugStatusTester().then(function(params) {
                     return new Promise(function(resolve, reject) {
-                        var dbQuery = "UPDATE bugs SET status = '" + req.body.status + "' WHERE id = " + req.body.bug;
-                        connection.query(dbQuery, function(err, devRes) {
-                            if (err)
-                                reject(err);
-                            else {
-                                // console.log("Database update successful");
-                                resolve([req.body.status, req.body.bug]);
-                            }
-                        });
+                      var status = params[0];
+                      var bugId = params[1];
+                      var dbQuery = "SELECT * FROM projects JOIN bugs WHERE bugs.id = ? AND bugs.project_id = projects.id";
+                      connection.query(dbQuery, [bugId], function(err, bugsRes) {
+                          if (err)
+                              reject(err);
+                          else {
+                              resolve(bugsRes);
+                          }
+                      });
                     });
-                }
-                updateBugStatusTester().then(function(params) {
-                  return new Promise(function(resolve, reject) {
-                    var status = params[0];
-                    var bugId = params[1];
-                    var dbQuery = "SELECT * FROM projects JOIN bugs WHERE bugs.id = ? AND bugs.project_id = projects.id";
-                    connection.query(dbQuery, [bugId], function(err, bugsRes) {
-                        if (err)
-                            reject(err);
-                        else {
-                            resolve(bugsRes);
-                        }
+                  }).then(function(bugsRes) {
+                    return new Promise(function(resolve, reject) {
+                      var dbQuery = "SELECT * FROM users WHERE id IN("+bugsRes[0].developer_id+", "+bugsRes[0].manager_id+")";
+                      connection.query(dbQuery, function(err, usersRes) {
+                          if (err)
+                              reject(err);
+                          else {
+                              resolve([bugsRes, usersRes]);
+                          }
+                      });
                     });
-                  });
-                }).then(function(bugsRes) {
-                  return new Promise(function(resolve, reject) {
-                    var dbQuery = "SELECT * FROM users WHERE id IN("+bugsRes[0].developer_id+", "+bugsRes[0].manager_id+")";
-                    connection.query(dbQuery, function(err, usersRes) {
-                        if (err)
-                            reject(err);
-                        else {
-                            resolve([bugsRes, usersRes]);
-                        }
+                  }).then(function(params) {
+                    var bugsRes = params[0];
+                    console.log("Params :\n");
+                    console.log(params[0]);
+                    console.log("Bugs :\n");
+                    console.log(bugsRes);
+                    var usersRes = params[1];
+                    usersRes.forEach(function(item, index) {
+                      var toAddress = item.email;
+                      var subject = "Bug status changed!"
+                      var text = "Dear "+item.name+",\n\nThe status of a bug that you are involved in has been changed recently :\n\nBug ID : "+bugsRes[0].id+"\n\nBug name : "+bugsRes[0].name+"\nBug type : "+bugsRes[0].bug_type+"\nDescription : "+bugsRes[0].description+"\nSeverity : "+bugsRes[0].severity+"\nPriority : "+bugsRes[0].priority+"\nStatus : "+bugsRes[0].status+"\nReject Reason : "+bugsRes[0].reject_reason;
+                      return sendMail(toAddress, subject, text);
                     });
-                  });
-                }).then(function(params) {
-                  var bugsRes = params[0];
-                  console.log("Params :\n");
-                  console.log(params[0]);
-                  console.log("Bugs :\n");
-                  console.log(bugsRes);
-                  var usersRes = params[1];
-                  usersRes.forEach(function(item, index) {
-                    var toAddress = item.email;
-                    var subject = "Bug status changed!"
-                    var text = "Dear "+item.name+",\n\nThe status of a bug that you are involved in has been changed recently :\n\nBug ID : "+bugsRes[0].id+"\n\nBug name : "+bugsRes[0].name+"\nBug type : "+bugsRes[0].bug_type+"\nDescription : "+bugsRes[0].description+"\nSeverity : "+bugsRes[0].severity+"\nPriority : "+bugsRes[0].priority+"\nStatus : "+bugsRes[0].status;
-                    return sendMail(toAddress, subject, text);
-                  });
-                }).then(function(response) {
-                  console.log(response);
-                  res.send("Bug status changed successfully.")
-                }).catch(function(err) {
-                  console.log(err);
-              });
-            } else {
-                console.log("Invalid input");
-                res.end("Invalid input");
+                  }).then(function(response) {
+                    console.log(response);
+                    res.send("Bug status changed successfully.")
+                  }).catch(function(err) {
+                    console.log(err);
+                });
+              } else {
+                  console.log("Invalid input1");
+                  res.end("Invalid input1");
+              }
+            }
+            else {
+              req.assert('status').notEmpty().isIn(['Review Reject', 'Approval']);
+              req.assert('bug').notEmpty().isInt();
+              var errors = req.validationErrors();
+              if (!errors) {
+                  function updateBugStatusTester() {
+                      return new Promise(function(resolve, reject) {
+                        var dbQuery = "UPDATE bugs SET status = ? WHERE id = ?";
+                        connection.query(dbQuery, [req.body.status, req.body.bug], function(err, devRes) {
+                              if (err)
+                                  reject(err);
+                              else {
+                                  // console.log("Database update successful");
+                                  resolve([req.body.status, req.body.bug]);
+                              }
+                          });
+                      });
+                  }
+                  updateBugStatusTester().then(function(params) {
+                    return new Promise(function(resolve, reject) {
+                      var status = params[0];
+                      var bugId = params[1];
+                      var dbQuery = "SELECT * FROM projects JOIN bugs WHERE bugs.id = ? AND bugs.project_id = projects.id";
+                      connection.query(dbQuery, [bugId], function(err, bugsRes) {
+                          if (err)
+                              reject(err);
+                          else {
+                              resolve(bugsRes);
+                          }
+                      });
+                    });
+                  }).then(function(bugsRes) {
+                    return new Promise(function(resolve, reject) {
+                      var dbQuery = "SELECT * FROM users WHERE id IN("+bugsRes[0].developer_id+", "+bugsRes[0].manager_id+")";
+                      connection.query(dbQuery, function(err, usersRes) {
+                          if (err)
+                              reject(err);
+                          else {
+                              resolve([bugsRes, usersRes]);
+                          }
+                      });
+                    });
+                  }).then(function(params) {
+                    var bugsRes = params[0];
+                    console.log("Params :\n");
+                    console.log(params[0]);
+                    console.log("Bugs :\n");
+                    console.log(bugsRes);
+                    var usersRes = params[1];
+                    usersRes.forEach(function(item, index) {
+                      var toAddress = item.email;
+                      var subject = "Bug status changed!"
+                      var text = "Dear "+item.name+",\n\nThe status of a bug that you are involved in has been changed recently :\n\nBug ID : "+bugsRes[0].id+"\n\nBug name : "+bugsRes[0].name+"\nBug type : "+bugsRes[0].bug_type+"\nDescription : "+bugsRes[0].description+"\nSeverity : "+bugsRes[0].severity+"\nPriority : "+bugsRes[0].priority+"\nStatus : "+bugsRes[0].status;
+                      return sendMail(toAddress, subject, text);
+                    });
+                  }).then(function(response) {
+                    console.log(response);
+                    res.send("Bug status changed successfully.")
+                  }).catch(function(err) {
+                    console.log(err);
+                });
+              } else {
+                  console.log("Invalid input2");
+                  res.end("Invalid input2");
+              }
             }
         } else {
             console.log("Forbidden access");

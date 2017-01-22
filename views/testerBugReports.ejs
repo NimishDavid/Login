@@ -53,11 +53,14 @@
                                             <td><%= resultTes[i].projectName %></td>
                                             <td><%= resultTes[i].assignedToName %></td>
                                             <td class="stat">
-                                                 <select class="form-control" name="status" required>
+                                                 <select class="form-control" name="status" onchange="rejectCheck($(this))">
                                                   <option value="">Select status</option>
                                                   <option value="Review Reject">Reject</option>
                                                   <option value="Approval">Request Approval</option>
                                                  </select>
+                                                 <div class="ifReject"  style="padding-top: 5px; display: none;">
+                                                   <input type="text" name="reason" placeholder="Reason" class="form-control reason" maxlength="200">
+                                                 </div>
                                                  <div class="help-block with-errors"></div>
                                             </td>
                                             <td class="text-center">
@@ -185,6 +188,7 @@
     <script src="/table.js" charset="utf-8"></script>
     <% if(type == 'review') { %>
     <script src="/testerStatusUpdate.js" charset="utf-8"></script>
+    <script src="/rejectReason.js" charset="utf-8"></script>
     <% } %>
     <% if(type == 'track') { %>
         <script src="/editBugs.js" charset="utf-8"></script>

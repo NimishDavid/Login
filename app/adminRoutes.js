@@ -154,14 +154,77 @@ var nodemailer = require('nodemailer');
     // Update the status of bugs pending approval
     app.post('/admin/approveBugs', isLoggedIn, function(req, res) {
         if (req.user.class == 0) {
+          if(typeof(req.body.reason) != 'undefined') {
+            req.assert('status').notEmpty().isIn(['Approve Reject', 'Closed']);
+            req.assert('bug').notEmpty().isInt();
+            req.assert('reason').notEmpty();
+            var errors = req.validationErrors();
+            if (!errors) {
+                function updateBugStatusAdmin() {
+                  return new Promise(function(resolve, reject) {
+                    var dbQuery = "UPDATE bugs SET status = ?, reject_reason = ? WHERE id = ?";
+                    connection.query(dbQuery, [req.body.status, req.body.reason, req.body.bug], function(err, devRes) {
+                        if (err)
+                            reject(err);
+                        else {
+                            resolve([req.body.status, req.body.bug]);
+                        }
+                    });
+                  });
+                }
+                updateBugStatusAdmin().then(function(params) {
+                  return new Promise(function(resolve, reject) {
+                    var status = params[0];
+                    var bugId = params[1];
+                    var dbQuery = "SELECT * FROM bugs WHERE id = ?";
+                    connection.query(dbQuery, [bugId], function(err, bugsRes) {
+                        if (err)
+                            reject(err);
+                        else {
+                            resolve(bugsRes);
+                        }
+                    });
+                  });
+                }).then(function(bugsRes) {
+                  return new Promise(function(resolve, reject) {
+                    var dbQuery = "SELECT * FROM users WHERE id IN("+bugsRes[0].developer_id+", "+bugsRes[0].tester_id+")";
+                    connection.query(dbQuery, function(err, usersRes) {
+                        if (err)
+                            reject(err);
+                        else {
+                            resolve([bugsRes, usersRes]);
+                        }
+                    });
+                  });
+                }).then(function(params) {
+                  var bugsRes = params[0];
+                  var usersRes = params[1];
+                  usersRes.forEach(function(item, index) {
+                    var toAddress = item.email;
+                    var subject = "Bug status changed!"
+                    var text = "Dear "+item.name+",\n\nThe status of a bug that you are involved in has been changed recently :\n\nBug ID : "+bugsRes[0].id+"\n\nBug name : "+bugsRes[0].name+"\nBug type : "+bugsRes[0].bug_type+"\nDescription : "+bugsRes[0].description+"\nSeverity : "+bugsRes[0].severity+"\nPriority : "+bugsRes[0].priority+"\nStatus : "+bugsRes[0].status+"\nReject Reason : "+bugsRes[0].reject_reason;
+                    return sendMail(toAddress, subject, text);
+                  });
+                }).then(function(response) {
+                  console.log(response);
+                  res.send("Bug status changed successfully.")
+                }).catch(function(err) {
+                  console.log(err);
+                })
+            } else {
+                console.log("Invalid input");
+                res.end("Invalid input");
+            }
+          }
+          else {
             req.assert('status').notEmpty().isIn(['Approve Reject', 'Closed']);
             req.assert('bug').notEmpty().isInt();
             var errors = req.validationErrors();
             if (!errors) {
                 function updateBugStatusAdmin() {
                   return new Promise(function(resolve, reject) {
-                    var dbQuery = "UPDATE bugs SET status = '" + req.body.status + "' WHERE id = " + req.body.bug;
-                    connection.query(dbQuery, function(err, devRes) {
+                    var dbQuery = "UPDATE bugs SET status = ? WHERE id = ?";
+                    connection.query(dbQuery, [req.body.status, req.body.bug], function(err, devRes) {
                         if (err)
                             reject(err);
                         else {
@@ -213,6 +276,7 @@ var nodemailer = require('nodemailer');
                 console.log("Invalid input");
                 res.end("Invalid input");
             }
+          }
         } else {
             console.log("Forbidden access");
             res.end("Forbidden access");

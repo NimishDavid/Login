@@ -96,7 +96,7 @@ module.exports = function (app, passport, expressValidator, connection, isLogged
     // Get the list of bugs that were rejected in review either by the admin or the tester.
     app.get('/developer/rejectedBugs', isLoggedIn, function(req, res) {
         if (req.user.class == 2) {
-            connection.query("SELECT bugs.id AS bugID, bugs.name AS bugName, bugs.bug_type AS bugType, bugs.description AS description, bugs.severity AS severity, bugs.priority AS priority, bugs.status AS rejectType, users.name AS tester, projects.name AS projectName FROM bugs JOIN users JOIN projects WHERE developer_id = ? AND (bugs.status = 'Review Reject' OR bugs.status = 'Approve Reject') AND users.id = bugs.tester_id AND bugs.project_id = projects.id AND projects.status = 'Open'", [req.user.id], function(err, rejectRes) {
+            connection.query("SELECT bugs.id AS bugID, bugs.name AS bugName, bugs.bug_type AS bugType, bugs.description AS description, bugs.severity AS severity, bugs.priority AS priority, bugs.status AS rejectType, users.name AS tester, projects.name AS projectName, bugs.reject_reason AS rejectReason FROM bugs JOIN users JOIN projects WHERE developer_id = ? AND (bugs.status = 'Review Reject' OR bugs.status = 'Approve Reject') AND users.id = bugs.tester_id AND bugs.project_id = projects.id AND projects.status = 'Open'", [req.user.id], function(err, rejectRes) {
                 if (err)
                     console.log(err);
                 else {
