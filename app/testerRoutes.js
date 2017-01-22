@@ -235,12 +235,19 @@ module.exports = function (app, passport, expressValidator, connection, isLogged
             getProjectsTester(req).then(function(projRes) {
                 return getBugDetails(req, projRes);
             }).then(function(params) {
+              console.log(params[1][0].tester_id);
+              console.log(req.user.id);
+              if(params[1][0].tester_id != req.user.id) {
+                res.end("Forbidden acces");
+              }
+              else {
                 res.render('editBugDetails.ejs', {
                     user: req.user,
                     proj: params[0],
                     len: params[0].length,
                     bugs: params[1]
                 });
+              }
             }).catch(function(err) {
                 console.log(err);
             });
