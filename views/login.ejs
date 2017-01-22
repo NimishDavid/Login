@@ -17,7 +17,7 @@
         <div class="col-md-6 col-md-offset-3 login_panel">
             <div class="panel">
                 <div class="panel-heading">
-                    <h2 class="text-center">BUG TRACKER</h2>
+                    <h2 class="text-center"><i class="fa fa-sign-in" aria-hidden="true"></i>&nbsp&nbspBUG TRACKER</h2>
                 <div class="panel-body">
                     <% if (message.length > 0) { %>
                         <div class="alert alert-danger"><%= message %></div>
@@ -27,7 +27,7 @@
                         <label for="username" class="col-sm-3 control-label">
                             Username</label>
                         <div class="col-sm-9">
-                            <input type="text" class="form-control" id="username" name="username" placeholder="Username" pattern="^[0-9]{3}$" required>
+                            <input type="text" class="form-control" id="username" name="username" placeholder="Username" pattern="^[0-9]{3}$" maxlength= "3" required>
                             <!-- <div class="help-block">Number of length 3</div> -->
                             <div class="help-block with-errors">Number of length 3</div>
                         </div>
