@@ -9,9 +9,9 @@
         <script src="/jquery.min.js"></script>
         <script src="/bootstrap.min.js"></script>
 
-
     </head>
     <body>
+      <script src="/activeTab.js"></script>
         <!-- Modal -->
         <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
           <div class="modal-dialog" role="document">
@@ -103,7 +103,7 @@
           </div>
         </div>
         <!-- Modal -->
-        <nav class="navbar navbar-primary">
+        <nav class="navbar navbar-default">
           <div class="container-fluid">
             <!-- Brand and toggle get grouped for better mobile display -->
             <div class="navbar-header">
@@ -113,7 +113,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
               </button>
-              <a class="navbar-brand" href="/home/" style="color: white">
+              <a class="navbar-brand" href="/home/">
                   Bug Tracker
               </a>
             </div>
@@ -123,35 +123,35 @@
               <% if(user.class == 0) { %>
                   <ul class="nav navbar-nav">
                       <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Bug Report&nbsp<span class="caret"></span></a>
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-bug" aria-hidden="true"></i>&nbsp&nbspBug Report&nbsp<span class="caret"></span></a>
                         <ul class="dropdown-menu">
                           <li><a href="/admin/bugReports/unassignedBugs">Unassigned</a></li>
                           <li><a href="/admin/bugReports/assignedBugs">Assigned</a></li>
                           <li><a href="/admin/bugReports/closedBugs">Closed</a></li>
                         </ul>
                       </li>
-                    <li><a href="/admin/approveBugs">Approve Resolved Bugs<span class="sr-only">(current)</span></a></li>
+                    <li><a href="/admin/approveBugs"><i class="fa fa-thumbs-o-up" aria-hidden="true"></i>&nbsp&nbspApprove Resolved Bugs<span class="sr-only">(current)</span></a></li>
                     <li class="dropdown">
-                      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Manage Project Team&nbsp<span class="caret"></span></a>
+                      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-users" aria-hidden="true"></i>&nbsp&nbspManage Project Team&nbsp<span class="caret"></span></a>
                       <ul class="dropdown-menu">
                         <li><a href="/admin/manageProjectTeam/manageTesters">Manage Testers</a></li>
                         <li><a href="/admin/manageProjectTeam/manageDevelopers">Manage Developers</a></li>
                       </ul>
                     </li>
-                    <li><a href="/admin/manageProjects">Manage Projects</a></li>
+                    <li><a href="/admin/manageProjects"><i class="fa fa-folder-open-o" aria-hidden="true"></i>&nbsp&nbspManage Projects</a></li>
                   </ul>
               <% } else if(user.class == 1) {%>
                   <ul class="nav navbar-nav">
-                    <li><a href="/tester/testerTasks">Tasks</a></li>
-                    <li><a href="/tester/reportBug">Report Bugs<span class="sr-only">(current)</span></a></li>
-                    <li><a href="/tester/reviewBugs">Review Bugs</a></li>
-                    <li><a href="/tester/trackBugs">Track Bugs</a></li>
+                    <li><a href="/tester/testerTasks"><i class="fa fa-tasks" aria-hidden="true"></i>&nbsp&nbspTasks</a></li>
+                    <li><a href="/tester/reportBug"><i class="fa fa-flag-o" aria-hidden="true"></i>&nbsp&nbspReport Bugs<span class="sr-only">(current)</span></a></li>
+                    <li><a href="/tester/reviewBugs"><i class="fa fa-eye" aria-hidden="true"></i>&nbsp&nbspReview Bugs</a></li>
+                    <li><a href="/tester/trackBugs"><i class="fa fa-bug" aria-hidden="true"></i>&nbsp&nbspTrack Bugs</a></li>
                   </ul>
               <% } else if(user.class == 2) {%>
                   <ul class="nav navbar-nav">
-                    <li><a href="/developer/bugReport">Bug Report</a></li>
-                    <li><a href="/developer/bugHistory">Bug History<span class="sr-only">(current)</span></a></li>
-                    <li><a href="/developer/rejectedBugs">Rejected Bugs</a></li>
+                    <li><a href="/developer/bugReport"><i class="fa fa-bug" aria-hidden="true"></i>&nbsp&nbspBug Report</a></li>
+                    <li><a href="/developer/bugHistory"><i class="fa fa-history" aria-hidden="true"></i>&nbsp&nbspBug History<span class="sr-only">(current)</span></a></li>
+                    <li><a href="/developer/rejectedBugs"><i class="fa fa-ban" aria-hidden="true"></i>&nbsp&nbspRejected Bugs</a></li>
                   </ul>
               <% } %>
               <ul class="nav navbar-nav navbar-right">
@@ -159,7 +159,7 @@
                 <li class="dropdown">
                   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Logout<span class="caret"></span></a>
                   <ul class="dropdown-menu">
-                    <li><a href="/logout">Logout</a></li>
+                    <li><a href="/logout">Logout&nbsp<i class="fa fa-sign-out" aria-hidden="true"></i></a></li>
                     <li role="separator" class="divider"></li>
                     <li><a href="#">User ID : <%= user.id %> </a></li>
                     <li><a href="#">Employee ID : <%= user.employee_id %> </a></li>
