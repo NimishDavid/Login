@@ -70,13 +70,21 @@ module.exports = function (app, passport, expressValidator, connection, isLogged
                             if (err)
                                 reject(err);
                             else {
-                                console.log("Bug report successful");
-                                message = "success";
-                                res.render('reportBug.ejs', {
-                                    user: req.user,
-                                    msg: message
+                                connection.query("SELECT * FROM project_team JOIN users JOIN projects ON users.id = project_team.user_id AND project_team.project_id = projects.id WHERE users.id = ? AND projects.status = 'Open'", [req.user.id], function(err, rows) {
+                                    if (err)
+                                        throw (err);
+                                    else {
+                                        console.log("Bug report successful");
+                                        message = "success";
+                                        res.render('reportBug.ejs', {
+                                            user: req.user,
+                                            msg: message,
+                                            proj: rows,
+                                            len: rows.length
+                                        });
+                                        resolve([req.body.project, req.body.bug_name, req.body.bug_type, req.body.bug_description, req.body.priority, req.body.severity, req.user.id]);
+                                    }
                                 });
-                                resolve([req.body.project, req.body.bug_name, req.body.bug_type, req.body.bug_description, req.body.priority, req.body.severity, req.user.id]);
                             }
                         });
                     });
@@ -288,7 +296,7 @@ module.exports = function (app, passport, expressValidator, connection, isLogged
     // Get list of bugs that were reported by the tester
     app.get('/tester/trackBugs', isLoggedIn, function(req, res) {
         if (req.user.class == 1) {
-            connection.query("SELECT bugs.id AS bugID, bugs.name AS bugName, bugs.bug_type AS bugType, bugs.description AS description, bugs.severity AS severity, bugs.priority AS priority, bugs.file AS file, bugs.method AS method, bugs.line AS line, bugs.status AS status, bugs.developer_id AS assignedTo FROM bugs JOIN projects ON bugs.project_id = projects.id AND projects.status = 'Open' AND tester_id = ? AND bugs.status NOT IN ('Review')", [req.user.id], function(err, bugsRes) {
+            connection.query("SELECT bugs.id AS bugID, bugs.name AS bugName, bugs.bug_type AS bugType, bugs.description AS description, bugs.severity AS severity, bugs.priority AS priority, bugs.file AS file, bugs.method AS method, bugs.line AS line, bugs.status AS status, bugs.developer_id AS assignedTo, projects.name AS projectName FROM bugs JOIN projects ON bugs.project_id = projects.id AND projects.status = 'Open' AND tester_id = ? AND bugs.status NOT IN ('Review')", [req.user.id], function(err, bugsRes) {
                 if (err)
                     console.log(err);
                 else {

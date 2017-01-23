@@ -1,5 +1,7 @@
 module.exports = function(app, passport, expressValidator) {
     var async = require('async');
+    var multer  = require('multer');
+    var upload = multer({ dest: 'uploads/' });
     var dbconfig = require('../config/database');
     var mysql = require('mysql');
     var connection = mysql.createConnection(dbconfig.connection);
