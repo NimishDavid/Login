@@ -31,7 +31,7 @@
     <h1 class="well">Report a bug</h1>
 	<div class="col-lg-12 well">
 	<div class="row">
-				<form name="reportBugForm" id="reportBugForm" data-toggle="validator" method="post" action="">
+				<form name="reportBugForm" id="reportBugForm" data-toggle="validator" method="post" action="" enctype="multipart/form-data">
 					<div class="col-sm-12">
 						<div class="row">
 							<div class="col-sm-5 form-group">
@@ -107,6 +107,11 @@
 							<div class="col-sm-3 form-group">
 								<label>Line</label>
 								<input type="number" name="line" placeholder="Line" class="form-control" required>
+                                <div class="help-block with-errors"></div>
+							</div>
+                            <div class="col-sm-6 form-group">
+								<label>Select Screenshot</label>
+								<input type="file" name="screenshots" required>
                                 <div class="help-block with-errors"></div>
 							</div>
                             <!-- <div class="col-sm-4 form-group">

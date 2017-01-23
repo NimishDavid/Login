@@ -1,5 +1,21 @@
 module.exports = function (app, passport, expressValidator, connection, isLoggedIn, sendMail) {
 
+    var multer  = require('multer');
+    
+    // Multipart form data handling
+    var storage = multer.diskStorage({
+      destination: function (req, file, cb) {
+        cb(null,  __dirname + '/../uploads/screenshots')
+      },
+      filename: function (req, file, cb) {
+        var filename = file.originalname;
+        filename = filename.split(".")[0] + Date.now() + "." + filename.split(".")[1];
+        req.filename = filename;
+        cb(null, filename);
+      }
+    });
+    var upload = multer({ storage: storage });
+
     // Get list of projects in which tester is present in the team
     app.get('/tester/testerTasks', isLoggedIn, function(req, res) {
         if (req.user.class == 1) {
@@ -45,7 +61,7 @@ module.exports = function (app, passport, expressValidator, connection, isLogged
     });
 
     // Insert bug details into the Database
-    app.post('/tester/reportBug', isLoggedIn, function(req, res) {
+    app.post('/tester/reportBug', isLoggedIn, upload.single('screenshots'), function(req, res) {
 
         if (req.user.class == 1) {
             var message;
@@ -64,7 +80,7 @@ module.exports = function (app, passport, expressValidator, connection, isLogged
             if (!errors) { //No errors were found.  Passed Validation!
                 function reportBug() {
                     return new Promise(function(resolve, reject) {
-                        var dbQuery = "INSERT INTO `bug_tracker`.`bugs` (`id`, `name`, `bug_type`, `description`, `project_id`, `file`, `method`, `line`, `priority`, `severity`, `status`, `tester_id`, `developer_id`) VALUES (NULL, \"" + req.body.bug_name + "\", \"" + req.body.bug_type + "\", \"" + req.body.bug_description + "\", \"" + req.body.project + "\", \"" + req.body.file + "\", \"" + req.body.method + "\", \"" + req.body.line + "\", \"" + req.body.priority + "\", \"" + req.body.severity + "\", \"Open\", \"" + req.user.id + "\" , NULL)";
+                        var dbQuery = "INSERT INTO `bug_tracker`.`bugs` (`id`, `name`, `bug_type`, `description`, `project_id`, `file`, `method`, `line`, `priority`, `severity`, `status`, `tester_id`, `developer_id`, `screenshot`) VALUES (NULL, \"" + req.body.bug_name + "\", \"" + req.body.bug_type + "\", \"" + req.body.bug_description + "\", \"" + req.body.project + "\", \"" + req.body.file + "\", \"" + req.body.method + "\", \"" + req.body.line + "\", \"" + req.body.priority + "\", \"" + req.body.severity + "\", \"Open\", \"" + req.user.id + "\" , NULL, \""+ req.filename +"\")";
 
                         connection.query(dbQuery, function(err, rows) {
                             if (err)
