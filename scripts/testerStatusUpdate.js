@@ -1,13 +1,13 @@
 $(".update").click(function() {
-    var $stat = $(this).closest("tr").find(".stat")     // Gets a descendent with class="stat"
+    var $stat = $(".stat")     // Gets a descendent with class="stat"
     .find(":selected").val();
     if(!$stat) {
         alert("Please select status");
     }
     else {
-      var $bug = $(this).closest("tr").find(".bug_id").text();         // Retrieves the text within <td>
+      var $bug = $('#bug_id').val();         // Retrieves the text within <td>
       if($stat == 'Review Reject') {
-        var $reason = $(this).closest("tr").find(".stat").find(".ifReject").find(".reason").val();
+        var $reason = $("#reason").val();
         if(!$reason) {
           alert("Please enter a reason");
         }

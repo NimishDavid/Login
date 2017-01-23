@@ -7,6 +7,151 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
     <body>
+      <!-- Modal -->
+      <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <h5 class="modal-title" id="exampleModalLabel"><h3>Bug Details</h3></h5>
+            </div>
+            <div class="modal-body">
+              <form>
+                  <div class="row">
+                      <div class="col-sm-12">
+                          <div class="form-group">
+                            <label for="bug_name" class="form-control-label">Bug Name</label>
+                            <input type="text" class="form-control" id="bug_name" value="" disabled>
+                          </div>
+                      </div>
+                  </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                          <label for="bug_id" class="form-control-label">Bug ID</label>
+                          <input type="text" class="form-control" id="bug_id" value="" disabled>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                          <label for="bug_type" class="form-control-label">Bug Type</label>
+                          <input type="text" class="form-control" id="bug_type" value="" disabled>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <label for="description" class="form-control-label">Description</label>
+                        <textarea class="form-control" id="description" disabled></textarea>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4">
+                        <label for="priority" class="form-control-label">Priority</label>
+                        <input type="text" class="form-control" id="priority" value="" disabled>
+                    </div>
+                    <div class="col-sm-4">
+                        <label for="severity" class="form-control-label">Severity</label>
+                        <input type="text" class="form-control" id="severity" value="" disabled>
+                    </div>
+                    <div class="col-sm-4">
+                        <label for="current_status" class="form-control-label">Current Status</label>
+                        <input type="text" class="form-control" id="current_status" value="" disabled>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4">
+                        <label for="project_id" class="form-control-label">Project</label>
+                        <input type="text" class="form-control" id="project_id" value="" disabled>
+                    </div>
+                    <div class="col-sm-4">
+                        <label for="tester_id" class="form-control-label">Tester</label>
+                        <input type="text" class="form-control" id="tester_id" value="" disabled>
+                    </div>
+                    <div class="col-sm-4">
+                        <label for="developer_id" class="form-control-label">Developer</label>
+                        <input type="text" class="form-control" id="developer_id" value="" disabled>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4">
+                        <label for="project_manager" class="form-control-label">Project Manager</label>
+                        <input type="text" class="form-control" id="project_manager" value="" disabled>
+                    </div>
+                    <div class="col-sm-8">
+                        <label for="file" class="form-control-label">File</label>
+                        <input type="text" class="form-control" id="file" value="" disabled>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <label for="screenshot" class="form-control-label">Screenshot</label>
+                        <img class="img-responsive" id="scrImg" src="" alt="image" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <label for="method" class="form-control-label">Method</label>
+                        <input type="text" class="form-control" id="method" value="" disabled>
+                    </div>
+                    <div class="col-sm-2">
+                        <label for="file" class="form-control-label">Line</label>
+                        <input type="line" class="form-control" id="line" value="" disabled>
+                    </div>
+                    <% if(typeof(resultAdmin) != 'undefined') { %>
+                        <% if(state == 'unassigned') { %>
+                          <div class="col-sm-4">
+                              <label for="developer" class="form-control-label">Developer</label>
+                              <div class="dev_id">
+
+                                      <select class="form-control" name="developer"  required>
+                                       <option value="">Select Developer</option>
+                                           <% for(j=0;j<devs.length;j++) {%>
+                                               <option value= <%= devs[j].devID %> > <%= devs[j].devName %>  </option>
+                                          <% } %>
+                                      </select>
+                                      <div class="help-block with-errors"></div>
+
+                              </div>
+                          </div>
+                        <% } %>
+                        <% if(state == 'approve') { %>
+                          <div class="col-sm-4">
+                              <label for="status" class="form-control-label">Status</label>
+                              <div class="stat">
+                                  <select class="form-control" name="status" onchange="rejectCheck($(this))">
+                                   <option value="">Select status</option>
+                                   <option value="Approve Reject">Reject</option>
+                                   <option value="Closed">Closed</option>
+                                  </select>
+                              </div>
+                          </div>
+                        <% } %>
+                    <% } %>
+                </div>
+                <div class="row ifReject" style="display: none;">
+                    <div class="col-sm-12">
+                        <label for="reason" class="form-control-label">Reason</label>
+                        <input type="text" class="form-control" id="reason" value="">
+                    </div>
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <% if(typeof(resultAdmin) != 'undefined') { %>
+                  <% if(state == 'unassigned') { %>
+                    <button class="btn btn-sm btn-primary update">Assign</button>
+                  <% } %>
+                  <% if(state == 'approve') { %>
+                    <button class="btn btn-sm btn-primary update">Save</button>
+                  <% } %>
+              <% } %>
+              <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Modal -->
     <% include navbar %>
     <div class="container">
     	<div class="row">
@@ -34,7 +179,6 @@
                                         <th>Severity</th>
                                         <th>Priority</th>
                                         <th>Project</th>
-                                        <th>Assign to</th>
                                         <th></th>
         							</tr>
         						</thead>
@@ -49,17 +193,7 @@
                                             <td><%= resultAdmin[i].severity %></td>
                                             <td><%= resultAdmin[i].priority %></td>
                                             <td><%= resultAdmin[i].projectName %></td>
-                                            <td class="dev_id">
 
-                                                    <select class="form-control" name="developer"  required>
-                                                     <option value="">Select Developer</option>
-                                                         <% for(j=0;j<devs.length;j++) {%>
-                                                             <option value= <%= devs[j].devID %> > <%= devs[j].devName %>  </option>
-                                                        <% } %>
-                                                    </select>
-                                                    <div class="help-block with-errors"></div>
-
-                                            </td>
                                             <td class="text-center">
                                                 <button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#exampleModal" data-bug="<%= resultAdmin[i].bugID %>">View More</button>
                                             </td>
@@ -200,8 +334,6 @@
                                         <th>Priority</th>
                                         <th>Project</th>
                                         <th>Assigned to</th>
-                                        <th>Status</th>
-                                        <th></th>
                                         <th></th>
         							</tr>
         						</thead>
@@ -217,18 +349,8 @@
                                             <td><%= resultAdmin[i].priority %></td>
                                             <td><%= resultAdmin[i].projectName %></td>
                                             <td><%= resultAdmin[i].assignedto %></td>
-                                            <td class="stat">
-                                                <select class="form-control" name="status" onchange="rejectCheck($(this))">
-                                                 <option value="">Select status</option>
-                                                 <option value="Approve Reject">Reject</option>
-                                                 <option value="Closed">Closed</option>
-                                                </select>
-                                            </td>
                                             <td class="text-center">
                                                 <button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#exampleModal" data-bug="<%= resultAdmin[i].bugid %>">View More</button>
-                                            </td>
-                                            <td>
-                                                <button class="btn btn-sm btn-primary update">Save</button>
                                             </td>
             							</tr>
 
