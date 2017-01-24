@@ -134,7 +134,7 @@ var md5 = require('md5');
     // Get list of resolved bugs pending approval
     app.get('/admin/approveBugs', isLoggedIn, function(req, res) {
         if (req.user.class == 0) {
-            connection.query("SELECT bugs.id AS bugid, bugs.name AS bugname, bugs.bug_type AS bugtype, bugs.description AS description, bugs.priority AS priority, bugs.severity as severity, users.name AS assignedto, bugs.status AS status, projects.name AS projectName FROM projects JOIN bugs JOIN users ON bugs.project_id = projects.id AND projects.manager_id = ? AND bugs.developer_id = users.id AND bugs.status = 'Approval' AND projects.status = 'Open'", [req.user.id], function(err, bugsRes) {
+            connection.query("SELECT bugs.id AS bugid, bugs.name AS bugname, bugs.bug_type AS bugtype, bugs.description AS description, bugs.priority AS priority, bugs.severity as severity, users.name AS assignedto, bugs.status AS status, projects.name AS projectName FROM projects JOIN bugs JOIN users ON bugs.project_id = projects.id AND projects.manager_id = ? AND bugs.developer_id = users.id AND bugs.status = 'Approval' AND projects.status = 'Open' ORDER BY bugs.id DESC", [req.user.id], function(err, bugsRes) {
                 if (err)
                     console.log(err);
                 else {

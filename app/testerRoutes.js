@@ -171,7 +171,7 @@ module.exports = function (app, passport, expressValidator, connection, isLogged
     // Get list of bugs pending tester review
     app.get('/tester/reviewBugs', isLoggedIn, function(req, res) {
         if (req.user.class == 1) {
-            connection.query("SELECT bugs.id AS bugID, bugs.name AS bugName, bugs.bug_type AS bugType, bugs.description AS description, bugs.severity AS severity, bugs.priority AS priority, bugs.file AS file, bugs.method AS method, bugs.line AS line, bugs.status AS status, bugs.developer_id AS assignedTo, projects.name AS projectName, users.name AS assignedToName FROM bugs JOIN projects JOIN users ON bugs.project_id = projects.id AND projects.status = 'Open' AND tester_id = ? AND bugs.status = 'Review' AND bugs.developer_id = users.id", [req.user.id], function(err, bugsRes) {
+            connection.query("SELECT bugs.id AS bugID, bugs.name AS bugName, bugs.bug_type AS bugType, bugs.description AS description, bugs.severity AS severity, bugs.priority AS priority, bugs.file AS file, bugs.method AS method, bugs.line AS line, bugs.status AS status, bugs.developer_id AS assignedTo, projects.name AS projectName, users.name AS assignedToName FROM bugs JOIN projects JOIN users ON bugs.project_id = projects.id AND projects.status = 'Open' AND tester_id = ? AND bugs.status = 'Review' AND bugs.developer_id = users.id ORDER BY bugs.id DESC", [req.user.id], function(err, bugsRes) {
                 if (err)
                     console.log(err);
                 else {
@@ -333,7 +333,7 @@ module.exports = function (app, passport, expressValidator, connection, isLogged
     // Get list of bugs that were reported by the tester
     app.get('/tester/trackBugs', isLoggedIn, function(req, res) {
         if (req.user.class == 1) {
-            connection.query("SELECT bugs.id AS bugID, bugs.name AS bugName, bugs.bug_type AS bugType, bugs.description AS description, bugs.severity AS severity, bugs.priority AS priority, bugs.file AS file, bugs.method AS method, bugs.line AS line, bugs.status AS status, bugs.developer_id AS assignedTo, projects.name AS projectName FROM bugs JOIN projects ON bugs.project_id = projects.id AND projects.status = 'Open' AND tester_id = ? AND bugs.status NOT IN ('Review')", [req.user.id], function(err, bugsRes) {
+            connection.query("SELECT bugs.id AS bugID, bugs.name AS bugName, bugs.bug_type AS bugType, bugs.description AS description, bugs.severity AS severity, bugs.priority AS priority, bugs.file AS file, bugs.method AS method, bugs.line AS line, bugs.status AS status, bugs.developer_id AS assignedTo, projects.name AS projectName FROM bugs JOIN projects ON bugs.project_id = projects.id AND projects.status = 'Open' AND tester_id = ? AND bugs.status NOT IN ('Review') ORDER BY bugs.id DESC", [req.user.id], function(err, bugsRes) {
                 if (err)
                     console.log(err);
                 else {
