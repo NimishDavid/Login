@@ -1,18 +1,34 @@
 module.exports = function (app, passport, expressValidator, connection, isLoggedIn, sendMail) {
 
     var multer  = require('multer');
-    
+
     // Multipart form data handling
     var storage = multer.diskStorage({
+            fileFilter: function (req, file, cb) {
+
+                if (file.mimetype !== 'image/png') {
+          req.fileValidationError = 'goes wrong on the mimetype';
+          return cb(null, false, new Error('goes wrong on the mimetype'));
+         }
+         cb(null, true);
+     },
       destination: function (req, file, cb) {
         cb(null,  __dirname + '/../uploads/screenshots')
       },
       filename: function (req, file, cb) {
         var filename = file.originalname;
         filename = filename.split(".")[0] + Date.now() + "." + filename.split(".")[1];
-        req.filename = filename;
+        req.body.filename = filename;
         cb(null, filename);
-      }
+        // var extension = filename.split(".")[1];
+        // if(extension == 'jpg' || extension == 'png' || extension == 'jpeg') {
+        //     req.body.filename = filename;
+        //     cb(null, filename);
+        // }
+        // else {
+        //     cb(null,null);
+        // }
+        }
     });
     var upload = multer({ storage: storage });
 
@@ -64,8 +80,11 @@ module.exports = function (app, passport, expressValidator, connection, isLogged
     app.post('/tester/reportBug', isLoggedIn, upload.single('screenshots'), function(req, res) {
 
         if (req.user.class == 1) {
-            var message;
 
+            var message;
+            var extension = req.body.filename.split(".")[1];
+            console.log("\nExtension : ", extension);
+            req.body.ext = extension;
             req.assert('bug_name', 'Bug name is required').notEmpty().isLength(5, 50);
             req.assert('bug_type', 'Bug type is required').notEmpty().isIn(['Type A', 'Type B', 'Type C']);
             req.assert('project', 'Project ID is required').notEmpty().isNumeric();
@@ -75,12 +94,14 @@ module.exports = function (app, passport, expressValidator, connection, isLogged
             req.assert('method', 'Method is required').notEmpty();
             req.assert('priority', 'Priority is required').notEmpty().isIn(['Low', 'Moderate', 'High']);
             req.assert('line', 'Line number is required').notEmpty().isNumeric();
+            req.assert('filename', 'Filename is required').notEmpty();
+            req.assert('ext', 'Extension').notEmpty().isIn(['jpg', 'png', 'jpeg']);
 
             var errors = req.validationErrors();
             if (!errors) { //No errors were found.  Passed Validation!
                 function reportBug() {
                     return new Promise(function(resolve, reject) {
-                        var dbQuery = "INSERT INTO `bug_tracker`.`bugs` (`id`, `name`, `bug_type`, `description`, `project_id`, `file`, `method`, `line`, `priority`, `severity`, `status`, `tester_id`, `developer_id`, `screenshot`) VALUES (NULL, \"" + req.body.bug_name + "\", \"" + req.body.bug_type + "\", \"" + req.body.bug_description + "\", \"" + req.body.project + "\", \"" + req.body.file + "\", \"" + req.body.method + "\", \"" + req.body.line + "\", \"" + req.body.priority + "\", \"" + req.body.severity + "\", \"Open\", \"" + req.user.id + "\" , NULL, \""+ req.filename +"\")";
+                        var dbQuery = "INSERT INTO `bug_tracker`.`bugs` (`id`, `name`, `bug_type`, `description`, `project_id`, `file`, `method`, `line`, `priority`, `severity`, `status`, `tester_id`, `developer_id`, `screenshot`) VALUES (NULL, \"" + req.body.bug_name + "\", \"" + req.body.bug_type + "\", \"" + req.body.bug_description + "\", \"" + req.body.project + "\", \"" + req.body.file + "\", \"" + req.body.method + "\", \"" + req.body.line + "\", \"" + req.body.priority + "\", \"" + req.body.severity + "\", \"Open\", \"" + req.user.id + "\" , NULL, \""+ req.body.filename +"\")";
 
                         connection.query(dbQuery, function(err, rows) {
                             if (err)
@@ -362,7 +383,7 @@ module.exports = function (app, passport, expressValidator, connection, isLogged
     });
 
     // Update the database with the edited bug details
-    app.post('/tester/reportBug/editBugDetails/', isLoggedIn, function(req, res) {
+    app.post('/tester/reportBug/editBugDetails/', isLoggedIn, upload.single('screenshots'), function(req, res) {
 
         if (req.user.class == 1) {
 
@@ -371,7 +392,9 @@ module.exports = function (app, passport, expressValidator, connection, isLogged
             }).then(function(params) {
 
                 var message;
-
+                var extension = req.body.filename.split(".")[1];
+                console.log("\nExtension : ", extension);
+                req.body.ext = extension;
                 req.assert('bug_name', 'Bug name is required').notEmpty().isLength(5, 50);
                 req.assert('bug_type', 'Bug type is required').notEmpty().isIn(['Type A', 'Type B', 'Type C']);
                 req.assert('project', 'Project ID is required').notEmpty().isNumeric();
@@ -381,13 +404,15 @@ module.exports = function (app, passport, expressValidator, connection, isLogged
                 req.assert('method', 'Method is required').notEmpty();
                 req.assert('priority', 'Priority is required').notEmpty().isIn(['Low', 'Moderate', 'High']);
                 req.assert('line', 'Line number is required').notEmpty().isNumeric();
+                req.assert('filename', 'Filename is required').notEmpty();
+                req.assert('ext', 'Extension').notEmpty().isIn(['jpg', 'png', 'jpeg']);
 
                 var errors = req.validationErrors();
                 if (!errors) { //No errors were found.  Passed Validation!
+                    console.log("Before query");
+                    var dbQuery = "UPDATE bugs SET name = ?, bug_type = ?, project_id = ?, description = ?, file = ?, method = ?, line = ?, severity = ?, priority = ?, screenshot = ? WHERE bugs.id = ?";
 
-                    var dbQuery = "UPDATE bugs SET name = ?, bug_type = ?, project_id = ?, description = ?, file = ?, method = ?, line = ?, severity = ?, priority = ? WHERE bugs.id = ?";
-
-                    connection.query(dbQuery, [req.body.bug_name, req.body.bug_type, req.body.project, req.body.bug_description, req.body.file, req.body.method, req.body.line, req.body.severity, req.body.priority, req.body.bug_id] , function(err, rows) {
+                    connection.query(dbQuery, [req.body.bug_name, req.body.bug_type, req.body.project, req.body.bug_description, req.body.file, req.body.method, req.body.line, req.body.severity, req.body.priority, req.body.filename, req.body.bug_id] , function(err, rows) {
                         if (err)
                             throw (err);
                         else {
