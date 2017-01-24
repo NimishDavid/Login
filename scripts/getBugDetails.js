@@ -21,14 +21,10 @@ $('#exampleModal').on('show.bs.modal', function (event) {
         modal.find('#file').val(bugDetails[0].file);
         modal.find('#method').val(bugDetails[0].method);
         modal.find('#line').val(bugDetails[0].line);
-        // if(bugDetails[0].status == 'Open') {
-        //     modal.find('#statDropdown').html("<select class='form-control' name='status' onchange='rejectCheck($(this))'>
-        //      <option value=''>Select status</option>
-        //      <option value='Approve Reject'>Reject</option>
-        //      <option value='Closed'>Closed</option>
-        //     </select>");
-        // }
         modal.find("#scrImg").attr("src",'/screenshots/'+bugDetails[0].screenshot);
+        if((bugDetails[0].status == 'Review Reject') || (bugDetails[0].status == 'Approve Reject')) {
+            modal.find('#reason').val(bugDetails[0].reason);
+        }
         if(typeof(bugDetails[2]) == 'undefined') {
             modal.find('#developer_id').val("Unassigned");
         }else {

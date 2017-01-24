@@ -116,7 +116,7 @@ module.exports = function (app, passport, expressValidator, connection, isLogged
     // Get the list of bugs previously assigned to the developer
     app.get('/developer/bugHistory', isLoggedIn, function(req, res) {
         if (req.user.class == 2) {
-            connection.query("SELECT bugs.id AS bugId, bugs.name AS bugName, bugs.bug_type AS bugType, bugs.severity AS severity, bugs.priority AS priority, projects.name AS projectName, bugs.status AS status FROM bugs JOIN projects ON bugs.developer_id = ? AND bugs.status NOT IN ('Assigned', 'Resolving') AND bugs.project_id = projects.id AND projects.status = 'Open'", [req.user.id], function(err, bugsRes) {
+            connection.query("SELECT bugs.id AS bugId, bugs.name AS bugName, bugs.bug_type AS bugType, bugs.severity AS severity, bugs.priority AS priority, projects.name AS projectName, bugs.status AS status FROM bugs JOIN projects ON bugs.developer_id = ? AND bugs.status NOT IN ('Assigned', 'Resolving', 'Review Reject', 'Approve Reject') AND bugs.project_id = projects.id AND projects.status = 'Open'", [req.user.id], function(err, bugsRes) {
                 if (err)
                     console.log(err);
                 else {

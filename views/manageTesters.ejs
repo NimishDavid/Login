@@ -108,7 +108,7 @@
                               <% if(typeof(testersRem) != 'undefined') { %>
                                 <% testersRem.forEach(function(item, index) {%>
                                   <div class="col-md-12">
-                                    <form class="" action="/admin/manageProjectTeam/manageTesters/removeTesters" method="post">
+                                    <form class="" action="/admin/manageProjectTeam/manageTesters/removeTesters" method="post" onsubmit="return confirm('Do you really want to remove the tester from the project?');">
                                       <div class="col-md-2">
                                           <p> <%= item.testerId %> </p>
                                           <input type="hidden" name="user_id" value="<%= item.testerId %>">

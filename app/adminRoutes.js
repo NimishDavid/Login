@@ -1,5 +1,6 @@
 module.exports = function (app, passport, expressValidator, connection, isLoggedIn, sendMail) {
 var nodemailer = require('nodemailer');
+var md5 = require('md5');
 // mailer = require('./mailer.js');
 
     // Get list of unassigned bugs
@@ -702,6 +703,84 @@ var nodemailer = require('nodemailer');
               console.log("Invalid input");
               res.end("Invalid input");
           }
+        } else {
+            console.log("Forbidden access");
+            res.end("Forbidden access");
+        }
+    });
+
+    app.get('/admin/addUsers', isLoggedIn, function(req, res) {
+        if (req.user.class == 0) {
+          res.render('addUsers.ejs', {
+              user: req.user
+          });
+        } else {
+            console.log("Forbidden access");
+            res.end("Forbidden access");
+        }
+    });
+
+    app.post('/admin/addUsers', isLoggedIn, function(req, res) {
+        if (req.user.class == 0) {
+            req.assert('name').notEmpty();
+            req.assert('employee_id').notEmpty().isInt().isLength(3);
+            req.assert('employee_type').notEmpty().isInt();
+            req.assert('email').notEmpty().isEmail();
+            req.assert('password').notEmpty();
+            req.assert('passwordre').notEmpty();
+            var errors = req.validationErrors();
+            if (!errors) {
+                function addUserAdmin() {
+                  return new Promise(function(resolve, reject) {
+                    var dbQuery = "INSERT INTO users (employee_id, password, class, name, email) VALUES (?, ?, ?, ?, ?)";
+                    connection.query(dbQuery, [req.body.employee_id, md5(req.body.password), req.body.employee_type, req.body.name, req.body.email], function(err, devRes) {
+                        if (err)
+                            reject(err);
+                        else {
+                            resolve();
+                        }
+                    });
+                  });
+                }
+                addUserAdmin().then(function() {
+                    res.render('addUsers.ejs', {
+                        msg: "success",
+                        user: req.user
+                    });
+                }).catch(function(err) {
+                    console.log(err);
+                    res.render('addUsers.ejs', {
+                        msg: "fail",
+                        user: req.user
+                    });
+                });
+            } else {
+                console.log("Invalid input");
+                res.end("Invalid input");
+            }
+        } else {
+            console.log("Forbidden access");
+            res.end("Forbidden access");
+        }
+    });
+
+    app.get('/admin/checkUser', isLoggedIn, function(req, res) {
+        if (req.user.class == 0) {
+            var empId = req.query.employee_id;
+            var dbQuery = "SELECT * FROM users WHERE employee_id = ?";
+            connection.query(dbQuery, [empId], function(err, userCheckRes) {
+                if (err)
+                    res.end(err);
+                else {
+                    if(userCheckRes.length != 0) {
+                        res.writeHead(400, 'EmpID already exists!');
+                        res.send();
+                    }
+                    else {
+                        res.sendStatus(200);
+                    }
+                }
+            });
         } else {
             console.log("Forbidden access");
             res.end("Forbidden access");

@@ -73,7 +73,7 @@
                             <div class="col-md-6"><strong><p>Project Name</p></strong></div>
                             <div class="col-md-5"><strong><p>Manager ID</p></strong></div>
                           </div>
-                          <form class="" action="/admin/manageProjects/removeProjects" method="post">
+                          <form class="" action="/admin/manageProjects/removeProjects" method="post" onsubmit="return confirm('Do you really want to close the project?');">
                               <% if(typeof(projects) != 'undefined') { %>
                                 <% projects.forEach(function(item, index) {%>
                                   <div class="col-md-12">
@@ -92,7 +92,7 @@
                                 <% }); %>
                             <% } %>
 
-                              <input type="submit" class="btn btn-md btn-primary pull-right checkBtn" value="Submit">
+                              <input type="submit" class="btn btn-md btn-primary pull-right checkBtn" value="Remove">
                           </form>
                         </div>
                     </div>
