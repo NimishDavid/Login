@@ -14,12 +14,12 @@
         <div class="container">
         <% if(typeof(msg) != 'undefined') { %>
             <%if(msg == 'success') {%>
-                <div class="alert alert-success alert-dismissable fade in">
+                <div class="alert alert-success alert-dismissable fade in col-sm-8 col-sm-offset-2">
                     <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
                     <strong>Success!</strong>&nbspNew user added.
                 </div>
             <% } else {%>
-                <div class="alert alert-danger alert-dismissable fade in">
+                <div class="alert alert-danger alert-dismissable fade in col-sm-8 col-sm-offset-2">
                     <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
                     <strong>Error!</strong>&nbspOperation failed.
                 </div>
@@ -47,7 +47,7 @@
                         </div>
                         <div class="col-sm-3 form-group">
                             <label>Employee Type</label>
-                            <select class="form-control" name="employee_type" pattern="^[0-9]{3}$" maxlength= "3" required>
+                            <select class="form-control" name="employee_type" required>
                                 <option value="">Select employee type</option>
                                 <option value="0">Admin</option>
                                 <option value="1">Tester</option>

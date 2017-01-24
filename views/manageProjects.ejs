@@ -71,7 +71,6 @@
                           <div class="col-md-12">
                             <div class="col-md-1"><input type="checkbox" name="developers" value= "" disabled></div>
                             <div class="col-md-6"><strong><p>Project Name</p></strong></div>
-                            <div class="col-md-5"><strong><p>Manager ID</p></strong></div>
                           </div>
                           <form class="" action="/admin/manageProjects/removeProjects" method="post" onsubmit="return confirm('Do you really want to close the project?');">
                               <% if(typeof(projects) != 'undefined') { %>
@@ -84,9 +83,6 @@
                                     </div>
                                     <div class="col-md-6">
                                         <p> <%= item.name %> </p>
-                                    </div>
-                                    <div class="col-md-5">
-                                        <p> <%= item.manager_id %> </p>
                                     </div>
                                   </div>
                                 <% }); %>
