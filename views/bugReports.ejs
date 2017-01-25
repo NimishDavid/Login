@@ -7,6 +7,12 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
     <body>
+      <script type="text/javascript">
+        function getProjectID() {
+            var pro = document.getElementById('project_id');
+            console.log(pro);
+        }
+      </script>
       <!-- Modal -->
       <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -62,7 +68,7 @@
                 <div class="row">
                     <div class="col-sm-4">
                         <label for="project_id" class="form-control-label">Project</label>
-                        <input type="text" class="form-control" id="project_id" value="" disabled>
+                        <input type="text" class="form-control" id="project_id" value="" oninput="getProjectID()" disabled>
                     </div>
                     <div class="col-sm-4">
                         <label for="tester_id" class="form-control-label">Tester</label>
@@ -107,7 +113,8 @@
                                       <select class="form-control" name="developer"  required>
                                        <option value="">Select Developer</option>
                                            <% for(j=0;j<devs.length;j++) {%>
-                                               <option value= <%= devs[j].devID %> > <%= devs[j].devName %>  </option>
+                                                   <option value= <%= devs[j].devID %> > <%= devs[j].devName %>  </option>
+                                              
                                           <% } %>
                                       </select>
                                       <div class="help-block with-errors"></div>

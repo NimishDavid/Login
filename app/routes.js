@@ -50,7 +50,7 @@ module.exports = function(app, passport, expressValidator) {
     });
 
     app.post('/getBugDetails', isLoggedIn, function(req, res) {
-        var dbQuery = "SELECT bugs.id AS bugID, bugs.name AS bugName, bugs.bug_type AS bugType, bugs.description AS description, bugs.file AS file, bugs.method AS method, bugs.line AS line, bugs.priority AS priority, bugs.severity AS severity, bugs.status AS status, projects.name AS projectName, users.name AS userName, bugs.screenshot AS screenshot, bugs.reject_reason AS reason FROM bugs JOIN projects JOIN users ON bugs.id = ? AND projects.id = bugs.project_id AND (bugs.tester_id = users.id OR bugs.developer_id = users.id OR projects.manager_id = users.id) ORDER BY users.class";
+        var dbQuery = "SELECT bugs.id AS bugID, bugs.name AS bugName, bugs.bug_type AS bugType, bugs.description AS description, bugs.file AS file, bugs.method AS method, bugs.line AS line, bugs.priority AS priority, bugs.severity AS severity, bugs.status AS status, projects.name AS projectName, users.name AS userName, bugs.screenshot AS screenshot, bugs.reject_reason AS reason, projects.id AS projectId FROM bugs JOIN projects JOIN users ON bugs.id = ? AND projects.id = bugs.project_id AND (bugs.tester_id = users.id OR bugs.developer_id = users.id OR projects.manager_id = users.id) ORDER BY users.class";
         console.log(req.body.bug);
         connection.query(dbQuery, req.body.bug, function(err, bugsRes) {
             if (err)
