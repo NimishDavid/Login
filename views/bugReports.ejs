@@ -110,12 +110,9 @@
                               <label for="developer" class="form-control-label">Developer</label>
                               <div class="dev_id">
 
-                                      <select class="form-control" name="developer"  required>
-                                       <option value="">Select Developer</option>
-                                           <% for(j=0;j<devs.length;j++) {%>
-                                                   <option value= <%= devs[j].devID %> > <%= devs[j].devName %>  </option>
-                                              
-                                          <% } %>
+                                      <select class="form-control" name="developer" id="devResult"  required>
+                                       <!-- <option value="">Select Developer</option> -->
+
                                       </select>
                                       <div class="help-block with-errors"></div>
 
@@ -384,6 +381,7 @@
         <% } %>
     <% } %>
     <script src="/axios.min.js" charset="utf-8"></script>
-    <script src="/getBugDetails.js" charset="utf-8"></script>
+    <!-- <script src="/getBugDetails.js" charset="utf-8"></script> -->
+    <script src="/getBugDetailsDev.js" charset="utf-8"></script>
     </body>
 </html>

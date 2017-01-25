@@ -10,7 +10,7 @@ var md5 = require('md5');
 
             getBugsAdminUnassigned(req).then(function(bugsRes) {
                     return new Promise(function(resolve, reject) {
-                        var dbQuery = "SELECT DISTINCT(project_team.user_id) AS devID, users.name AS devName, projects.id AS projectId FROM projects JOIN project_team JOIN users ON projects.manager_id = ? AND projects.id = project_team.project_id AND project_team.user_id = users.id AND users.class = 2 AND projects.status = 'Open'";
+                        var dbQuery = "SELECT project_team.user_id AS devID, users.name AS devName, projects.id AS projectId FROM projects JOIN project_team JOIN users ON projects.manager_id = ? AND projects.id = project_team.project_id AND project_team.user_id = users.id AND users.class = 2 AND projects.status = 'Open'";
                         connection.query(dbQuery, [req.user.id], function(err, devRes) {
                             if (err)
                                 reject(err);

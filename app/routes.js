@@ -62,6 +62,20 @@ module.exports = function(app, passport, expressValidator) {
         });
     });
 
+    app.post('/getDevs', isLoggedIn, function(req, res) {
+        console.log('getDevs entered');
+        var dbQuery = "SELECT users.id AS devID, users.name AS devName FROM project_team JOIN users ON project_team.user_id = users.id AND project_team.project_id = ? AND users.class = 2";
+        console.log(req.body.proj);
+        connection.query(dbQuery, [req.body.proj], function(err, devResult) {
+            if (err)
+                res.send(err);
+            else {
+                console.log(devResult);
+                res.send(devResult);
+            }
+        });
+    });
+
     // Admin routes
     require('./adminRoutes.js')(app, passport, expressValidator, connection, isLoggedIn, sendMail);
 

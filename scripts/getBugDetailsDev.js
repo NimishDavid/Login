@@ -1,12 +1,15 @@
 $('#exampleModal').on('show.bs.modal', function (event) {
   var button = $(event.relatedTarget); // Button that triggered the modal
   var bugId = button.data('bug'); // Extract info from data-* attributes
+  var project;
   console.log(bugId);
   axios.post('/getBugDetails', {
       bug : bugId
     })
     .then(function (response) {
         var bugDetails = response.data;
+        project = bugDetails[0].projectId;
+        console.log(project);
         modal.find('#bug_name').val(bugDetails[0].bugName);
         modal.find('#bug_id').val(bugDetails[0].bugID);
         modal.find('#bug_type').val(bugDetails[0].bugType);
@@ -29,6 +32,21 @@ $('#exampleModal').on('show.bs.modal', function (event) {
         }else {
             modal.find('#developer_id').val(bugDetails[2].userName);
         }
+
+
+        axios.post('/getDevs', {
+            proj : project
+        }).then(function(response) {
+            var devs = response.data;
+            var replace = "<option value = ''>Select Developer</option>";
+            devs.forEach(function(item, index) {
+                replace += "<option value = '"+item.devID+"'>"+item.devName+"</option>";
+            });
+            modal.find('#devResult').html(replace);
+        }).catch(function(error) {
+            console.log(error);
+        });
+
     })
     .catch(function (error) {
       console.log(error);
