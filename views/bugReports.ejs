@@ -3,16 +3,9 @@
     <head>
         <meta charset="utf-8">
         <title>Bug Reports</title>
-        <link rel="stylesheet" type="text/css" href="/style/bugReports.css">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
     <body>
-      <script type="text/javascript">
-        function getProjectID() {
-            var pro = document.getElementById('project_id');
-            console.log(pro);
-        }
-      </script>
       <!-- Modal -->
       <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -172,41 +165,43 @@
             						</div>
             					</div>
             					<div class="panel-body">
-            						<input type="text" class="form-control" id="dev-table-filter" data-action="filter" data-filters="#dev-table" placeholder="Filter Bugs" />
+            						<div class="panel-filter">
+            						  <input type="text" class="form-control" id="dev-table-filter" data-action="filter" data-filters="#dev-table" placeholder="Filter Bugs" />
+            						</div>
+                        <table class="table table-hover table-responsive" id="dev-table">
+              						<thead>
+              							<tr>
+              								<th>#</th>
+              								<th>Name</th>
+              								<th>Type</th>
+                                              <th>Severity</th>
+                                              <th>Priority</th>
+                                              <th>Project</th>
+                                              <th></th>
+              							</tr>
+              						</thead>
+                                      <tbody>
+                                      <% for(i=0; i<resultAdmin.length; i++) {%>
+                                          <% if(resultAdmin[i].status == 'Open') {%>
+
+                                              <tr>
+                  								<td class="bug_id"><%= resultAdmin[i].bugID %></td>
+                  								<td><%= resultAdmin[i].bugName %></td>
+                  								<td><%= resultAdmin[i].bugType %></td>
+                                                  <td><%= resultAdmin[i].severity %></td>
+                                                  <td><%= resultAdmin[i].priority %></td>
+                                                  <td><%= resultAdmin[i].projectName %></td>
+
+                                                  <td class="text-center">
+                                                      <button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#exampleModal" data-bug="<%= resultAdmin[i].bugID %>">View More</button>
+                                                  </td>
+                  							</tr>
+
+                                          <% } %>
+                                      <% } %>
+              						</tbody>
+              					</table>
             					</div>
-        					<table class="table table-hover table-responsive" id="dev-table">
-        						<thead>
-        							<tr>
-        								<th>#</th>
-        								<th>Name</th>
-        								<th>Type</th>
-                                        <th>Severity</th>
-                                        <th>Priority</th>
-                                        <th>Project</th>
-                                        <th></th>
-        							</tr>
-        						</thead>
-                                <tbody>
-                                <% for(i=0; i<resultAdmin.length; i++) {%>
-                                    <% if(resultAdmin[i].status == 'Open') {%>
-
-                                        <tr>
-            								<td class="bug_id"><%= resultAdmin[i].bugID %></td>
-            								<td><%= resultAdmin[i].bugName %></td>
-            								<td><%= resultAdmin[i].bugType %></td>
-                                            <td><%= resultAdmin[i].severity %></td>
-                                            <td><%= resultAdmin[i].priority %></td>
-                                            <td><%= resultAdmin[i].projectName %></td>
-
-                                            <td class="text-center">
-                                                <button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#exampleModal" data-bug="<%= resultAdmin[i].bugID %>">View More</button>
-                                            </td>
-            							</tr>
-
-                                    <% } %>
-                                <% } %>
-        						</tbody>
-        					</table>
                         <% } %> <!--If state is unassigned -->
 
                         <% if(state == 'assigned') { %>
@@ -221,44 +216,47 @@
             						</div>
             					</div>
             					<div class="panel-body">
-            						<input type="text" class="form-control" id="dev-table-filter" data-action="filter" data-filters="#dev-table" placeholder="Filter Bugs" />
+            						<div class="panel-filter">
+            						  <input type="text" class="form-control" id="dev-table-filter" data-action="filter" data-filters="#dev-table" placeholder="Filter Bugs" />
+            						</div>
+                        <table class="table table-hover" id="dev-table">
+              						<thead>
+              							<tr>
+              								<th>Bug #</th>
+              								<th>Name</th>
+              								<th>Type</th>
+              								<th>Severity</th>
+                                              <th>Priority</th>
+                                              <th>Project</th>
+                                              <th>Assigned to</th>
+                                              <th>Status</th>
+                                              <th></th>
+              							</tr>
+              						</thead>
+                                      <tbody>
+                                      <% for(i=0; i<resultAdmin.length; i++) {%>
+                                          <% if((resultAdmin[i].status != 'Open') && (resultAdmin[i].status != 'Closed')) {%>
+
+                                              <tr>
+                  								<td class="bug_id"><%= resultAdmin[i].bugID %></td>
+                  								<td><%= resultAdmin[i].bugName %></td>
+                  								<td><%= resultAdmin[i].bugType %></td>
+                  								<td><%= resultAdmin[i].severity %></td>
+                                                  <td><%= resultAdmin[i].priority %></td>
+                                                  <td><%= resultAdmin[i].projectName %></td>
+                                                  <td><%= resultAdmin[i].assignedToName %></td>
+                                                  <td><%= resultAdmin[i].status %></td>
+                                                  <td>
+                                                      <button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#exampleModal" data-bug="<%= resultAdmin[i].bugID %>">View More</button>
+                                                  </td>
+                  							</tr>
+
+                                          <% } %>
+                                      <% } %>
+              						</tbody>
+              					</table>
             					</div>
-        					<table class="table table-hover" id="dev-table">
-        						<thead>
-        							<tr>
-        								<th>Bug #</th>
-        								<th>Name</th>
-        								<th>Type</th>
-        								<th>Severity</th>
-                                        <th>Priority</th>
-                                        <th>Project</th>
-                                        <th>Assigned to</th>
-                                        <th>Status</th>
-                                        <th></th>
-        							</tr>
-        						</thead>
-                                <tbody>
-                                <% for(i=0; i<resultAdmin.length; i++) {%>
-                                    <% if((resultAdmin[i].status != 'Open') && (resultAdmin[i].status != 'Closed')) {%>
 
-                                        <tr>
-            								<td class="bug_id"><%= resultAdmin[i].bugID %></td>
-            								<td><%= resultAdmin[i].bugName %></td>
-            								<td><%= resultAdmin[i].bugType %></td>
-            								<td><%= resultAdmin[i].severity %></td>
-                                            <td><%= resultAdmin[i].priority %></td>
-                                            <td><%= resultAdmin[i].projectName %></td>
-                                            <td><%= resultAdmin[i].assignedToName %></td>
-                                            <td><%= resultAdmin[i].status %></td>
-                                            <td>
-                                                <button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#exampleModal" data-bug="<%= resultAdmin[i].bugID %>">View More</button>
-                                            </td>
-            							</tr>
-
-                                    <% } %>
-                                <% } %>
-        						</tbody>
-        					</table>
 
                         <% } %> <!-- If state is assigned -->
 
@@ -274,44 +272,46 @@
             						</div>
             					</div>
             					<div class="panel-body">
-            						<input type="text" class="form-control" id="dev-table-filter" data-action="filter" data-filters="#dev-table" placeholder="Filter Bugs" />
+            						<div class="panel-filter">
+            						  <input type="text" class="form-control" id="dev-table-filter" data-action="filter" data-filters="#dev-table" placeholder="Filter Bugs" />
+            						</div>
+                        <table class="table table-hover" id="dev-table">
+              						<thead>
+              							<tr>
+                                              <th>Bug #</th>
+              								<th>Name</th>
+              								<th>Type</th>
+              								<th>Severity</th>
+                                              <th>Priority</th>
+                                              <th>Project</th>
+                                              <th>Assigned to</th>
+                                              <th>Status</th>
+                                              <th></th>
+              							</tr>
+              						</thead>
+                                      <tbody>
+                                      <% for(i=0; i<resultAdmin.length; i++) {%>
+                                          <% if(resultAdmin[i].status == 'Closed') {%>
+
+                                              <tr>
+                                                  <td class="bug_id"><%= resultAdmin[i].bugID %></td>
+                  								<td><%= resultAdmin[i].bugName %></td>
+                  								<td><%= resultAdmin[i].bugType %></td>
+                  								<td><%= resultAdmin[i].severity %></td>
+                                                  <td><%= resultAdmin[i].priority %></td>
+                                                  <td><%= resultAdmin[i].projectName %></td>
+                                                  <td><%= resultAdmin[i].assignedToName %></td>
+                                                  <td><%= resultAdmin[i].status %></td>
+                                                  <td>
+                                                      <button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#exampleModal" data-bug="<%= resultAdmin[i].bugID %>">View More</button>
+                                                  </td>
+                  							</tr>
+
+                                          <% } %>
+                                      <% } %>
+              						</tbody>
+              					</table>
             					</div>
-        					<table class="table table-hover" id="dev-table">
-        						<thead>
-        							<tr>
-                                        <th>Bug #</th>
-        								<th>Name</th>
-        								<th>Type</th>
-        								<th>Severity</th>
-                                        <th>Priority</th>
-                                        <th>Project</th>
-                                        <th>Assigned to</th>
-                                        <th>Status</th>
-                                        <th></th>
-        							</tr>
-        						</thead>
-                                <tbody>
-                                <% for(i=0; i<resultAdmin.length; i++) {%>
-                                    <% if(resultAdmin[i].status == 'Closed') {%>
-
-                                        <tr>
-                                            <td class="bug_id"><%= resultAdmin[i].bugID %></td>
-            								<td><%= resultAdmin[i].bugName %></td>
-            								<td><%= resultAdmin[i].bugType %></td>
-            								<td><%= resultAdmin[i].severity %></td>
-                                            <td><%= resultAdmin[i].priority %></td>
-                                            <td><%= resultAdmin[i].projectName %></td>
-                                            <td><%= resultAdmin[i].assignedToName %></td>
-                                            <td><%= resultAdmin[i].status %></td>
-                                            <td>
-                                                <button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#exampleModal" data-bug="<%= resultAdmin[i].bugID %>">View More</button>
-                                            </td>
-            							</tr>
-
-                                    <% } %>
-                                <% } %>
-        						</tbody>
-        					</table>
 
                         <% } %> <!-- Closed bugs -->
 
@@ -326,42 +326,45 @@
             						</div>
             					</div>
             					<div class="panel-body">
-            						<input type="text" class="form-control" id="dev-table-filter" data-action="filter" data-filters="#dev-table" placeholder="Filter Bugs" />
+            						<div class="panel-filter">
+            						  <input type="text" class="form-control" id="dev-table-filter" data-action="filter" data-filters="#dev-table" placeholder="Filter Bugs" />
+            						</div>
+                        <table class="table table-hover" id="dev-table">
+              						<thead>
+              							<tr>
+              								<th>Bug #</th>
+              								<th>Name</th>
+              								<th>Type</th>
+                                              <th>Severity</th>
+                                              <th>Priority</th>
+                                              <th>Project</th>
+                                              <th>Assigned to</th>
+                                              <th></th>
+              							</tr>
+              						</thead>
+                                      <tbody>
+                                      <% for(i=0; i<resultAdmin.length; i++) {%>
+                                          <% if(resultAdmin[i].status == 'Approval') {%>
+
+                                              <tr>
+                  								<td class="bug_id"><%= resultAdmin[i].bugid %></td>
+                  								<td><%= resultAdmin[i].bugname %></td>
+                  								<td><%= resultAdmin[i].bugtype %></td>
+                                                  <td><%= resultAdmin[i].severity %></td>
+                                                  <td><%= resultAdmin[i].priority %></td>
+                                                  <td><%= resultAdmin[i].projectName %></td>
+                                                  <td><%= resultAdmin[i].assignedto %></td>
+                                                  <td class="text-center">
+                                                      <button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#exampleModal" data-bug="<%= resultAdmin[i].bugid %>">View More</button>
+                                                  </td>
+                  							</tr>
+
+                                          <% } %>
+                                      <% } %>
+              						</tbody>
+              					</table>
             					</div>
-        					<table class="table table-hover" id="dev-table">
-        						<thead>
-        							<tr>
-        								<th>Bug #</th>
-        								<th>Name</th>
-        								<th>Type</th>
-                                        <th>Severity</th>
-                                        <th>Priority</th>
-                                        <th>Project</th>
-                                        <th>Assigned to</th>
-                                        <th></th>
-        							</tr>
-        						</thead>
-                                <tbody>
-                                <% for(i=0; i<resultAdmin.length; i++) {%>
-                                    <% if(resultAdmin[i].status == 'Approval') {%>
 
-                                        <tr>
-            								<td class="bug_id"><%= resultAdmin[i].bugid %></td>
-            								<td><%= resultAdmin[i].bugname %></td>
-            								<td><%= resultAdmin[i].bugtype %></td>
-                                            <td><%= resultAdmin[i].severity %></td>
-                                            <td><%= resultAdmin[i].priority %></td>
-                                            <td><%= resultAdmin[i].projectName %></td>
-                                            <td><%= resultAdmin[i].assignedto %></td>
-                                            <td class="text-center">
-                                                <button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#exampleModal" data-bug="<%= resultAdmin[i].bugid %>">View More</button>
-                                            </td>
-            							</tr>
-
-                                    <% } %>
-                                <% } %>
-        						</tbody>
-        					</table>
                         <% } %> <!--If state is unassigned -->
 
                     <% } %> <!--If admin -->
@@ -369,6 +372,17 @@
 			</div>
 		</div>
 	</div>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('#dev-table').DataTable({
+        "searching": false,
+        "lengthChange": false,
+        "info": false
+      });
+    } );
+  </script>
+  <script src="/jquery.dataTables.min.js" charset="utf-8"></script>
+  <script src="/dataTables.bootstrap.min.js" charset="utf-8"></script>
 
     <script src="/table.js" charset="utf-8"></script>
     <% if(typeof(resultAdmin) != 'undefined') { %>
@@ -381,7 +395,8 @@
         <% } %>
     <% } %>
     <script src="/axios.min.js" charset="utf-8"></script>
-    <!-- <script src="/getBugDetails.js" charset="utf-8"></script> -->
     <script src="/getBugDetailsDev.js" charset="utf-8"></script>
+    <!-- <link rel="stylesheet" href="https://cdn.datatables.net/1.10.13/css/jquery.dataTables.min.css"> -->
+    <link rel="stylesheet" type="text/css" href="/style/bugReports.css">
     </body>
 </html>

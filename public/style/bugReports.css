@@ -13,8 +13,28 @@
 .panel-heading div span{
     margin-left:5px;
 }
-.panel-body{
+.panel-filter{
     display: none;
+    padding: 10px;
+}
+
+.panel-body {
+  padding: 0!important;
+}
+
+
+#dev-table_wrapper .row {
+  margin: 0;
+  padding: 0;
+}
+
+#dev-table_wrapper .col-sm-12 {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.table {
+  margin: 0;
 }
 
 .resp {

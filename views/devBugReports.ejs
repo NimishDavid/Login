@@ -169,42 +169,44 @@
             						</div>
             					</div>
             					<div class="panel-body">
-            						<input type="text" class="form-control" id="dev-table-filter" data-action="filter" data-filters="#dev-table" placeholder="Filter Bugs" />
+            						<div class="panel-filter">
+            						  <input type="text" class="form-control" id="dev-table-filter" data-action="filter" data-filters="#dev-table" placeholder="Filter Bugs" />
+            						</div>
+                        <table class="table table-responsive table-hover" id="dev-table">
+              						<thead>
+              							<tr>
+              								<th>Bug #</th>
+              								<th>Name</th>
+              								<th>Type</th>
+                                              <th>Severity</th>
+                                              <th>Priority</th>
+                                              <th>Project</th>
+                                              <th>Current status</th>
+                                              <th></th>
+              							</tr>
+              						</thead>
+                                  <tbody>
+                                  <% for(i=0; i<resultDev.length; i++) {%>
+                                      <% if((resultDev[i].status == 'Assigned')||(resultDev[i].status == 'Resolving')) {%>
+
+                                          <tr>
+                  								<td class="bug_id"><%= resultDev[i].bugID %></td>
+                  								<td><%= resultDev[i].bugName %></td>
+                  								<td><%= resultDev[i].bugType %></td>
+                                                  <td><%= resultDev[i].severity %></td>
+                                                  <td><%= resultDev[i].priority %></td>
+                                                  <td><%= resultDev[i].projectName %></td>
+                                                  <td><%= resultDev[i].status %></td>
+                                                  <td class="text-center">
+                                                      <button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#exampleModal" data-bug="<%= resultDev[i].bugID %>">View More</button>
+                                                  </td>
+                  							</tr>
+
+                                          <% } %>
+                                      <% } %>
+              						</tbody>
+              					</table>
             					</div>
-        					<table class="table table-responsive table-hover" id="dev-table">
-        						<thead>
-        							<tr>
-        								<th>Bug #</th>
-        								<th>Name</th>
-        								<th>Type</th>
-                                        <th>Severity</th>
-                                        <th>Priority</th>
-                                        <th>Project</th>
-                                        <th>Current status</th>
-                                        <th></th>
-        							</tr>
-        						</thead>
-                            <tbody>
-                            <% for(i=0; i<resultDev.length; i++) {%>
-                                <% if((resultDev[i].status == 'Assigned')||(resultDev[i].status == 'Resolving')) {%>
-
-                                    <tr>
-            								<td class="bug_id"><%= resultDev[i].bugID %></td>
-            								<td><%= resultDev[i].bugName %></td>
-            								<td><%= resultDev[i].bugType %></td>
-                                            <td><%= resultDev[i].severity %></td>
-                                            <td><%= resultDev[i].priority %></td>
-                                            <td><%= resultDev[i].projectName %></td>
-                                            <td><%= resultDev[i].status %></td>
-                                            <td class="text-center">
-                                                <button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#exampleModal" data-bug="<%= resultDev[i].bugID %>">View More</button>
-                                            </td>
-            							</tr>
-
-                                    <% } %>
-                                <% } %>
-        						</tbody>
-        					</table>
                         <% } %> <!--If state is unassigned -->
 
                         <% if(type == 'history') { %>
@@ -218,42 +220,44 @@
             						</div>
             					</div>
             					<div class="panel-body">
-            						<input type="text" class="form-control" id="dev-table-filter" data-action="filter" data-filters="#dev-table" placeholder="Filter Bugs" />
+            						<div class="panel-filter">
+            						  <input type="text" class="form-control" id="dev-table-filter" data-action="filter" data-filters="#dev-table" placeholder="Filter Bugs" />
+            						</div>
+                        <table class="table table-responsive table-hover" id="dev-table">
+              						<thead>
+              							<tr>
+                                              <th>Bug #</th>
+              								<th>Name</th>
+              								<th>Type</th>
+                                              <th>Severity</th>
+                                              <th>Priority</th>
+                                              <th>Project</th>
+                                              <th>Status</th>
+                                              <th></th>
+              							</tr>
+              						</thead>
+                                  <tbody>
+                                  <% for(i=0; i<resultDev.length; i++) {%>
+                                      <% if((resultDev[i].status != 'Assigned')&&(resultDev[i].status != 'Resolving')) {%>
+
+                                          <tr>
+                  								<td class="bug_id"><%= resultDev[i].bugId %></td>
+                  								<td><%= resultDev[i].bugName %></td>
+                  								<td><%= resultDev[i].bugType %></td>
+                                                  <td><%= resultDev[i].severity %></td>
+                                                  <td><%= resultDev[i].priority %></td>
+                                                  <td><%= resultDev[i].projectName %></td>
+                                                  <td><%= resultDev[i].status %></td>
+                                                  <td class="text-center">
+                                                      <button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#exampleModal" data-bug="<%= resultDev[i].bugId %>">View More</button>
+                                                  </td>
+                  							</tr>
+
+                                          <% } %>
+                                      <% } %>
+              						</tbody>
+              					</table>
             					</div>
-        					<table class="table table-responsive table-hover" id="dev-table">
-        						<thead>
-        							<tr>
-                                        <th>Bug #</th>
-        								<th>Name</th>
-        								<th>Type</th>
-                                        <th>Severity</th>
-                                        <th>Priority</th>
-                                        <th>Project</th>
-                                        <th>Status</th>
-                                        <th></th>
-        							</tr>
-        						</thead>
-                            <tbody>
-                            <% for(i=0; i<resultDev.length; i++) {%>
-                                <% if((resultDev[i].status != 'Assigned')&&(resultDev[i].status != 'Resolving')) {%>
-
-                                    <tr>
-            								<td class="bug_id"><%= resultDev[i].bugId %></td>
-            								<td><%= resultDev[i].bugName %></td>
-            								<td><%= resultDev[i].bugType %></td>
-                                            <td><%= resultDev[i].severity %></td>
-                                            <td><%= resultDev[i].priority %></td>
-                                            <td><%= resultDev[i].projectName %></td>
-                                            <td><%= resultDev[i].status %></td>
-                                            <td class="text-center">
-                                                <button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#exampleModal" data-bug="<%= resultDev[i].bugId %>">View More</button>
-                                            </td>
-            							</tr>
-
-                                    <% } %>
-                                <% } %>
-        						</tbody>
-        					</table>
                         <% } %>
 
                         <% if(type == 'reject') { %>
@@ -267,38 +271,40 @@
             						</div>
             					</div>
             					<div class="panel-body">
-            						<input type="text" class="form-control" id="dev-table-filter" data-action="filter" data-filters="#dev-table" placeholder="Filter Bugs" />
+            						<div class="panel-filter">
+            						  <input type="text" class="form-control" id="dev-table-filter" data-action="filter" data-filters="#dev-table" placeholder="Filter Bugs" />
+            						</div>
+                        <table class="table table-responsive table-hover" id="dev-table">
+              						<thead>
+              							<tr>
+              								<th>Bug #</th>
+              								<th>Name</th>
+              								<th>Type</th>
+                                              <th>Project</th>
+                                              <th>Reject Type</th>
+                                              <th></th>
+              							</tr>
+              						</thead>
+                                  <tbody>
+                                  <% for(i=0; i<resultDev.length; i++) {%>
+                                      <% if((resultDev[i].rejectType == 'Review Reject')||(resultDev[i].rejectType == 'Approve Reject')) {%>
+
+                                          <tr>
+                  								<td class="bug_id"><%= resultDev[i].bugID %></td>
+                  								<td><%= resultDev[i].bugName %></td>
+                  								<td><%= resultDev[i].bugType %></td>
+                                                  <td><%= resultDev[i].projectName %></td>
+                                                  <td><%= resultDev[i].rejectType %></td>
+                                                  <td class="text-center">
+                                                      <button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#exampleModal" data-bug="<%= resultDev[i].bugID %>">View More</button>
+                                                  </td>
+                  							</tr>
+
+                                          <% } %>
+                                      <% } %>
+              						</tbody>
+              					</table>
             					</div>
-        					<table class="table table-responsive table-hover" id="dev-table">
-        						<thead>
-        							<tr>
-        								<th>Bug #</th>
-        								<th>Name</th>
-        								<th>Type</th>
-                                        <th>Project</th>
-                                        <th>Reject Type</th>
-                                        <th></th>
-        							</tr>
-        						</thead>
-                            <tbody>
-                            <% for(i=0; i<resultDev.length; i++) {%>
-                                <% if((resultDev[i].rejectType == 'Review Reject')||(resultDev[i].rejectType == 'Approve Reject')) {%>
-
-                                    <tr>
-            								<td class="bug_id"><%= resultDev[i].bugID %></td>
-            								<td><%= resultDev[i].bugName %></td>
-            								<td><%= resultDev[i].bugType %></td>
-                                            <td><%= resultDev[i].projectName %></td>
-                                            <td><%= resultDev[i].rejectType %></td>
-                                            <td class="text-center">
-                                                <button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#exampleModal" data-bug="<%= resultDev[i].bugID %>">View More</button>
-                                            </td>
-            							</tr>
-
-                                    <% } %>
-                                <% } %>
-        						</tbody>
-        					</table>
                         <% } %>
 
                     <% } %> <!--If developer -->
@@ -306,7 +312,17 @@
 			</div>
 		</div>
 	</div>
-
+    <script type="text/javascript">
+      $(document).ready(function() {
+        $('#dev-table').DataTable({
+          "searching": false,
+          "lengthChange": false,
+          "info": false
+        });
+      } );
+    </script>
+    <script src="/jquery.dataTables.min.js" charset="utf-8"></script>
+    <script src="/dataTables.bootstrap.min.js" charset="utf-8"></script>
     <script src="/table.js" charset="utf-8"></script>
     <script src="/devStatusUpdate.js" charset="utf-8"></script>
     <script src="/axios.min.js" charset="utf-8"></script>
