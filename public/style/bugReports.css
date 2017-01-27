@@ -1,5 +1,5 @@
 .row{
-    margin-top:40px;
+    margin-top:20px;
     padding: 0 10px;
 }
 .clickable{
@@ -19,7 +19,7 @@
 }
 
 .panel-body {
-  padding: 0!important;
+  /*padding: 0!important;*/
 }
 
 
@@ -36,6 +36,11 @@
 .table {
   margin: 0;
 }
+
+.pagination {
+  margin: 5px 0;
+}
+
 
 .resp {
   overflow: auto;

@@ -6,7 +6,8 @@
         <link rel="stylesheet" href="/style/manageProjects.css">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <script src="/jquery.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/1000hz-bootstrap-validator/0.11.9/validator.min.js"></script>
+        <script src="/validator.min.js"></script>
+        <script src="/axios.min.js" charset="utf-8"></script>
     </head>
     <body>
 
@@ -97,36 +98,49 @@
                             <div class="col-md-2"><strong><p>User ID</p></strong></div>
                             <div class="col-md-3"><strong><p>Developer Name</p></strong></div>
                             <div class="col-md-3"><strong><p>Project Name</p></strong></div>
-                            <div class="col-md-2"><strong><p>Remove</p></strong></div>
+                            <div class="col-md-1"><strong><p>Remove</p></strong></div>
+                            <div class="col-md-2">
+                              <select class="form-control" name="projectDeveloper" id="projectDeveloper" onchange="getDevelopers($(this))">
+                                  <option value="">Select Project</option>
+                                  <% if(typeof(projects) != 'undefined') { %>
+                                      <% projects.forEach(function(item, index) { %>
+                                          <option value="<%= item.id %>"> <%= item.name %> </option>
+                                      <% }); %>
+                                  <% } %>
+                              </select>
+                            </div>
                           </div>
-                              <% if(typeof(developersRem) != 'undefined') { %>
-                                <% developersRem.forEach(function(item, index) {%>
-                                  <div class="col-md-12">
-                                    <form class="" action="/admin/manageProjectTeam/manageDevelopers/removeDevelopers" method="post" onsubmit="return confirm('Do you really want to remove the developer from the project?');">
-                                      <div class="col-md-2">
-                                          <p> <%= item.developerId %> </p>
-                                          <input type="hidden" name="user_id" value="<%= item.developerId %>">
-                                      </div>
-                                    <div class="col-md-3">
-                                        <p> <%= item.developerName %> </p>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <p> <%= item.projectName %> </p>
-                                        <input type="hidden" name="project_id" value="<%= item.projectId %>">
-                                    </div>
+                          <div id="developersRemove">
+                            <% if(typeof(developersRem) != 'undefined') { %>
+                              <% developersRem.forEach(function(item, index) {%>
+                                <div class="col-md-12">
+                                  <form class="" action="/admin/manageProjectTeam/manageDevelopers/removeDevelopers" method="post" onsubmit="return confirm('Do you really want to remove the developer from the project?');">
                                     <div class="col-md-2">
-                                      <button type="submit" class="removeBtn">
-                                        <i class="fa fa-trash" aria-hidden="true"></i>
-                                      </button>
+                                        <p> <%= item.developerId %> </p>
+                                        <input type="hidden" name="user_id" value="<%= item.developerId %>">
                                     </div>
-                                    </form>
+                                  <div class="col-md-3">
+                                      <p> <%= item.developerName %> </p>
                                   </div>
-                                <% }); %>
-                            <% } %>
+                                  <div class="col-md-3">
+                                      <p> <%= item.projectName %> </p>
+                                      <input type="hidden" name="project_id" value="<%= item.projectId %>">
+                                  </div>
+                                  <div class="col-md-2">
+                                    <button type="submit" class="removeBtn">
+                                      <i class="fa fa-trash" aria-hidden="true"></i>
+                                    </button>
+                                  </div>
+                                  </form>
+                                </div>
+                              <% }); %>
+                          <% } %>
+                          </div>
                         </div>
                     </div>
                 </div>
               </div>
               <script src="/checkboxValidate.js"></script>
+              <script src="/getDevelopers.js" charset="utf-8"></script>
     </body>
 </html>

@@ -77,7 +77,7 @@ body {
 }
 
 .panel-primary .panel-body{
-  background-color: #f5f5f5;
+  background-color: white;
   opacity: 0.9;
   border-bottom-left-radius: 3px;
   border-bottom-right-radius: 3px;

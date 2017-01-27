@@ -64,7 +64,7 @@ module.exports = function(app, passport, expressValidator) {
 
     app.post('/getDevs', isLoggedIn, function(req, res) {
         console.log('getDevs entered');
-        var dbQuery = "SELECT users.id AS devID, users.name AS devName FROM project_team JOIN users ON project_team.user_id = users.id AND project_team.project_id = ? AND users.class = 2";
+        var dbQuery = "SELECT users.id AS devID, users.name AS devName, projects.id AS projectId, projects.name AS projectName FROM project_team JOIN projects JOIN users ON project_team.user_id = users.id AND project_team.project_id = ? AND projects.id = project_team.project_id AND users.class = 2";
         console.log(req.body.proj);
         connection.query(dbQuery, [req.body.proj], function(err, devResult) {
             if (err)
@@ -72,6 +72,20 @@ module.exports = function(app, passport, expressValidator) {
             else {
                 console.log(devResult);
                 res.send(devResult);
+            }
+        });
+    });
+
+    app.post('/getTesters', isLoggedIn, function(req, res) {
+        console.log('getTesters entered');
+        var dbQuery = "SELECT users.id AS testerID, users.name AS testerName, projects.name AS projectName, projects.id AS projectId FROM project_team JOIN users JOIN projects ON project_team.user_id = users.id AND project_team.project_id = ? AND projects.id = project_team.project_id AND users.class = 1";
+        console.log(req.body.proj);
+        connection.query(dbQuery, [req.body.proj], function(err, testerResult) {
+            if (err)
+                res.send(err);
+            else {
+                console.log(testerResult);
+                res.send(testerResult);
             }
         });
     });

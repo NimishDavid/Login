@@ -3,7 +3,6 @@
     <head>
         <meta charset="utf-8">
         <title>Bug Reports</title>
-        <link rel="stylesheet" type="text/css" href="/style/bugReports.css">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
     <body>
@@ -304,12 +303,14 @@
 			</div>
 		</div>
 	</div>
+    <script src="/conditionalPaging.js" charset="utf-8"></script>
     <script type="text/javascript">
       $(document).ready(function() {
         $('#dev-table').DataTable({
           "searching": false,
           "lengthChange": false,
-          "info": false
+          "info": false,
+          "conditionalPaging": true
         });
       } );
     </script>
@@ -325,5 +326,6 @@
     <% } %>
     <script src="/axios.min.js" charset="utf-8"></script>
     <script src="/getBugDetails.js" charset="utf-8"></script>
+    <link rel="stylesheet" type="text/css" href="/style/bugReports.css">
     </body>
 </html>
