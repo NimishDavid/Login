@@ -390,13 +390,18 @@ var md5 = require('md5');
     // Remove selected testers from the existing team
     app.post('/admin/manageProjectTeam/manageTesters/removeTesters', isLoggedIn, function(req, res) {
         if (req.user.class == 0) {
-            req.assert('user_id').notEmpty().isInt();
-            req.assert('project_id').notEmpty().isInt();
+            req.assert('testers').notEmpty();
+            req.assert('projectTester').notEmpty().isInt();
             var errors = req.validationErrors();
             if (!errors) {
                 console.log("No validation errors!");
-                dbQuery = "DELETE FROM project_team WHERE user_id = ? AND project_id = ?";
-                connection.query(dbQuery, [req.body.user_id, req.body.project_id], function(err, rows) {
+                var t = "";
+                req.body.testers.forEach(function(item, index) {
+     	            t += item+", ";
+                });
+                t = t.slice(0, -2);
+                dbQuery = "DELETE FROM project_team WHERE user_id IN ("+ t +") AND project_id = ?";
+                connection.query(dbQuery, [req.body.projectTester], function(err, rows) {
                     if (err) {
                         getProjectsManage(req).then(function(projectsRes) {
                             return getTestersRem(req, projectsRes);
@@ -547,13 +552,18 @@ var md5 = require('md5');
     // Remove selected devlopers from the team
     app.post('/admin/manageProjectTeam/manageDevelopers/removeDevelopers', isLoggedIn, function(req, res) {
         if (req.user.class == 0) {
-            req.assert('user_id').notEmpty().isInt();
-            req.assert('project_id').notEmpty().isInt();
+            req.assert('developers').notEmpty();
+            req.assert('projectDeveloper').notEmpty().isInt();
             var errors = req.validationErrors();
             if (!errors) {
                 console.log("No validation errors!");
-                dbQuery = "DELETE FROM project_team WHERE user_id = ? AND project_id = ?";
-                connection.query(dbQuery, [req.body.user_id, req.body.project_id], function(err, rows) {
+                var t = "";
+                req.body.developers.forEach(function(item, index) {
+     	            t += item+", ";
+                });
+                t = t.slice(0, -2);
+                dbQuery = "DELETE FROM project_team WHERE user_id IN ("+ t +") AND project_id = ?";
+                connection.query(dbQuery, [req.body.projectDeveloper], function(err, rows) {
                     if (err) {
                         getProjectsManage(req).then(function(projectsRes) {
                             return getDevelopersRem(req, projectsRes);
