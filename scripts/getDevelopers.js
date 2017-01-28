@@ -18,3 +18,24 @@ function getDevelopers(that) {
       console.log(error);
     });
 }
+
+function getDevelopersAdd(that) {
+  var $project = that.val();
+  if(!$project) {
+    location.reload();
+  }
+  axios.post('/getDevelopersAdd', {
+      proj: $project
+    })
+    .then(function (response) {
+        var developers = response.data;
+        var replace = "";
+        developers.forEach(function(item, index) {
+          replace += "<div class='col-md-12'><div class='col-md-1'><label><input type='checkbox' name='developers[]' value= '"+item.developerId+"' ></label></div><div class='col-md-6'><p>"+item.developerName+"</p></div></div>";
+        });
+        $('#developersAdd').html(replace);
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+}

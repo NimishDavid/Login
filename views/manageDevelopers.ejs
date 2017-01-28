@@ -69,7 +69,7 @@
                               <div class="col-sm-12">
                                 <div class="col-sm-11">
                                     <div class="col-sm-3 col-sm-offset-9 form-group">
-                                        <select class="form-control" name="project_id" required>
+                                        <select class="form-control" name="project_id" id="project_id" onchange="getDevelopersAdd($(this))" required>
                                             <option value="">Select Project</option>
                                             <% if(typeof(projects) != 'undefined') { %>
                                                 <% projects.forEach(function(item, index) { %>

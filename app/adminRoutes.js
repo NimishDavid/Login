@@ -316,6 +316,7 @@ var md5 = require('md5');
             if (!errors) {
                 console.log("No validation errors!");
                 var vals = "";
+                console.log(req.body.testers);
                 req.body.testers.forEach(function(item, index) {
                     vals += "(" + req.body.project_id + ", " + item + "), ";
                 });

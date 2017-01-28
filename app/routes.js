@@ -79,13 +79,40 @@ module.exports = function(app, passport, expressValidator) {
     app.post('/getTesters', isLoggedIn, function(req, res) {
         console.log('getTesters entered');
         var dbQuery = "SELECT users.id AS testerID, users.name AS testerName, projects.name AS projectName, projects.id AS projectId FROM project_team JOIN users JOIN projects ON project_team.user_id = users.id AND project_team.project_id = ? AND projects.id = project_team.project_id AND users.class = 1";
-        console.log(req.body.proj);
         connection.query(dbQuery, [req.body.proj], function(err, testerResult) {
             if (err)
                 res.send(err);
             else {
                 console.log(testerResult);
                 res.send(testerResult);
+            }
+        });
+    });
+
+    app.post('/getTestersAdd', isLoggedIn, function(req, res) {
+        console.log('getTesters entered');
+        var dbQuery = "SELECT DISTINCT(users.id) AS testerId, users.name AS testerName, projects.id AS projectId FROM users JOIN project_team JOIN projects ON projects.id = project_team.project_id AND users.class = 1 AND projects.id != ? WHERE users.id NOT IN (SELECT DISTINCT(users.id) FROM projects JOIN project_team JOIN users ON project_team.user_id = users.id AND projects.id = project_team.project_id AND users.class = 1 AND projects.id = ?) GROUP BY users.id";
+        console.log(req.body.proj);
+        connection.query(dbQuery, [req.body.proj, req.body.proj], function(err, testerResult) {
+            if (err)
+                res.send(err);
+            else {
+                console.log(testerResult);
+                res.send(testerResult);
+            }
+        });
+    });
+
+    app.post('/getDevelopersAdd', isLoggedIn, function(req, res) {
+        console.log('getDevelopers entered');
+        var dbQuery = "SELECT DISTINCT(users.id) AS developerId, users.name AS developerName, projects.id AS projectId FROM users JOIN project_team JOIN projects ON projects.id = project_team.project_id AND users.class = 2 AND projects.id != ? WHERE users.id NOT IN (SELECT DISTINCT(users.id) FROM projects JOIN project_team JOIN users ON project_team.user_id = users.id AND projects.id = project_team.project_id AND users.class = 2 AND projects.id = ?) GROUP BY users.id";
+        console.log(req.body.proj);
+        connection.query(dbQuery, [req.body.proj, req.body.proj], function(err, developerResult) {
+            if (err)
+                res.send(err);
+            else {
+                console.log(developerResult);
+                res.send(developerResult);
             }
         });
     });
