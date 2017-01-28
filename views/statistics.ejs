@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Statistics</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="/jquery.min.js"></script>
+        <script src="/validator.min.js"></script>
+        <script src="/bootstrap.min.js"></script>
+        <script src="/axios.min.js" charset="utf-8"></script>
+        <link rel="stylesheet" href="http://rendro.github.io/easy-pie-chart/stylesheets/jquery.easy-pie-chart.css">
+    </head>
+    <body>
+        <script type="text/javascript">
+        $(function() {
+          $('.chart').easyPieChart();
+        });
+        </script>
+        <% include navbar %>
+
+        <div class="container">
+
+          <div class="panel panel-primary resp">
+          <div class="panel-heading">
+            <h3 class="panel-title">Statistics</h3>
+          </div>
+          <div class="panel-body fixed-panel">
+            <div class="chart" data-percent="73">73%</div>
+          </div>
+          </div>
+
+        </div>
+        <script src="http://rendro.github.io/easy-pie-chart/javascripts/jquery.easy-pie-chart.js"></script>
+    </body>
+</html>

@@ -3,6 +3,17 @@ var nodemailer = require('nodemailer');
 var md5 = require('md5');
 // mailer = require('./mailer.js');
 
+    app.get('/admin/bugReports/statistics', isLoggedIn, function(req, res) {
+        if (req.user.class == 0) {
+            res.render('statistics.ejs', {
+              user: req.user
+            });
+        } else {
+            console.log("Forbidden access");
+            res.end("Forbidden access");
+        }
+    });
+
     // Get list of unassigned bugs
     app.get('/admin/bugReports/unassignedBugs', isLoggedIn, function(req, res) {
 
