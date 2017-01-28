@@ -39,3 +39,23 @@ function getTestersAdd(that) {
       console.log(error);
     });
 }
+
+function addTestersCheck() {
+  var $project = $("#project_id")     // Gets a descendent with class="stat"
+  .find(":selected").val();
+  if(!$project) {
+      alert("Please select a project first");
+      event.preventDefault();
+      event.stopPropagation();
+  }
+}
+
+function removeTestersCheck() {
+  var $project = $("#projectTester")     // Gets a descendent with class="stat"
+  .find(":selected").val();
+  if(!$project) {
+      alert("Please select a project first");
+      event.preventDefault();
+      event.stopPropagation();
+  }
+}

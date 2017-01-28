@@ -39,3 +39,23 @@ function getDevelopersAdd(that) {
       console.log(error);
     });
 }
+
+function addDevelopersCheck() {
+  var $project = $("#project_id")     // Gets a descendent with class="stat"
+  .find(":selected").val();
+  if(!$project) {
+      alert("Please select a project first");
+      event.preventDefault();
+      event.stopPropagation();
+  }
+}
+
+function removeDevelopersCheck() {
+  var $project = $("#projectDeveloper")     // Gets a descendent with class="stat"
+  .find(":selected").val();
+  if(!$project) {
+      alert("Please select a project first");
+      event.preventDefault();
+      event.stopPropagation();
+  }
+}
