@@ -3,9 +3,9 @@ var nodemailer = require('nodemailer');
 var md5 = require('md5');
 // mailer = require('./mailer.js');
 
-    app.get('/admin/bugReports/statistics', isLoggedIn, function(req, res) {
+    app.get('/admin/bugReports/overview', isLoggedIn, function(req, res) {
         if (req.user.class == 0) {
-            res.render('statistics.ejs', {
+            res.render('overview.ejs', {
               user: req.user
             });
         } else {

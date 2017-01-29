@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Statistics</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="/style/easyPieChart.css">
+        <link rel="stylesheet" href="/style/overview.css">
+    </head>
+    <body>
+        <% include navbar %>
+        <script type="text/javascript">
+        $(function() {
+          $('.chartTotal').easyPieChart({
+            scaleColor: false,
+            lineWidth: 10,
+            lineCap: "butt",
+            barColor: "#4ec9ce"
+          });
+          $('.chartOpen').easyPieChart({
+            scaleColor: false,
+            lineWidth: 10,
+            lineCap: "butt",
+            barColor: "#ec7337"
+          });
+          $('.chartClosed').easyPieChart({
+            scaleColor: false,
+            lineWidth: 10,
+            lineCap: "butt",
+            barColor: "#bacf0b"
+          });
+          $('.chartApproval').easyPieChart({
+            scaleColor: false,
+            lineWidth: 10,
+            lineCap: "butt",
+            barColor: "#f377ab"
+          });
+          $('.chartCritical').easyPieChart({
+            scaleColor: false,
+            lineWidth: 10,
+            lineCap: "butt",
+            barColor: "#ff5252"
+          });
+          $('.chartHigh').easyPieChart({
+            scaleColor: false,
+            lineWidth: 10,
+            lineCap: "butt",
+            barColor: "#d550ff"
+          });
+        });
+        </script>
+        <div class="container">
+
+          <div class="panel panel-primary resp">
+          <div class="panel-heading">
+            <h3 class="panel-title">Overview</h3>
+          </div>
+          <div class="panel-body fixed-panel text-center">
+            <div class="overview clearfix">
+              <div class="chart clearfix">
+                <div class="chartTotal" data-percent="73">220</div>
+                <div class="caption text-center">
+                  <label>Total Bugs</label>
+                </div>
+              </div>
+              <div class="chart clearfix">
+                <div class="chartOpen" data-percent="73">220</div>
+                <div class="caption text-center">
+                  <label>Open Bugs</label>
+                </div>
+              </div>
+              <div class="chart clearfix">
+                <div class="chartClosed" data-percent="73">220</div>
+                <div class="caption text-center">
+                  <label>Closed Bugs</label>
+                </div>
+              </div>
+              <div class="chart clearfix">
+                <div class="chartApproval" data-percent="73">220</div>
+                <div class="caption text-center">
+                  <label>Pending approval</label>
+                </div>
+              </div>
+              <div class="chart clearfix">
+                <div class="chartCritical" data-percent="73">220</div>
+                <div class="caption text-center">
+                  <label>Critical Bugs</label>
+                </div>
+              </div>
+              <div class="chart clearfix">
+                <div class="chartHigh" data-percent="73">220</div>
+                <div class="caption text-center">
+                  <label>High Priority</label>
+                </div>
+              </div>
+            </div>
+          </div>
+          </div>
+
+        </div>
+        <script src="/easyPieChart.js"></script>
+        <script src="/validator.min.js"></script>
+        <script src="/axios.min.js" charset="utf-8"></script>
+    </body>
+</html>

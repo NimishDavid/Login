@@ -1,0 +1,11 @@
+.chart {
+  display: inline-block;
+  margin: 20px;
+}
+.caption {
+  margin-top: 10px;
+}
+.overview {
+  display: inline-block;
+  margin: auto;
+}
