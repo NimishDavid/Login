@@ -1,3 +1,48 @@
+$(function() {
+  $('.chartTotal').easyPieChart({
+    animate: 1000,
+    scaleColor: false,
+    lineWidth: 10,
+    lineCap: "butt",
+    barColor: "#4ec9ce"
+  });
+  $('.chartOpen').easyPieChart({
+    animate: 1000,
+    scaleColor: false,
+    lineWidth: 10,
+    lineCap: "butt",
+    barColor: "#E7912A"
+  });
+  $('.chartClosed').easyPieChart({
+    animate: 1000,
+    scaleColor: false,
+    lineWidth: 10,
+    lineCap: "butt",
+    barColor: "#bacf0b"
+  });
+  $('.chartApproval').easyPieChart({
+    animate: 1000,
+    scaleColor: false,
+    lineWidth: 10,
+    lineCap: "butt",
+    barColor: "#f377ab"
+  });
+  $('.chartCritical').easyPieChart({
+    animate: 1000,
+    scaleColor: false,
+    lineWidth: 10,
+    lineCap: "butt",
+    barColor: "#ff5252"
+  });
+  $('.chartHigh').easyPieChart({
+    animate: 1000,
+    scaleColor: false,
+    lineWidth: 10,
+    lineCap: "butt",
+    barColor: "#d550ff"
+  });
+});
+
 function getDetails(that) {
   var $project = that.val();
   console.log($project);
