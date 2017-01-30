@@ -21,7 +21,7 @@
             scaleColor: false,
             lineWidth: 10,
             lineCap: "butt",
-            barColor: "#ec7337"
+            barColor: "#E7912A"
           });
           $('.chartClosed').easyPieChart({
             scaleColor: false,
@@ -52,54 +52,270 @@
         <div class="container">
 
           <div class="panel panel-primary resp">
-          <div class="panel-heading">
-            <h3 class="panel-title">Overview</h3>
+              <div class="panel-heading">
+                <h3 class="panel-title">Overview</h3>
+              </div>
+              <div class="panel-body fixed-panel text-center">
+                <div class="col-sm-3 pull-right">
+                  <select class="form-control" name="project" id="project" onchange="getDetails($(this))" required>
+                      <option value="">Select Project</option>
+                      <% if(typeof(proj) != 'undefined') { %>
+                          <% proj.forEach(function(item, index) { %>
+                              <option value="<%= item.id %>"> <%= item.name %> </option>
+                          <% }); %>
+                      <% } %>
+                  </select>
+                </div>
+                <div class="overview clearfix">
+                  <div class="chart clearfix">
+                    <div class="chartTotal" data-percent="0">
+                      <div id="totalBugs">
+                        0
+                      </div>
+                    </div>
+                    <div class="caption text-center">
+                      <label>Total Bugs</label>
+                    </div>
+                  </div>
+                  <div class="chart clearfix">
+                    <div class="chartOpen" data-percent="0">
+                      <div id="openBugs">
+                        0
+                      </div>
+                    </div>
+                    <div class="caption text-center">
+                      <label>Open Bugs</label>
+                    </div>
+                  </div>
+                  <div class="chart clearfix">
+                    <div class="chartClosed" data-percent="0">
+                      <div id="closedBugs">
+                        0
+                      </div>
+                    </div>
+                    <div class="caption text-center">
+                      <label>Closed Bugs</label>
+                    </div>
+                  </div>
+                  <div class="chart clearfix">
+                    <div class="chartApproval" data-percent="0">
+                      <div id="approvalBugs">
+                        0
+                      </div>
+                    </div>
+                    <div class="caption text-center">
+                      <label>Pending approval</label>
+                    </div>
+                  </div>
+                  <div class="chart clearfix">
+                    <div class="chartCritical" data-percent="0">
+                      <div id="criticalBugs">
+                        0
+                      </div>
+                    </div>
+                    <div class="caption text-center">
+                      <label>Critical Bugs</label>
+                    </div>
+                  </div>
+                  <div class="chart clearfix">
+                    <div class="chartHigh" data-percent="0">
+                      <div id="highBugs">
+                        0
+                      </div>
+                    </div>
+                    <div class="caption text-center">
+                      <label>High Priority</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
           </div>
-          <div class="panel-body fixed-panel text-center">
-            <div class="overview clearfix">
-              <div class="chart clearfix">
-                <div class="chartTotal" data-percent="73">220</div>
-                <div class="caption text-center">
-                  <label>Total Bugs</label>
-                </div>
+
+          <div class="row clearfix">
+              <div class="col-sm-7">
+                  <div class="panel panel-primary resp">
+                      <div class="panel-heading">
+                        <h3 class="panel-title">Team Members</h3>
+                      </div>
+                      <div class="panel-body fixed-panel events">
+                        <div class="row">
+                          <div class="col-sm-6">
+                            <label>Testers</label>
+                            <div class="well testers" id="testers">
+
+                            </div>
+                          </div>
+                          <div class="col-sm-6">
+                            <label>Developers</label>
+                            <div class="well developers" id="developers">
+
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                  </div>
               </div>
-              <div class="chart clearfix">
-                <div class="chartOpen" data-percent="73">220</div>
-                <div class="caption text-center">
-                  <label>Open Bugs</label>
-                </div>
+              <div class="col-sm-5">
+                  <div class="panel panel-primary resp">
+                      <div class="panel-heading">
+                        <h3 class="panel-title">Statistics</h3>
+                      </div>
+                      <div class="panel-body fixed-panel events">
+                        <div class="row event">
+                          <div class="col-sm-2">
+                            <div class="counter">
+                              <span class="openCounter">
+                              0
+                              </span>
+                            </div>
+                          </div>
+                          <div class="col-sm-10 event-detail">
+                            <p>Open Bugs</p>
+                          </div>
+                        </div>
+                        <div class="row event">
+                          <div class="col-sm-2">
+                            <div class="counter">
+                              <span class="assignedCounter">
+                              0
+                              </span>
+                            </div>
+                          </div>
+                          <div class="col-sm-10 event-detail">
+                            <p>Assigned Bugs</p>
+                          </div>
+                        </div>
+                        <div class="row event">
+                          <div class="col-sm-2">
+                            <div class="counter">
+                              <span class="reviewCounter">
+                              0
+                              </span>
+                            </div>
+                          </div>
+                          <div class="col-sm-10 event-detail">
+                            <p>Bugs Under Review</p>
+                          </div>
+                        </div>
+                        <div class="row event">
+                          <div class="col-sm-2">
+                            <div class="counter">
+                              <span class="approvalCounter">
+                              0
+                              </span>
+                            </div>
+                          </div>
+                          <div class="col-sm-10 event-detail">
+                            <p>Bugs Pending Approval</p>
+                          </div>
+                        </div>
+                        <div class="row event">
+                          <div class="col-sm-2">
+                            <div class="counter">
+                              <span class="rejectedCounter">
+                              0
+                              </span>
+                            </div>
+                          </div>
+                          <div class="col-sm-10 event-detail">
+                            <p>Bugs Rejected</p>
+                          </div>
+                        </div>
+                        <div class="row event">
+                          <div class="col-sm-2">
+                            <div class="counter">
+                              <span class="closedCounter">
+                              0
+                              </span>
+                            </div>
+                          </div>
+                          <div class="col-sm-10 event-detail">
+                            <p>Bugs Closed</p>
+                          </div>
+                        </div>
+                        <div class="row event">
+                          <div class="col-sm-2">
+                            <div class="counter">
+                              <span class="criticalCounter">
+                              0
+                              </span>
+                            </div>
+                          </div>
+                          <div class="col-sm-10 event-detail">
+                            <p>Critical Bugs</p>
+                          </div>
+                        </div>
+                        <div class="row event">
+                          <div class="col-sm-2">
+                            <div class="counter">
+                              <span class="majorCounter">
+                              0
+                              </span>
+                            </div>
+                          </div>
+                          <div class="col-sm-10 event-detail">
+                            <p>Major Bugs</p>
+                          </div>
+                        </div>
+                        <div class="row event">
+                          <div class="col-sm-2">
+                            <div class="counter">
+                              <span class="minorCounter">
+                              0
+                              </span>
+                            </div>
+                          </div>
+                          <div class="col-sm-10 event-detail">
+                            <p>Minor Bugs</p>
+                          </div>
+                        </div>
+                        <div class="row event">
+                          <div class="col-sm-2">
+                            <div class="counter">
+                              <span class="highCounter">
+                              0
+                              </span>
+                            </div>
+                          </div>
+                          <div class="col-sm-10 event-detail">
+                            <p>High Priority Bugs</p>
+                          </div>
+                        </div>
+                        <div class="row event">
+                          <div class="col-sm-2">
+                            <div class="counter">
+                              <span class="mediumCounter">
+                              0
+                              </span>
+                            </div>
+                          </div>
+                          <div class="col-sm-10 event-detail">
+                            <p>Medium Priority Bugs</p>
+                          </div>
+                        </div>
+                        <div class="row event">
+                          <div class="col-sm-2">
+                            <div class="counter">
+                              <span class="lowCounter">
+                              0
+                              </span>
+                            </div>
+                          </div>
+                          <div class="col-sm-10 event-detail">
+                            <p>Low Priority Bugs</p>
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>
               </div>
-              <div class="chart clearfix">
-                <div class="chartClosed" data-percent="73">220</div>
-                <div class="caption text-center">
-                  <label>Closed Bugs</label>
-                </div>
-              </div>
-              <div class="chart clearfix">
-                <div class="chartApproval" data-percent="73">220</div>
-                <div class="caption text-center">
-                  <label>Pending approval</label>
-                </div>
-              </div>
-              <div class="chart clearfix">
-                <div class="chartCritical" data-percent="73">220</div>
-                <div class="caption text-center">
-                  <label>Critical Bugs</label>
-                </div>
-              </div>
-              <div class="chart clearfix">
-                <div class="chartHigh" data-percent="73">220</div>
-                <div class="caption text-center">
-                  <label>High Priority</label>
-                </div>
-              </div>
-            </div>
-          </div>
           </div>
 
         </div>
         <script src="/easyPieChart.js"></script>
         <script src="/validator.min.js"></script>
         <script src="/axios.min.js" charset="utf-8"></script>
+        <script src="/overview.js" charset="utf-8"></script>
     </body>
 </html>

@@ -5,9 +5,14 @@ var md5 = require('md5');
 
     app.get('/admin/bugReports/overview', isLoggedIn, function(req, res) {
         if (req.user.class == 0) {
+          getProjectsManage(req).then(function(projectsRes) {
             res.render('overview.ejs', {
-              user: req.user
+              user: req.user,
+              proj: projectsRes
             });
+          }).catch(function(err) {
+              console.log(err);
+          });
         } else {
             console.log("Forbidden access");
             res.end("Forbidden access");

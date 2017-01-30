@@ -39,7 +39,7 @@ module.exports = function(app, passport, expressValidator) {
     // Home page. Login verified using isLoggedIn.
     app.get('/home', isLoggedIn, function(req, res) {
         if (req.user.class == 0) {
-            res.redirect('/admin/bugReports/unassignedBugs');
+            res.redirect('/admin/bugReports/overview');
         }
         if (req.user.class == 1) {
             res.redirect('/tester/testerTasks');
@@ -74,6 +74,19 @@ module.exports = function(app, passport, expressValidator) {
                 res.send(devResult);
             }
         });
+    });
+
+    app.post('/getBugsProject', isLoggedIn, function(req, res) {
+
+      connection.query("SELECT * FROM bugs WHERE project_id = ?", [req.body.proj], function(err, bugsProjectResult) {
+          if (err)
+              res.send(err);
+          else {
+              console.log(bugsProjectResult);
+              res.send(bugsProjectResult);
+          }
+      });
+
     });
 
     app.post('/getTesters', isLoggedIn, function(req, res) {
