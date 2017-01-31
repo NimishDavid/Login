@@ -81,6 +81,11 @@ module.exports = function (app, passport, expressValidator, connection, isLogged
 
         if (req.user.class == 1) {
 
+           var date = new Date();
+           var year = date.getFullYear();
+           var month = date.getMonth();
+           var day = date.getDate();
+           var today = year + "-" + (month + 1) + "-" + day;
           if(req.body.filename) {
             var message;
             var extension = req.body.filename.split(".")[1];
@@ -102,7 +107,7 @@ module.exports = function (app, passport, expressValidator, connection, isLogged
             if (!errors) { //No errors were found.  Passed Validation!
                 function reportBug() {
                     return new Promise(function(resolve, reject) {
-                        var dbQuery = "INSERT INTO `bug_tracker`.`bugs` (`id`, `name`, `bug_type`, `description`, `project_id`, `file`, `method`, `line`, `priority`, `severity`, `status`, `tester_id`, `developer_id`, `screenshot`) VALUES (NULL, \"" + req.body.bug_name + "\", \"" + req.body.bug_type + "\", \"" + req.body.bug_description + "\", \"" + req.body.project + "\", \"" + req.body.file + "\", \"" + req.body.method + "\", \"" + req.body.line + "\", \"" + req.body.priority + "\", \"" + req.body.severity + "\", \"Open\", \"" + req.user.id + "\" , NULL, \""+ req.body.filename +"\")";
+                        var dbQuery = "INSERT INTO `bug_tracker`.`bugs` (`id`, `name`, `bug_type`, `description`, `project_id`, `file`, `method`, `line`, `priority`, `severity`, `status`, `tester_id`, `developer_id`, `screenshot`, `date`) VALUES (NULL, \"" + req.body.bug_name + "\", \"" + req.body.bug_type + "\", \"" + req.body.bug_description + "\", \"" + req.body.project + "\", \"" + req.body.file + "\", \"" + req.body.method + "\", \"" + req.body.line + "\", \"" + req.body.priority + "\", \"" + req.body.severity + "\", \"Open\", \"" + req.user.id + "\" , NULL, \""+ req.body.filename +"\", \""+today+"\")";
 
                         connection.query(dbQuery, function(err, rows) {
                             if (err)
@@ -179,7 +184,7 @@ module.exports = function (app, passport, expressValidator, connection, isLogged
             if (!errors) { //No errors were found.  Passed Validation!
                 function reportBug() {
                     return new Promise(function(resolve, reject) {
-                        var dbQuery = "INSERT INTO `bug_tracker`.`bugs` (`id`, `name`, `bug_type`, `description`, `project_id`, `file`, `method`, `line`, `priority`, `severity`, `status`, `tester_id`, `developer_id`) VALUES (NULL, \"" + req.body.bug_name + "\", \"" + req.body.bug_type + "\", \"" + req.body.bug_description + "\", \"" + req.body.project + "\", \"" + req.body.file + "\", \"" + req.body.method + "\", \"" + req.body.line + "\", \"" + req.body.priority + "\", \"" + req.body.severity + "\", \"Open\", \"" + req.user.id + "\" , NULL)";
+                        var dbQuery = "INSERT INTO `bug_tracker`.`bugs` (`id`, `name`, `bug_type`, `description`, `project_id`, `file`, `method`, `line`, `priority`, `severity`, `status`, `tester_id`, `developer_id`, `date`) VALUES (NULL, \"" + req.body.bug_name + "\", \"" + req.body.bug_type + "\", \"" + req.body.bug_description + "\", \"" + req.body.project + "\", \"" + req.body.file + "\", \"" + req.body.method + "\", \"" + req.body.line + "\", \"" + req.body.priority + "\", \"" + req.body.severity + "\", \"Open\", \"" + req.user.id + "\" , NULL, \""+ today +"\")";
 
                         connection.query(dbQuery, function(err, rows) {
                             if (err)

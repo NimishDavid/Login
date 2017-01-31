@@ -21,6 +21,7 @@ $('#exampleModal').on('show.bs.modal', function (event) {
         modal.find('#tester_id').val(bugDetails[1].userName);
         modal.find('#project_manager').val(bugDetails[0].userName);
         modal.find('#file').val(bugDetails[0].file);
+        modal.find('#date').val(moment(bugDetails[0].date).format('DD-MM-YYYY'));
         modal.find('#method').val(bugDetails[0].method);
         modal.find('#line').val(bugDetails[0].line);
         modal.find("#scrImg").attr("src",'/screenshots/'+bugDetails[0].screenshot);

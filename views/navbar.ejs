@@ -73,8 +73,14 @@
                   <ul class="dropdown-menu">
                     <li><a href="/logout">Logout&nbsp<i class="fa fa-sign-out" aria-hidden="true"></i></a></li>
                     <li role="separator" class="divider"></li>
-                    <li><a href="#">User ID : <%= user.id %> </a></li>
                     <li><a href="#">Employee ID : <%= user.employee_id %> </a></li>
+                    <% if(user.class == 0) { %>
+                      <li><a href="#">Class : Admin </a></li>
+                    <% } else if(user.class == 1) { %>
+                      <li><a href="#">Class : Tester </a></li>
+                    <% } else if(user.class == 2) { %>
+                      <li><a href="#">Class : Developer </a></li>
+                    <% } %>
                     <li><a href="#">Email : <%= user.email %> </a></li>
                   </ul>
                 </li>
