@@ -646,7 +646,7 @@ var md5 = require('md5');
     // Add a new project
     app.post('/admin/manageProjects/addProjects', isLoggedIn, function(req, res) {
         if (req.user.class == 0) {
-            req.assert('project_name').notEmpty();
+            req.assert('project_name').notEmpty().matches(/^[a-zA-Z0-9\s]+$/);
             var errors = req.validationErrors();
             if (!errors) {
                 console.log("No validation errors!");
@@ -750,11 +750,11 @@ var md5 = require('md5');
 
     app.post('/admin/addUsers', isLoggedIn, function(req, res) {
         if (req.user.class == 0) {
-            req.assert('name').notEmpty();
+            req.assert('name').notEmpty().matches(/^[a-zA-Z\s]+$/);
             req.assert('employee_id').notEmpty().isInt().isLength(3);
             req.assert('employee_type').notEmpty().isInt();
             req.assert('email').notEmpty().isEmail();
-            req.assert('password').notEmpty();
+            req.assert('password').notEmpty().isLength(6,50);
             req.assert('passwordre').notEmpty();
             var errors = req.validationErrors();
             if (!errors) {

@@ -35,3 +35,7 @@
   height: 230px;
   overflow: auto;
 }
+
+.event-detail {
+  display: inline-block;
+}

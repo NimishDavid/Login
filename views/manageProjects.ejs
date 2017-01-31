@@ -48,8 +48,8 @@
                             <form class="" action="/admin/manageProjects/addProjects" method="post" data-toggle="validator">
 
                                 <div class="col-sm-6 form-group">
-                                  <input type="text" name="project_name" placeholder="Project Name" class="form-control" required>
-                                  <div class="help-block with-errors"></div>
+                                  <input type="text" name="project_name" placeholder="Project Name" class="form-control" pattern="^[a-zA-Z0-9\s]+$" required>
+                                  <div class="help-block with-errors">Alphanumeric characters only</div>
                                 </div>
                                 <div class="col-sm-1">
                                   <input type="submit" class="btn btn-md btn-primary" value="Submit">

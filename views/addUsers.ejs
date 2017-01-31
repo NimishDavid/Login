@@ -36,14 +36,14 @@
                     <div class="row">
                         <div class="col-sm-6 form-group">
                             <label>Name</label>
-                            <input class="form-control" name="name" placeholder="Name" type="text"
+                            <input class="form-control" name="name" placeholder="Name" type="text" pattern="^[a-zA-Z\s]+$"
                                 required autofocus />
-                            <div class="help-block with-errors"></div>
+                            <div class="help-block with-errors">Only alphabets</div>
                         </div>
                         <div class="col-sm-3 form-group">
                             <label>Employee ID</label>
                             <input class="form-control" name="employee_id" id="employee_id" placeholder="Employee ID" type="text" pattern="^[0-9]{3}$" maxlength= "3" data-remote="/admin/checkUser" required />
-                            <div class="help-block with-errors"></div>
+                            <div class="help-block with-errors">3 Digit number</div>
                         </div>
                         <div class="col-sm-3 form-group">
                             <label>Employee Type</label>
@@ -69,8 +69,8 @@
                         <div class="col-sm-12">
                             <div class="form-group">
                                 <label>Password</label>
-                                <input class="form-control" name="password" id= "password" placeholder="New Password" type="password" required/>
-                                <div class="help-block with-errors"></div>
+                                <input class="form-control" name="password" id= "password" placeholder="New Password" type="password" data-minlength="6" required/>
+                                <div class="help-block with-errors">Minimum 6 characters</div>
                             </div>
                         </div>
                     </div>
