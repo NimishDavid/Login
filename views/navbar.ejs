@@ -50,7 +50,13 @@
                       </ul>
                     </li>
                     <li><a href="/admin/manageProjects"><i class="fa fa-folder-open-o" aria-hidden="true"></i>&nbsp&nbspManage Projects</a></li>
-                    <li><a href="/admin/manageUsers"><i class="fa fa-user-plus" aria-hidden="true"></i>&nbsp&nbspManage Users</a></li>
+                    <li class="dropdown">
+                      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-user-plus" aria-hidden="true"></i>&nbsp&nbspManage Users&nbsp<span class="caret"></span></a>
+                      <ul class="dropdown-menu">
+                        <li><a href="/admin/manageUsers/addUsers">Add Users</a></li>
+                        <li><a href="/admin/manageUsers/removeUsers">Remove Users</a></li>
+                      </ul>
+                    </li>
                   </ul>
               <% } else if(user.class == 1) {%>
                   <ul class="nav navbar-nav">

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Add Users</title>
+        <style media="screen">
+        </style>
+        <script src="/jquery.min.js" charset="utf-8"></script>
+        <script src="/validator.js" charset="utf-8"></script>
+        <link rel="stylesheet" href="/style/addUser.css">
+    </head>
+    <body>
+        <% include navbar %>
+        <div class="container">
+        <% if(typeof(msg) != 'undefined') { %>
+            <%if(msg == 'successAdd') {%>
+                <div class="alert alert-success alert-dismissable fade in col-sm-8 col-sm-offset-2">
+                    <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                    <strong>Success!</strong>&nbspNew user added.
+                </div>
+            <% } else if((msg == 'failAdd') || (msg == 'failRem')) {%>
+                <div class="alert alert-danger alert-dismissable fade in col-sm-8 col-sm-offset-2">
+                    <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                    <strong>Error!</strong>&nbspOperation failed.
+                </div>
+            <% } else if(msg == 'successRem') { %>
+              <div class="alert alert-success alert-dismissable fade in col-sm-8 col-sm-offset-2">
+                  <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                  <strong>Success!</strong>&nbspUser removed.
+              </div>
+            <% } %>
+        <% } %>
+    <div class="row">
+        <div class="col-sm-8 col-sm-offset-2">
+
+            <div class="panel panel-primary resp">
+                <div class="panel-heading">
+                  <h3 class="panel-title">Remove Users</h3>
+                </div>
+                <div class="panel-body fixed-panel remove_panel">
+                  <div class="col-md-12">
+                    <div class="col-md-1"><input type="checkbox" name="users" value= "" disabled></div>
+                    <div class="col-md-3"><strong><p>User Name</p></strong></div>
+                    <div class="col-md-3"><strong><p>Role</p></strong></div>
+                  </div>
+                    <form class="" action="/admin/manageUsers/removeUsers" method="post" onsubmit="return confirm('Do you really want to remove the users(s)?');">
+                    <div id="usersRemove">
+                    <% if(typeof(users) != 'undefined') { %>
+                      <% users.forEach(function(item, index) {%>
+                        <div class="col-sm-12">
+                            <div class="col-sm-1">
+                                <label>
+                                    <input type="checkbox" name="users[]" value= "<%= item.id %>">
+                                </label>
+                            </div>
+                          <div class="col-sm-3">
+                              <p> <%= item.name %> </p>
+                          </div>
+                          <div class="col-sm-3">
+                              <% if(item.class == 0) { %>
+                                <p>Admin</p>
+                              <% } else if(item.class == 1) { %>
+                                <p>Tester</p>
+                              <% } else if(item.class == 2) { %>
+                                <p>Developer</p>
+                              <% } %>
+                          </div>
+                        </div>
+                      <% }); %>
+                  <% } %>
+                </div>
+                  <div class="row">
+                    <div class="col-sm-1 form-group col-sm-offset-10 ">
+                        <input type="submit" class="btn btn-md btn-primary checkBtn" value="Remove">
+                    </div>
+                  </div>
+                  </form>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+    </div>
+<script src="/axios.min.js" charset="utf-8"></script>
+<script src="/checkboxValidateUser.js"></script>
+    </body>
+</html>

@@ -737,14 +737,25 @@ var md5 = require('md5');
         }
     });
 
-    app.get('/admin/manageUsers', isLoggedIn, function(req, res) {
+    app.get('/admin/manageUsers/addUsers', isLoggedIn, function(req, res) {
+        if (req.user.class == 0) {
+            res.render('addUsers.ejs', {
+                user: req.user
+            });
+        } else {
+            console.log("Forbidden access");
+            res.end("Forbidden access");
+        }
+    });
+
+    app.get('/admin/manageUsers/removeUsers', isLoggedIn, function(req, res) {
         if (req.user.class == 0) {
           var dbQuery = "SELECT * FROM users WHERE flag = 1";
           connection.query(dbQuery, function(err, usersResult) {
               if (err)
                   console.log(err);
               else {
-                res.render('manageUsers.ejs', {
+                res.render('removeUsers.ejs', {
                     user: req.user,
                     users: usersResult
                 });
@@ -756,7 +767,7 @@ var md5 = require('md5');
         }
     });
 
-    app.post('/admin/manageUsers/addUser', isLoggedIn, function(req, res) {
+    app.post('/admin/manageUsers/addUsers', isLoggedIn, function(req, res) {
         if (req.user.class == 0) {
             req.assert('name').notEmpty().matches(/^[a-zA-Z\s]+$/);
             req.assert('employee_id').notEmpty().isInt().isLength(3);
@@ -779,13 +790,13 @@ var md5 = require('md5');
                   });
                 }
                 addUserAdmin().then(function() {
-                    res.render('manageUsers.ejs', {
+                    res.render('addUsers.ejs', {
                         msg: "successAdd",
                         user: req.user
                     });
                 }).catch(function(err) {
                     console.log(err);
-                    res.render('manageUsers.ejs', {
+                    res.render('addUsers.ejs', {
                         msg: "failAdd",
                         user: req.user
                     });
@@ -819,7 +830,7 @@ var md5 = require('md5');
                           if (err)
                               console.log(err);
                           else {
-                            res.render('manageUsers.ejs', {
+                            res.render('removeUsers.ejs', {
                                 user: req.user,
                                 users: usersResult,
                                 msg: "failRem"
@@ -832,7 +843,7 @@ var md5 = require('md5');
                           if (err)
                               console.log(err);
                           else {
-                            res.render('manageUsers.ejs', {
+                            res.render('removeUsers.ejs', {
                                 user: req.user,
                                 users: usersResult,
                                 msg: "successRem"

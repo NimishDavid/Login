@@ -64,7 +64,7 @@ module.exports = function(app, passport, expressValidator) {
 
     app.post('/getDevs', isLoggedIn, function(req, res) {
         console.log('getDevs entered');
-        var dbQuery = "SELECT users.id AS devID, users.name AS devName, projects.id AS projectId, projects.name AS projectName FROM project_team JOIN projects JOIN users ON project_team.user_id = users.id AND project_team.project_id = ? AND projects.id = project_team.project_id AND users.class = 2";
+        var dbQuery = "SELECT users.id AS devID, users.name AS devName, projects.id AS projectId, projects.name AS projectName FROM project_team JOIN projects JOIN users ON project_team.user_id = users.id AND project_team.project_id = ? AND projects.id = project_team.project_id AND users.class = 2 AND users.flag = 1";
         console.log(req.body.proj);
         connection.query(dbQuery, [req.body.proj], function(err, devResult) {
             if (err)
@@ -91,7 +91,7 @@ module.exports = function(app, passport, expressValidator) {
 
     app.post('/getTesters', isLoggedIn, function(req, res) {
         console.log('getTesters entered');
-        var dbQuery = "SELECT users.id AS testerID, users.name AS testerName, projects.name AS projectName, projects.id AS projectId FROM project_team JOIN users JOIN projects ON project_team.user_id = users.id AND project_team.project_id = ? AND projects.id = project_team.project_id AND users.class = 1";
+        var dbQuery = "SELECT users.id AS testerID, users.name AS testerName, projects.name AS projectName, projects.id AS projectId FROM project_team JOIN users JOIN projects ON project_team.user_id = users.id AND project_team.project_id = ? AND projects.id = project_team.project_id AND users.class = 1 AND users.flag = 1";
         connection.query(dbQuery, [req.body.proj], function(err, testerResult) {
             if (err)
                 res.send(err);
@@ -104,7 +104,7 @@ module.exports = function(app, passport, expressValidator) {
 
     app.post('/getTestersAdd', isLoggedIn, function(req, res) {
         console.log('getTesters entered');
-        var dbQuery = "SELECT DISTINCT(users.id) AS testerId, users.name AS testerName, projects.id AS projectId FROM users JOIN project_team JOIN projects ON projects.id = project_team.project_id AND users.class = 1 AND projects.id != ? WHERE users.id NOT IN (SELECT DISTINCT(users.id) FROM projects JOIN project_team JOIN users ON project_team.user_id = users.id AND projects.id = project_team.project_id AND users.class = 1 AND projects.id = ?) GROUP BY users.id";
+        var dbQuery = "SELECT DISTINCT(users.id) AS testerId, users.name AS testerName, projects.id AS projectId FROM users JOIN project_team JOIN projects ON projects.id = project_team.project_id AND users.class = 1 AND projects.id != ? AND users.flag = 1 WHERE users.id NOT IN (SELECT DISTINCT(users.id) FROM projects JOIN project_team JOIN users ON project_team.user_id = users.id AND projects.id = project_team.project_id AND users.class = 1 AND projects.id = ?) GROUP BY users.id";
         console.log(req.body.proj);
         connection.query(dbQuery, [req.body.proj, req.body.proj], function(err, testerResult) {
             if (err)
@@ -118,7 +118,7 @@ module.exports = function(app, passport, expressValidator) {
 
     app.post('/getDevelopersAdd', isLoggedIn, function(req, res) {
         console.log('getDevelopers entered');
-        var dbQuery = "SELECT DISTINCT(users.id) AS developerId, users.name AS developerName, projects.id AS projectId FROM users JOIN project_team JOIN projects ON projects.id = project_team.project_id AND users.class = 2 AND projects.id != ? WHERE users.id NOT IN (SELECT DISTINCT(users.id) FROM projects JOIN project_team JOIN users ON project_team.user_id = users.id AND projects.id = project_team.project_id AND users.class = 2 AND projects.id = ?) GROUP BY users.id";
+        var dbQuery = "SELECT DISTINCT(users.id) AS developerId, users.name AS developerName, projects.id AS projectId FROM users JOIN project_team JOIN projects ON projects.id = project_team.project_id AND users.class = 2 AND projects.id != ? AND users.flag = 1 WHERE users.id NOT IN (SELECT DISTINCT(users.id) FROM projects JOIN project_team JOIN users ON project_team.user_id = users.id AND projects.id = project_team.project_id AND users.class = 2 AND projects.id = ?) GROUP BY users.id";
         console.log(req.body.proj);
         connection.query(dbQuery, [req.body.proj, req.body.proj], function(err, developerResult) {
             if (err)
