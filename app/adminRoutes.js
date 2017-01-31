@@ -737,10 +737,18 @@ var md5 = require('md5');
         }
     });
 
-    app.get('/admin/addUsers', isLoggedIn, function(req, res) {
+    app.get('/admin/manageUsers', isLoggedIn, function(req, res) {
         if (req.user.class == 0) {
-          res.render('addUsers.ejs', {
-              user: req.user
+          var dbQuery = "SELECT * FROM users WHERE flag = 1";
+          connection.query(dbQuery, function(err, usersResult) {
+              if (err)
+                  console.log(err);
+              else {
+                res.render('manageUsers.ejs', {
+                    user: req.user,
+                    users: usersResult
+                });
+              }
           });
         } else {
             console.log("Forbidden access");
@@ -748,7 +756,7 @@ var md5 = require('md5');
         }
     });
 
-    app.post('/admin/addUsers', isLoggedIn, function(req, res) {
+    app.post('/admin/manageUsers/addUser', isLoggedIn, function(req, res) {
         if (req.user.class == 0) {
             req.assert('name').notEmpty().matches(/^[a-zA-Z\s]+$/);
             req.assert('employee_id').notEmpty().isInt().isLength(3);
@@ -771,18 +779,71 @@ var md5 = require('md5');
                   });
                 }
                 addUserAdmin().then(function() {
-                    res.render('addUsers.ejs', {
-                        msg: "success",
+                    res.render('manageUsers.ejs', {
+                        msg: "successAdd",
                         user: req.user
                     });
                 }).catch(function(err) {
                     console.log(err);
-                    res.render('addUsers.ejs', {
-                        msg: "fail",
+                    res.render('manageUsers.ejs', {
+                        msg: "failAdd",
                         user: req.user
                     });
                 });
             } else {
+                console.log("Invalid input");
+                res.end("Invalid input");
+            }
+        } else {
+            console.log("Forbidden access");
+            res.end("Forbidden access");
+        }
+    });
+
+    app.post('/admin/manageUsers/removeUsers', isLoggedIn, function(req, res) {
+        if (req.user.class == 0) {
+            req.assert('users').notEmpty();
+            var errors = req.validationErrors();
+            if (!errors) {
+                console.log("No validation errors!");
+                var t = "";
+                req.body.users.forEach(function(item, index) {
+     	            t += item+", ";
+                });
+                t = t.slice(0, -2);
+                dbQuery = "UPDATE users SET flag = '0' WHERE id IN ("+ t +")";
+                connection.query(dbQuery, function(err, rows) {
+                    if (err) {
+                      var dbQuery = "SELECT * FROM users WHERE flag = 1";
+                      connection.query(dbQuery, function(err, usersResult) {
+                          if (err)
+                              console.log(err);
+                          else {
+                            res.render('manageUsers.ejs', {
+                                user: req.user,
+                                users: usersResult,
+                                msg: "failRem"
+                            });
+                          }
+                      });
+                    } else {
+                      var dbQuery = "SELECT * FROM users WHERE flag = 1";
+                      connection.query(dbQuery, function(err, usersResult) {
+                          if (err)
+                              console.log(err);
+                          else {
+                            res.render('manageUsers.ejs', {
+                                user: req.user,
+                                users: usersResult,
+                                msg: "successRem"
+                            });
+                          }
+                      });
+                    }
+                });
+            }
+            else {
+                console.log(errors);
                 console.log("Invalid input");
                 res.end("Invalid input");
             }
@@ -852,7 +913,7 @@ var md5 = require('md5');
     // Get list of testers in the existing project team
     function getTestersRem(req, projectsRes) {
         return new Promise(function(resolve, reject) {
-            var dbQuery1 = "SELECT users.id AS testerId, users.name AS testerName, projects.id AS projectId, projects.name AS projectName FROM projects JOIN project_team JOIN users ON project_team.user_id = users.id AND projects.id = project_team.project_id AND users.class = 1 AND projects.manager_id = ? AND projects.status = 'Open'";
+            var dbQuery1 = "SELECT users.id AS testerId, users.name AS testerName, projects.id AS projectId, projects.name AS projectName FROM projects JOIN project_team JOIN users ON project_team.user_id = users.id AND projects.id = project_team.project_id AND users.class = 1 AND projects.manager_id = ? AND projects.status = 'Open' AND users.flag = 1";
             connection.query(dbQuery1, [req.user.id], function(err, testResRem) {
                 if (err) {
                     reject(err);
@@ -866,7 +927,7 @@ var md5 = require('md5');
     // Get list of testers who are not yet in at least one of the projects managed by the admin
     function getTestersAdd(req, projectsRes, testResRem) {
         return new Promise(function(resolve, reject) {
-            var dbQuery2 = "SELECT DISTINCT(users.id) AS testerId, users.name AS testerName, projects.id AS projectId FROM users JOIN project_team JOIN projects ON projects.id = project_team.project_id AND users.class = 1 AND projects.manager_id != ? AND projects.status = 'Open'";
+            var dbQuery2 = "SELECT DISTINCT(users.id) AS testerId, users.name AS testerName, projects.id AS projectId FROM users JOIN project_team JOIN projects ON projects.id = project_team.project_id AND users.class = 1 AND projects.manager_id != ? AND projects.status = 'Open' AND users.flag = 1";
             connection.query(dbQuery2, [req.user.id, req.user.id], function(err, testResAdd) {
                 if (err) {
                     reject(err);
@@ -880,7 +941,7 @@ var md5 = require('md5');
     // Get list of developers who are in the existing project team
     function getDevelopersRem(req, projectsRes) {
         return new Promise(function(resolve, reject) {
-            var dbQuery1 = "SELECT users.id AS developerId, users.name AS developerName, projects.id AS projectId, projects.name AS projectName FROM projects JOIN project_team JOIN users ON project_team.user_id = users.id AND projects.id = project_team.project_id AND users.class = 2 AND projects.manager_id = ? AND projects.status = 'Open'";
+            var dbQuery1 = "SELECT users.id AS developerId, users.name AS developerName, projects.id AS projectId, projects.name AS projectName FROM projects JOIN project_team JOIN users ON project_team.user_id = users.id AND projects.id = project_team.project_id AND users.class = 2 AND projects.manager_id = ? AND projects.status = 'Open' AND users.flag = 1";
             connection.query(dbQuery1, [req.user.id], function(err, devResRem) {
                 if (err) {
                     reject(err);
@@ -894,7 +955,7 @@ var md5 = require('md5');
     // Get list of developers who are not in at least one of the projects managed by the admin
     function getDevelopersAdd(req, projectsRes, devResRem) {
         return new Promise(function(resolve, reject) {
-            var dbQuery2 = "SELECT DISTINCT(users.id) AS developerId, users.name AS developerName, projects.id AS projectId FROM users JOIN project_team JOIN projects ON projects.id = project_team.project_id AND users.class = 2 AND projects.manager_id != ? AND projects.status = 'Open'";
+            var dbQuery2 = "SELECT DISTINCT(users.id) AS developerId, users.name AS developerName, projects.id AS projectId FROM users JOIN project_team JOIN projects ON projects.id = project_team.project_id AND users.class = 2 AND projects.manager_id != ? AND projects.status = 'Open' AND users.flag = 1";
             connection.query(dbQuery2, [req.user.id, req.user.id], function(err, devResAdd) {
                 if (err) {
                     reject(err);
