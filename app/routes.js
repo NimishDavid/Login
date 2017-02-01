@@ -29,7 +29,7 @@ module.exports = function(app, passport, expressValidator) {
             console.log("Login success");
 
             if (req.body.remember) {
-                req.session.cookie.maxAge = 1000 * 60 * 3;
+                req.session.cookie.maxAge = 1000 * 60 * 60;
             } else {
                 req.session.cookie.expires = false;
             }
