@@ -95,6 +95,7 @@ module.exports = function(app, passport, expressValidator) {
                 res.end("Invalid link");
               }
               else {
+                console.log(rows[0].time);
                 res.render('resetPassword.ejs', {
                   reqID: req.params.params
                 });
