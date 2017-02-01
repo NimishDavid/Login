@@ -2,6 +2,8 @@ module.exports = function(app, passport, expressValidator) {
     var async = require('async');
     var dbconfig = require('../config/database');
     var mysql = require('mysql');
+    var random = require('randomstring');
+    var md5 = require('md5');
     var connection = mysql.createConnection(dbconfig.connection);
     connection.query('USE ' + dbconfig.database);
     var nodemailer = require('nodemailer');
@@ -41,6 +43,123 @@ module.exports = function(app, passport, expressValidator) {
         // Render the page and pass in any flash data if it exists
         res.render('forgotPassword.ejs', {
         });
+    });
+
+    app.post('/forgotPassword', function(req, res) {
+      req.assert('username').notEmpty().isLength(3).isInt();
+      req.assert('email').notEmpty().isEmail();
+      var errors = req.validationErrors();
+      if( !errors) {
+        console.log("No validation errors");
+        connection.query("SELECT * FROM users WHERE employee_id = ? AND email = ?",[req.body.username, req.body.email], function(err, rows){
+            if (err)
+                console.log(err);
+            else {
+              if (!rows.length) {
+                res.render('forgotPassword.ejs', {
+                  message: "fail"
+                });
+              }
+              else {
+                var reqID = random.generate({ length:10, charset:'alphabetic'});
+                connection.query("INSERT INTO password_change_requests (request_id, employee_id) VALUES (?, ?)",[md5(reqID), req.body.username], function(err, rows){
+                    if (err)
+                        console.log(err);
+                    else {
+                      var subject = "Bug Tracker : Reset Password"
+                      var content = "Please click the link below to reset your password :\nhttp://192.168.1.233:8000/resetPassword/"+reqID;
+                      sendMail(req.body.email, subject, content);
+                      res.render('forgotPassword.ejs', {
+                        message: "success"
+                      });
+                    }
+                });
+              }
+            }
+        });
+      }
+      else {
+        console.log("Invalid input");
+        res.end("Invalid input");
+      }
+    });
+
+    app.get('/resetPassword/:params', function(req, res) {
+      var dbQuery = "SELECT * FROM password_change_requests WHERE request_id = ? AND flag = 1";
+      console.log(req.body.bug);
+      connection.query(dbQuery, [md5(req.params.params)], function(err, rows) {
+          if (err)
+              console.log(err);
+          else {
+              if(!rows.length) {
+                res.end("Invalid link");
+              }
+              else {
+                res.render('resetPassword.ejs', {
+                  reqID: req.params.params
+                });
+              }
+          }
+      });
+    });
+
+    app.post('/resetPassword', function(req, res) {
+      req.assert('password').notEmpty().isLength(6,50);
+      req.assert('passwordre').notEmpty();
+      req.assert('req_id').notEmpty();
+      var errors = req.validationErrors();
+      if (!errors) {
+          function getEmployee() {
+            return new Promise(function(resolve, reject) {
+              var dbQuery = "SELECT * FROM password_change_requests WHERE request_id = ?";
+              connection.query(dbQuery, [md5(req.body.req_id)], function(err, rows) {
+                  if (err)
+                      reject(err);
+                  else {
+                      if(!rows.length) {
+                        reject("Invalid link");
+                      }
+                      else {
+                        resolve([rows[0].employee_id, md5(req.body.req_id)]);
+                      }
+                  }
+              });
+            });
+          }
+          getEmployee().then(function(params) {
+            return new Promise(function(resolve, reject) {
+              var empID = params[0];
+              var reqID = params[1];
+              var dbQuery = "UPDATE users SET password = ? WHERE employee_id = ?";
+              connection.query(dbQuery, [md5(req.body.password), empID], function(err, devRes) {
+                  if (err)
+                      reject(err);
+                  else {
+                    resolve([empID, reqID]);
+                  }
+              });
+            });
+          }).then(function(params) {
+            return new Promise(function(resolve, reject) {
+              var dbQuery = "UPDATE password_change_requests SET flag = 0 WHERE request_id = ?";
+              connection.query(dbQuery, [params[1]], function(err, devRes) {
+                  if (err)
+                      reject(err);
+                  else {
+                    res.render('resetPassword.ejs', {
+                      message: "success"
+                    });
+                  }
+              });
+            });
+          }).catch(function(err) {
+              console.log(err);
+              res.end(err);
+          });
+      } else {
+          console.log("Invalid input");
+          res.end("Invalid input");
+      }
     });
 
     // Home page. Login verified using isLoggedIn.
