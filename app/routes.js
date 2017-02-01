@@ -34,7 +34,14 @@ module.exports = function(app, passport, expressValidator) {
                 req.session.cookie.expires = false;
             }
             res.redirect('/');
+    });
+
+    app.get('/forgotPassword', function(req, res) {
+
+        // Render the page and pass in any flash data if it exists
+        res.render('forgotPassword.ejs', {
         });
+    });
 
     // Home page. Login verified using isLoggedIn.
     app.get('/home', isLoggedIn, function(req, res) {
