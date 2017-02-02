@@ -70,7 +70,7 @@ module.exports = function(passport) {
           }
           else {
             console.log("Login failed");
-            return done(error);
+            return done(null, false, req.flash('loginMessage', 'Invalid input!'));
           }
         })
     );
