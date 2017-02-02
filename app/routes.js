@@ -51,7 +51,7 @@ module.exports = function(app, passport, expressValidator) {
       var errors = req.validationErrors();
       if( !errors) {
         console.log("No validation errors");
-        connection.query("SELECT * FROM users WHERE employee_id = ? AND email = ?",[req.body.username, req.body.email], function(err, rows){
+        connection.query("SELECT * FROM users WHERE employee_id = ? AND email = ? AND flag = 1",[req.body.username, req.body.email], function(err, rows){
             if (err)
                 console.log(err);
             else {

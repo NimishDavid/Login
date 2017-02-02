@@ -48,4 +48,4 @@ require('./app/routes.js')(app, passport,expressValidator);
 
 // Start Server
 app.listen(port);
-console.log('Server listening at port ' + port);
+console.log('Server listening on port #' + port);
